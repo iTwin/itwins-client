@@ -1,0 +1,16 @@
+# dependencies
+node_modules
+package-lock.json
+pnpm-debug.log
+
+# config files
+.env
+
+# build output
+/**/lib
+
+# pack output
+*.tgz
+
+# Mac specfic
+.DS_Store
