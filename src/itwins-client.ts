@@ -2,13 +2,13 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-export * from "./ProjectsClient";
-export * from "./ProjectsAccessProps";
+export * from "./iTwinsClient";
+export * from "./iTwinsAccessProps";
 /** @docs-package-description
- * The projects-client package provides a means of interfacing with services relating to projects which surround iModels.
+ * The itwins-client package provides a means of interfacing with services relating to iTwins.
  */
 
 /**
- * @docs-group-description ProjectsClient
- * Classes for communicating with the projects service.
+ * @docs-group-description iTwinsClient
+ * Classes for communicating with the iTwins service.
  */
