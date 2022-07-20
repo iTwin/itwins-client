@@ -5,7 +5,7 @@
 import * as chai from "chai";
 import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
-import type { iTwin } from "../../iTwinsAccessProps";
+import type { iTwin, iTwinsAPIResponse } from "../../iTwinsAccessProps";
 import { iTwinSubClass } from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
 
@@ -19,212 +19,171 @@ describe("iTwinsClient", () => {
     accessToken = await TestConfig.getAccessToken();
   });
 
-  it("should get a list of projects", async () => {
-    const iTwinsList: iTwin[] = await iTwinsAccessClient.queryAsync(
-      accessToken,
-      iTwinSubClass.Project
-    );
+  it("should get a list of project iTwins", async () => {
+    // Act
+    const iTwinsResponse: iTwinsAPIResponse<iTwin[]> =
+      await iTwinsAccessClient.queryAsync(accessToken, iTwinSubClass.Project);
 
-    // At least one project
-    chai.expect(iTwinsList).to.not.be.empty;
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
   });
 
-  // it("should get a paged list of projects using top", async () => {
-  //   const numberOfProjects = 3;
+  it("should get a project iTwin", async () => {
+    // Arrange
+    const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
 
-  //   // Verify there are enough projects to test the paging
-  //   const fullProjectList: Project[] = await iTwinsAccessClient.queryAsync(
-  //     accessToken,
-  //     iTwinSubClass.Project
-  //   );
-  //   chai.assert(
-  //     fullProjectList.length >= numberOfProjects,
-  //     "Unable to meaningfully run test since there are too few projects."
-  //   );
+    // Act
+    const iTwinsResponse: iTwinsAPIResponse<iTwin> =
+      await iTwinsAccessClient.getAsync(accessToken, iTwinId!);
 
-  //   const partialProjectList: Project[] = await iTwinsAccessClient.queryAsync(
-  //     accessToken,
-  //     iTwinSubClass.Project,
-  //     {
-  //       pagination: {
-  //         top: numberOfProjects,
-  //       },
-  //     }
-  //   );
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    const actualiTwin = iTwinsResponse.data!;
+    chai.expect(iTwinId).to.be.eq(actualiTwin.id);
+  });
 
-  //   // Get the same number of projects as the top param
-  //   chai
-  //     .expect(partialProjectList)
-  //     .length(numberOfProjects, "Paged list length does not match top value.");
-  // });
+  it("should get a 404 when trying to get an iTwin", async () => {
+    // Arrange
+    const notAniTwinId = "22acf21e-0575-4faf-849b-bcd538718269";
 
-  // it("should get a paged list of projects using skip", async () => {
-  //   const numberSkipped = 4;
+    // Act
+    const iTwinsResponse: iTwinsAPIResponse<iTwin> =
+      await iTwinsAccessClient.getAsync(accessToken, notAniTwinId);
 
-  //   // Verify there are enough projects to test the paging
-  //   const fullProjectList: Project[] = await iTwinsAccessClient.queryAsync(
-  //     accessToken,
-  //     iTwinSubClass.Project
-  //   );
-  //   chai.assert(
-  //     fullProjectList.length >= numberSkipped,
-  //     "Unable to meaningfully run test since there are too few projects."
-  //   );
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(404);
+    chai.expect(iTwinsResponse.statusText).to.be.eq("Not Found");
+    chai.expect(iTwinsResponse.data).to.be.undefined;
+    chai.expect(iTwinsResponse.error!.code).to.be.eq("iTwinNotFound");
+  });
 
-  //   const partialProjectList: Project[] = await iTwinsAccessClient.queryAsync(
-  //     accessToken,
-  //     iTwinSubClass.Project,
-  //     {
-  //       pagination: {
-  //         skip: numberSkipped,
-  //       },
-  //     }
-  //   );
+  it("should get a paged list of iTwin Projects using top", async () => {
+    // Arrange
+    const numberOfiTwins = 3;
 
-  //   // Get all but the skipped ones
-  //   chai
-  //     .expect(partialProjectList)
-  //     .length(
-  //       fullProjectList.length - numberSkipped,
-  //       "Paged list length does not match the expected number skipped."
-  //     );
-  // });
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryAsync(
+      accessToken,
+      iTwinSubClass.Project,
+      {
+        top: numberOfiTwins,
+      }
+    );
 
-  // it("should get a continuous paged list of projects", async () => {
-  //   const numberOfProjects = 3;
-  //   const numberSkipped = 2;
+    // Assert
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    chai.expect(iTwinsResponse.data!.length).to.be.eq(3);
+  });
 
-  //   // Verify the paging properties can be tested
-  //   chai.assert(
-  //     numberSkipped < numberOfProjects,
-  //     "There must be overlap between the two pages to run test."
-  //   );
+  it("should get a paged list of iTwin Projects using skip", async () => {
+    // Arrange
+    const numberOfiTwins = 3;
+    const numberToSkip = 3;
 
-  //   // Verify there are enough projects to test the paging
-  //   const fullProjectList: Project[] = await iTwinsAccessClient.queryAsync(
-  //     accessToken,
-  //     iTwinSubClass.Project,
-  //     {
-  //       pagination: {
-  //         top: numberOfProjects + numberSkipped,
-  //       },
-  //     }
-  //   );
-  //   chai.assert(
-  //     fullProjectList.length === numberOfProjects + numberSkipped,
-  //     "Unable to meaningfully run test since there are too few projects."
-  //   );
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryAsync(
+      accessToken,
+      iTwinSubClass.Project,
+      {
+        top: numberOfiTwins,
+        skip: numberToSkip,
+      }
+    );
 
-  //   const firstPageList: Project[] = await iTwinsAccessClient.queryAsync(
-  //     accessToken,
-  //     iTwinSubClass.Project,
-  //     {
-  //       pagination: {
-  //         top: numberOfProjects,
-  //       },
-  //     }
-  //   );
+    // Assert
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    chai.expect(iTwinsResponse.data!.length).to.be.eq(3);
+  });
 
-  //   const secondPageList: Project[] = await iTwinsAccessClient.queryAsync(
-  //     accessToken,
-  //     iTwinSubClass.Project,
-  //     {
-  //       pagination: {
-  //         top: numberOfProjects,
-  //         skip: numberSkipped,
-  //       },
-  //     }
-  //   );
+  it("should get a first three pages of iTwin Projects", async () => {
+    // Arrange
+    const numberOfPages = 3;
+    const pageSize = 10;
 
-  //   // Find all projects from the first page that are not in the second
-  //   const uniqueFirstPageProjects: Project[] = firstPageList.filter(
-  //     (firstProject) => {
-  //       return !secondPageList.some(
-  //         (secondProject) => secondProject.id === firstProject.id
-  //       );
-  //     }
-  //   );
+    // Act
+    for (let skip = 0; skip < numberOfPages * pageSize; skip += pageSize) {
+      const iTwinsResponse = await iTwinsAccessClient.queryAsync(
+        accessToken,
+        iTwinSubClass.Project,
+        {
+          top: pageSize,
+          skip,
+        }
+      );
 
-  //   // Find all projects from the second page that are not in the first
-  //   const uniqueSecondPageProjects: Project[] = secondPageList.filter(
-  //     (secondProject) => {
-  //       return !firstPageList.some(
-  //         (firstProject) => secondProject.id === firstProject.id
-  //       );
-  //     }
-  //   );
+      // Assert
+      chai.expect(iTwinsResponse.data).to.not.be.empty;
+      chai.expect(iTwinsResponse.data!.length).to.be.eq(pageSize);
+    }
+  });
 
-  //   // Both pages should have a full page's worth of projects
-  //   chai
-  //     .expect(firstPageList)
-  //     .length(numberOfProjects, "First page length does not match top value.");
-  //   chai
-  //     .expect(secondPageList)
-  //     .length(numberOfProjects, "Second page length does not match top value.");
+  it("should get query an iTwin Project by name", async () => {
+    // Arrange
+    const iTwinName = TestConfig.iTwinProjectName;
 
-  //   // The number of unique projects must match the number skipped
-  //   chai
-  //     .expect(uniqueFirstPageProjects)
-  //     .length(
-  //       numberSkipped,
-  //       "The number of first page specific items does not match the skip value."
-  //     );
-  //   chai
-  //     .expect(uniqueSecondPageProjects)
-  //     .length(
-  //       numberSkipped,
-  //       "The number of second page specific items does not match the skip value."
-  //     );
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryAsync(
+      accessToken,
+      iTwinSubClass.Project,
+      {
+        displayName: iTwinName,
+      }
+    );
+    const iTwins = iTwinsResponse.data!;
 
-  //   // Both pages are contained within the larger full page
-  //   // Reduce objects down to project properties
-  //   const mappedFullProjectList: Project[] = fullProjectList.map((project) => {
-  //     return {
-  //       id: project.id,
-  //       name: project.name,
-  //       code: project.code,
-  //     };
-  //   });
+    // Assert
+    chai.expect(iTwins).to.not.be.empty;
+    // All items match the name
+    iTwins.forEach((actualiTwin) => {
+      chai.expect(actualiTwin.displayName).to.be.eq(iTwinName);
+    });
+  });
 
-  //   chai.expect(mappedFullProjectList).to.deep.include.members(
-  //     firstPageList.map((project) => {
-  //       return {
-  //         id: project.id,
-  //         name: project.name,
-  //         code: project.code,
-  //       };
-  //     }),
-  //     "The first page contains items not present in the full page."
-  //   );
+  it("should get query an iTwin Project by number", async () => {
+    // Arrange
+    const iTwinNumber = TestConfig.iTwinProjectNumber;
 
-  //   chai.expect(mappedFullProjectList).to.deep.include.members(
-  //     secondPageList.map((project) => {
-  //       return {
-  //         id: project.id,
-  //         name: project.name,
-  //         code: project.code,
-  //       };
-  //     }),
-  //     "The second page contains items not present in the full page."
-  //   );
-  // });
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryAsync(
+      accessToken,
+      iTwinSubClass.Project,
+      {
+        number: iTwinNumber,
+      }
+    );
+    const iTwins = iTwinsResponse.data!;
 
-  // it("should get a list of projects by name", async () => {
-  //   const projectList: Project[] = await iTwinsAccessClient.queryAsync(
-  //     accessToken,
-  //     iTwinSubClass.Project,
-  //     {
-  //       displayName: TestConfig.projectName,
-  //     }
-  //   );
+    // Assert
+    chai.expect(iTwins).to.not.be.empty;
+    // All items match the name
+    iTwins.forEach((actualiTwin) => {
+      chai.expect(actualiTwin.number).to.be.eq(iTwinNumber);
+    });
+  });
 
-  //   // At least one project
-  //   chai.expect(projectList).to.not.be.empty;
-  //   // All items match the name
-  //   projectList.forEach((project) => {
-  //     chai.expect(project).property("name").equal(TestConfig.projectName);
-  //   });
-  // });
+  it("should search for iTwin Projects", async () => {
+    // Arrange
+    const iTwinSearchString = TestConfig.iTwinSearchString;
+
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryAsync(
+      accessToken,
+      iTwinSubClass.Project,
+      {
+        search: iTwinSearchString,
+      }
+    );
+    const iTwins = iTwinsResponse.data!;
+
+    // Assert
+    chai.expect(iTwins).to.not.be.empty;
+    // All items match the name
+    iTwins.forEach((actualiTwin) => {
+      chai.expect(actualiTwin.displayName).to.be.contain(iTwinSearchString);
+    });
+  });
 
   // // it("should get a list of recent projects", async () => {
   // //   const projectList: Project[] = await iTwinsAccessClient.queryAsync(accessToken, iTwinSubClass.Project, {

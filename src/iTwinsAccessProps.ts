@@ -8,6 +8,30 @@
 
 import type { AccessToken } from "@itwin/core-bentley";
 
+/** Methods for accessing itwins
+ * @beta
+ */
+export interface iTwinsAccess {
+  /** Get iTwins associated with the requester */
+  queryAsync(
+    accessToken: AccessToken,
+    subClass: iTwinSubClass,
+    arg?: iTwinsQueryArg
+  ): Promise<iTwinsAPIResponse<iTwin[]>>;
+  /** Get an iTwin associated with the requester */
+  getAsync(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<iTwinsAPIResponse<iTwin>>;
+}
+
+export interface iTwinsAPIResponse<T> {
+  data?: T;
+  status: number;
+  statusText: string;
+  error?: Error;
+}
+
 /** The a simplified iTwin object
  * @beta
  */
@@ -32,24 +56,6 @@ export enum iTwinClass {
   Endeavor = "Endeavor",
 }
 
-/** Methods for accessing itwins
- * @beta
- */
-export interface iTwinsAccess {
-  /** Get iTwins associated with the requester */
-  queryAsync(
-    accessToken: AccessToken,
-    subClass: iTwinSubClass,
-    arg?: iTwinsQueryArg
-  ): Promise<iTwin[]>;
-  /** Get an iTwin associated with the requester */
-  // getAsync(
-  //   accessToken: AccessToken,
-  //   iTwinId: string,
-  //   arg?: iTwinsQueryArg
-  // ): Promise<iTwin>;
-}
-
 /** Set of optional arguments used for querying the iTwins API
  * @beta
  */
@@ -60,4 +66,17 @@ export interface iTwinsQueryArg {
   displayName?: string;
   number?: string;
   type?: string;
+}
+
+export interface Error {
+  code: string;
+  message: string;
+  details?: ErrorDetail[];
+  target?: string;
+}
+
+export interface ErrorDetail {
+  code: string;
+  message: string;
+  target?: string;
 }

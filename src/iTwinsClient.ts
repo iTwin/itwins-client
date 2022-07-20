@@ -6,11 +6,13 @@
  * @module iTwinsClient
  */
 import type { AccessToken } from "@itwin/core-bentley";
+import type { Method } from "axios";
 import type { AxiosRequestConfig } from "axios";
 import axios from "axios";
 import type {
   iTwin,
   iTwinsAccess,
+  iTwinsAPIResponse,
   iTwinsQueryArg,
   iTwinSubClass,
 } from "./iTwinsAccessProps";
@@ -40,27 +42,46 @@ export class ITwinsAccessClient implements iTwinsAccess {
     accessToken: AccessToken,
     subClass: iTwinSubClass,
     arg?: iTwinsQueryArg
-  ): Promise<iTwin[]> {
+  ): Promise<iTwinsAPIResponse<iTwin[]>> {
     let url = `${this._baseUrl}?subClass=${subClass}`;
     if (arg) url += this.getQueryString(arg);
-    return this.sendGet(accessToken, url);
+
+    const requestOptions = this.getRequestOptions(accessToken);
+
+    try {
+      const response = await axios.get(url, requestOptions);
+
+      return {
+        status: response.status,
+        statusText: response.statusText,
+        data: response.data.iTwins,
+        error: response.data.error,
+      };
+    } catch (err) {
+      return {
+        status: 500,
+        statusText: "Internal Server Error",
+        error: {
+          code: "InternalServerError",
+          message:
+            "An internal exception happened while calling iTwins Service",
+        },
+      };
+    }
   }
 
   /** Get itwin accessible to the user
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
-   * @param arg Optional query arguments, for paging, searching, and filtering
    * @returns Array of projects, may be empty
    */
-  // public async getAsync(
-  //   accessToken: AccessToken,
-  //   iTwinId: string,
-  //   arg?: iTwinsQueryArg
-  // ): Promise<iTwin> {
-  //   let url = `${this._baseUrl}/${iTwinId}`;
-  //   if (arg) url += `?${this.getQueryString(arg)}`;
-  //   return (await this.sendGet(accessToken, url))[0];
-  // }
+  public async getAsync(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<iTwinsAPIResponse<iTwin>> {
+    const url = `${this._baseUrl}/${iTwinId}`;
+    return this.sendAPIRequest(accessToken, "GET", url);
+  }
 
   // /** Gets projects using the given query options
   //  * @param accessToken The client access token string
@@ -70,51 +91,35 @@ export class ITwinsAccessClient implements iTwinsAccess {
   // public async getByQuery(accessToken: AccessToken, subClass: iTwinSubClass, arg?: iTwinsQueryArg): Promise<iTwinsQueryResult> {
   // }
 
-  private async sendGet(
+  private async sendAPIRequest(
     accessToken: AccessToken,
+    method: Method,
     url: string
-  ): Promise<iTwin[]> {
+  ): Promise<iTwinsAPIResponse<iTwin>> {
     const requestOptions = this.getRequestOptions(accessToken);
-    const iTwins: iTwin[] = [];
-    // const links: ProjectsLinks = {};
+    requestOptions.method = method;
+    requestOptions.url = url;
 
     try {
-      const response = await axios.get(url, requestOptions);
+      const response = await axios(requestOptions);
 
-      if (!response.data.iTwins) {
-        new Error("Expected array of iTwins not found in API response.");
-      }
-
-      response.data.iTwins.forEach((_iTwin: any) => {
-        iTwins.push(_iTwin);
-      });
-
-      /*
-  id: string;
-  class: string;
-  subClass: string;
-  type: string;
-  displayName: string;
-  number: string;
-      */
-
-      // const linkData = response.data._links;
-      // if (linkData) {
-      //   if (linkData.self && linkData.self.href)
-      //     links.self = async (token: AccessToken) =>
-      //       this.getByUrl(token, linkData.self.href);
-      //   if (linkData.next && linkData.next.href)
-      //     links.next = async (token: AccessToken) =>
-      //       this.getByUrl(token, linkData.next.href);
-      //   if (linkData.prev && linkData.prev.href)
-      //     links.previous = async (token: AccessToken) =>
-      //       this.getByUrl(token, linkData.prev.href);
-      // }
-    } catch (errorResponse: any) {
-      throw Error(`API request error: ${JSON.stringify(errorResponse)}`);
+      return {
+        status: response.status,
+        statusText: response.statusText,
+        data: response.data.iTwin,
+        error: response.data.error,
+      };
+    } catch (err) {
+      return {
+        status: 500,
+        statusText: "Internal Server Error",
+        error: {
+          code: "InternalServerError",
+          message:
+            "An internal exception happened while calling iTwins Service",
+        },
+      };
     }
-
-    return iTwins;
   }
 
   /**
@@ -127,6 +132,9 @@ export class ITwinsAccessClient implements iTwinsAccess {
       headers: {
         authorization: accessTokenString,
         "content-type": "application/json",
+      },
+      validateStatus(status) {
+        return status < 500; // Resolve only if the status code is less than 500
       },
     };
   }
