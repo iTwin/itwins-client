@@ -130,7 +130,7 @@ describe("iTwinsClient", () => {
   it("should get a first three pages of project iTwins", async () => {
     // Arrange
     const numberOfPages = 3;
-    const pageSize = 10;
+    const pageSize = 2;
 
     // Act
     for (let skip = 0; skip < numberOfPages * pageSize; skip += pageSize) {
