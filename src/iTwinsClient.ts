@@ -181,7 +181,7 @@ export class ITwinsAccessClient implements iTwinsAccess {
     return {
       method: "GET",
       headers: {
-        authorization: accessTokenString,
+        "authorization": accessTokenString,
         "content-type": "application/json",
       },
       validateStatus(status) {

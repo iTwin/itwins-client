@@ -61,6 +61,7 @@ export interface iTwin {
   subClass: string;
   type: string;
   displayName: string;
+  // eslint-disable-next-line id-blacklist
   number: string;
 }
 
@@ -84,6 +85,7 @@ export interface iTwinsQueryArg {
   skip?: number;
   search?: string;
   displayName?: string;
+  // eslint-disable-next-line id-blacklist
   number?: string;
   type?: string;
 }

@@ -185,6 +185,7 @@ describe("iTwinsClient", () => {
       accessToken,
       iTwinSubClass.Project,
       {
+        // eslint-disable-next-line id-blacklist
         number: iTwinNumber,
       }
     );
@@ -384,6 +385,7 @@ describe("iTwinsClient", () => {
       accessToken,
       iTwinSubClass.Asset,
       {
+        // eslint-disable-next-line id-blacklist
         number: iTwinNumber,
       }
     );
