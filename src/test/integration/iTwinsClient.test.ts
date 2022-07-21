@@ -31,7 +31,6 @@ describe("iTwinsClient", () => {
     // eslint-disable-next-line no-console
     console.log(JSON.stringify(iTwinsResponse));
     chai.expect(iTwinsResponse.status).to.be.eq(404);
-    chai.expect(iTwinsResponse.statusText).to.be.eq("Not Found");
     chai.expect(iTwinsResponse.data).to.be.undefined;
     chai.expect(iTwinsResponse.error!.code).to.be.eq("iTwinNotFound");
   });
@@ -48,7 +47,6 @@ describe("iTwinsClient", () => {
     // eslint-disable-next-line no-console
     console.log(JSON.stringify(iTwinsResponse));
     chai.expect(iTwinsResponse.status).to.be.eq(422);
-    chai.expect(iTwinsResponse.statusText).to.be.eq("Unprocessable Entity");
     chai.expect(iTwinsResponse.data).to.be.undefined;
     chai.expect(iTwinsResponse.error).to.not.be.undefined;
     chai.expect(iTwinsResponse.error!.code).to.be.eq("InvalidiTwinsRequest");

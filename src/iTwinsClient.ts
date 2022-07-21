@@ -125,14 +125,12 @@ export class ITwinsAccessClient implements ITwinsAccess {
 
       return {
         status: response.status,
-        statusText: response.statusText,
         data: response.data.iTwins,
         error: response.data.error,
       };
     } catch (err) {
       return {
         status: 500,
-        statusText: "Internal Server Error",
         error: {
           code: "InternalServerError",
           message:
@@ -156,14 +154,12 @@ export class ITwinsAccessClient implements ITwinsAccess {
 
       return {
         status: response.status,
-        statusText: response.statusText,
         data: response.data.iTwin,
         error: response.data.error,
       };
     } catch (err) {
       return {
         status: 500,
-        statusText: "Internal Server Error",
         error: {
           code: "InternalServerError",
           message:

@@ -48,7 +48,6 @@ export interface ITwinsAccess {
 export interface ITwinsAPIResponse<T> {
   data?: T;
   status: number;
-  statusText: string;
   error?: Error;
 }
 
