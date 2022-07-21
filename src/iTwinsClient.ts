@@ -45,7 +45,79 @@ export class ITwinsAccessClient implements iTwinsAccess {
   ): Promise<iTwinsAPIResponse<iTwin[]>> {
     let url = `${this._baseUrl}?subClass=${subClass}`;
     if (arg) url += this.getQueryString(arg);
+    return this.sendGETManyAPIRequest(accessToken, url);
+  }
 
+  /** Get itwin accessible to the user
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @returns Array of projects, may be empty
+   */
+  public async getAsync(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<iTwinsAPIResponse<iTwin>> {
+    const url = `${this._baseUrl}/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "GET", url);
+  }
+
+  /** Get itwins accessible to the user
+   * @param accessToken The client access token string
+   * @param subClass Required parameter to search a specific iTwin subClass
+   * @param arg Optional query arguments, for paging, searching, and filtering
+   * @returns Array of projects, may be empty
+   */
+  public async queryFavoritesAsync(
+    accessToken: AccessToken,
+    subClass: iTwinSubClass,
+    arg?: iTwinsQueryArg
+  ): Promise<iTwinsAPIResponse<iTwin[]>> {
+    let url = `${this._baseUrl}/favorites?subClass=${subClass}`;
+    if (arg) url += this.getQueryString(arg);
+    return this.sendGETManyAPIRequest(accessToken, url);
+  }
+
+  /** Get itwins accessible to the user
+   * @param accessToken The client access token string
+   * @param subClass Required parameter to search a specific iTwin subClass
+   * @param arg Optional query arguments, for paging, searching, and filtering
+   * @returns Array of projects, may be empty
+   */
+  public async queryRecentsAsync(
+    accessToken: AccessToken,
+    subClass: iTwinSubClass,
+    arg?: iTwinsQueryArg
+  ): Promise<iTwinsAPIResponse<iTwin[]>> {
+    let url = `${this._baseUrl}/recents?subClass=${subClass}`;
+    if (arg) url += this.getQueryString(arg);
+    return this.sendGETManyAPIRequest(accessToken, url);
+  }
+
+  /** Get itwins accessible to the user
+   * @param accessToken The client access token string
+   * @param subClass Required parameter to search a specific iTwin subClass
+   * @param arg Optional query arguments, for paging, searching, and filtering
+   * @returns Array of projects, may be empty
+   */
+  public async getPrimaryAccountAsync(
+    accessToken: AccessToken
+  ): Promise<iTwinsAPIResponse<iTwin>> {
+    const url = `${this._baseUrl}/myprimaryaccount`;
+    return this.sendGenericAPIRequest(accessToken, "GET", url);
+  }
+
+  // /** Gets projects using the given query options
+  //  * @param accessToken The client access token string
+  //  * @param arg Optional object containing queryable properties
+  //  * @returns Projects and links meeting the query's requirements
+  //  */
+  // public async getByQuery(accessToken: AccessToken, subClass: iTwinSubClass, arg?: iTwinsQueryArg): Promise<iTwinsQueryResult> {
+  // }
+
+  private async sendGETManyAPIRequest(
+    accessToken: AccessToken,
+    url: string
+  ): Promise<iTwinsAPIResponse<iTwin[]>> {
     const requestOptions = this.getRequestOptions(accessToken);
 
     try {
@@ -70,28 +142,7 @@ export class ITwinsAccessClient implements iTwinsAccess {
     }
   }
 
-  /** Get itwin accessible to the user
-   * @param accessToken The client access token string
-   * @param iTwinId The id of the iTwin
-   * @returns Array of projects, may be empty
-   */
-  public async getAsync(
-    accessToken: AccessToken,
-    iTwinId: string
-  ): Promise<iTwinsAPIResponse<iTwin>> {
-    const url = `${this._baseUrl}/${iTwinId}`;
-    return this.sendAPIRequest(accessToken, "GET", url);
-  }
-
-  // /** Gets projects using the given query options
-  //  * @param accessToken The client access token string
-  //  * @param arg Optional object containing queryable properties
-  //  * @returns Projects and links meeting the query's requirements
-  //  */
-  // public async getByQuery(accessToken: AccessToken, subClass: iTwinSubClass, arg?: iTwinsQueryArg): Promise<iTwinsQueryResult> {
-  // }
-
-  private async sendAPIRequest(
+  private async sendGenericAPIRequest(
     accessToken: AccessToken,
     method: Method,
     url: string

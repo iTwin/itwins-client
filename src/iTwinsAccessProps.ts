@@ -12,16 +12,36 @@ import type { AccessToken } from "@itwin/core-bentley";
  * @beta
  */
 export interface iTwinsAccess {
-  /** Get iTwins associated with the requester */
+  /** Get iTwins */
   queryAsync(
     accessToken: AccessToken,
     subClass: iTwinSubClass,
     arg?: iTwinsQueryArg
   ): Promise<iTwinsAPIResponse<iTwin[]>>;
-  /** Get an iTwin associated with the requester */
+
+  /** Get an iTwin */
   getAsync(
     accessToken: AccessToken,
     iTwinId: string
+  ): Promise<iTwinsAPIResponse<iTwin>>;
+
+  /** Get favorited iTwins */
+  queryFavoritesAsync(
+    accessToken: AccessToken,
+    subClass: iTwinSubClass,
+    arg?: iTwinsQueryArg
+  ): Promise<iTwinsAPIResponse<iTwin[]>>;
+
+  /** Get recent iTwins */
+  queryRecentsAsync(
+    accessToken: AccessToken,
+    subClass: iTwinSubClass,
+    arg?: iTwinsQueryArg
+  ): Promise<iTwinsAPIResponse<iTwin[]>>;
+
+  /** Get the primary account iTwin */
+  getPrimaryAccountAsync(
+    accessToken: AccessToken
   ): Promise<iTwinsAPIResponse<iTwin>>;
 }
 
