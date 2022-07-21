@@ -28,6 +28,8 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.getAsync(accessToken, notAniTwinId);
 
     // Assert
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify(iTwinsResponse));
     chai.expect(iTwinsResponse.status).to.be.eq(404);
     chai.expect(iTwinsResponse.statusText).to.be.eq("Not Found");
     chai.expect(iTwinsResponse.data).to.be.undefined;
@@ -43,6 +45,8 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify(iTwinsResponse));
     chai.expect(iTwinsResponse.status).to.be.eq(422);
     chai.expect(iTwinsResponse.statusText).to.be.eq("Unprocessable Entity");
     chai.expect(iTwinsResponse.data).to.be.undefined;
