@@ -28,8 +28,6 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.getAsync(accessToken, notAniTwinId);
 
     // Assert
-    // eslint-disable-next-line no-console
-    console.log(JSON.stringify(iTwinsResponse));
     chai.expect(iTwinsResponse.status).to.be.eq(404);
     chai.expect(iTwinsResponse.data).to.be.undefined;
     chai.expect(iTwinsResponse.error!.code).to.be.eq("iTwinNotFound");
@@ -44,8 +42,6 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
-    // eslint-disable-next-line no-console
-    console.log(JSON.stringify(iTwinsResponse));
     chai.expect(iTwinsResponse.status).to.be.eq(422);
     chai.expect(iTwinsResponse.data).to.be.undefined;
     chai.expect(iTwinsResponse.error).to.not.be.undefined;
