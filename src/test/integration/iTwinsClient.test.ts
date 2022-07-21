@@ -5,8 +5,8 @@
 import * as chai from "chai";
 import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
-import type { iTwin, iTwinsAPIResponse } from "../../iTwinsAccessProps";
-import { iTwinSubClass } from "../../iTwinsAccessProps";
+import type { ITwin, ITwinsAPIResponse } from "../../iTwinsAccessProps";
+import { ITwinSubClass } from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
 
 chai.should();
@@ -24,27 +24,25 @@ describe("iTwinsClient", () => {
     const notAniTwinId = "22acf21e-0575-4faf-849b-bcd538718269";
 
     // Act
-    const iTwinsResponse: iTwinsAPIResponse<iTwin> =
+    const iTwinsResponse: ITwinsAPIResponse<ITwin> =
       await iTwinsAccessClient.getAsync(accessToken, notAniTwinId);
 
     // Assert
     chai.expect(iTwinsResponse.status).to.be.eq(404);
-    chai.expect(iTwinsResponse.statusText).to.be.eq("Not Found");
     chai.expect(iTwinsResponse.data).to.be.undefined;
     chai.expect(iTwinsResponse.error!.code).to.be.eq("iTwinNotFound");
   });
 
   it("should get a 422 when querying with an unsupported subClass", async () => {
     // Act
-    const iTwinsResponse: iTwinsAPIResponse<iTwin[]> =
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
       await iTwinsAccessClient.queryAsync(
         accessToken,
-        "Invalid" as iTwinSubClass
+        "Invalid" as ITwinSubClass
       );
 
     // Assert
     chai.expect(iTwinsResponse.status).to.be.eq(422);
-    chai.expect(iTwinsResponse.statusText).to.be.eq("Unprocessable Entity");
     chai.expect(iTwinsResponse.data).to.be.undefined;
     chai.expect(iTwinsResponse.error).to.not.be.undefined;
     chai.expect(iTwinsResponse.error!.code).to.be.eq("InvalidiTwinsRequest");
@@ -56,8 +54,8 @@ describe("iTwinsClient", () => {
 
   it("should get a list of project iTwins", async () => {
     // Act
-    const iTwinsResponse: iTwinsAPIResponse<iTwin[]> =
-      await iTwinsAccessClient.queryAsync(accessToken, iTwinSubClass.Project);
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsAccessClient.queryAsync(accessToken, ITwinSubClass.Project);
 
     // Assert
     chai.expect(iTwinsResponse.status).to.be.eq(200);
@@ -69,7 +67,7 @@ describe("iTwinsClient", () => {
     const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
 
     // Act
-    const iTwinsResponse: iTwinsAPIResponse<iTwin> =
+    const iTwinsResponse: ITwinsAPIResponse<ITwin> =
       await iTwinsAccessClient.getAsync(accessToken, iTwinId!);
 
     // Assert
@@ -88,7 +86,7 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinsResponse = await iTwinsAccessClient.queryAsync(
       accessToken,
-      iTwinSubClass.Project,
+      ITwinSubClass.Project,
       {
         top: numberOfiTwins,
       }
@@ -111,7 +109,7 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinsResponse = await iTwinsAccessClient.queryAsync(
       accessToken,
-      iTwinSubClass.Project,
+      ITwinSubClass.Project,
       {
         top: numberOfiTwins,
         skip: numberToSkip,
@@ -130,13 +128,13 @@ describe("iTwinsClient", () => {
   it("should get a first three pages of project iTwins", async () => {
     // Arrange
     const numberOfPages = 3;
-    const pageSize = 10;
+    const pageSize = 2;
 
     // Act
     for (let skip = 0; skip < numberOfPages * pageSize; skip += pageSize) {
       const iTwinsResponse = await iTwinsAccessClient.queryAsync(
         accessToken,
-        iTwinSubClass.Project,
+        ITwinSubClass.Project,
         {
           top: pageSize,
           skip,
@@ -160,7 +158,7 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinsResponse = await iTwinsAccessClient.queryAsync(
       accessToken,
-      iTwinSubClass.Project,
+      ITwinSubClass.Project,
       {
         displayName: iTwinName,
       }
@@ -183,8 +181,9 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinsResponse = await iTwinsAccessClient.queryAsync(
       accessToken,
-      iTwinSubClass.Project,
+      ITwinSubClass.Project,
       {
+        // eslint-disable-next-line id-blacklist
         number: iTwinNumber,
       }
     );
@@ -207,7 +206,7 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinsResponse = await iTwinsAccessClient.queryAsync(
       accessToken,
-      iTwinSubClass.Project,
+      ITwinSubClass.Project,
       {
         search: iTwinSearchString,
       }
@@ -226,10 +225,10 @@ describe("iTwinsClient", () => {
 
   it("should get a list of recent project iTwins", async () => {
     // Act
-    const iTwinsResponse: iTwinsAPIResponse<iTwin[]> =
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
       await iTwinsAccessClient.queryRecentsAsync(
         accessToken,
-        iTwinSubClass.Project
+        ITwinSubClass.Project
       );
 
     // Assert
@@ -239,10 +238,10 @@ describe("iTwinsClient", () => {
 
   it("should get a list of favorited project iTwins", async () => {
     // Act
-    const iTwinsResponse: iTwinsAPIResponse<iTwin[]> =
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
       await iTwinsAccessClient.queryFavoritesAsync(
         accessToken,
-        iTwinSubClass.Project
+        ITwinSubClass.Project
       );
 
     // Assert
@@ -256,8 +255,8 @@ describe("iTwinsClient", () => {
 
   it("should get a list of asset iTwins", async () => {
     // Act
-    const iTwinsResponse: iTwinsAPIResponse<iTwin[]> =
-      await iTwinsAccessClient.queryAsync(accessToken, iTwinSubClass.Asset);
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsAccessClient.queryAsync(accessToken, ITwinSubClass.Asset);
 
     // Assert
     chai.expect(iTwinsResponse.status).to.be.eq(200);
@@ -269,7 +268,7 @@ describe("iTwinsClient", () => {
     const iTwinId = process.env.IMJS_TEST_ASSET_ID;
 
     // Act
-    const iTwinsResponse: iTwinsAPIResponse<iTwin> =
+    const iTwinsResponse: ITwinsAPIResponse<ITwin> =
       await iTwinsAccessClient.getAsync(accessToken, iTwinId!);
 
     // Assert
@@ -286,7 +285,7 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinsResponse = await iTwinsAccessClient.queryAsync(
       accessToken,
-      iTwinSubClass.Asset,
+      ITwinSubClass.Asset,
       {
         top: numberOfiTwins,
       }
@@ -309,7 +308,7 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinsResponse = await iTwinsAccessClient.queryAsync(
       accessToken,
-      iTwinSubClass.Asset,
+      ITwinSubClass.Asset,
       {
         top: numberOfiTwins,
         skip: numberToSkip,
@@ -334,7 +333,7 @@ describe("iTwinsClient", () => {
     for (let skip = 0; skip < numberOfPages * pageSize; skip += pageSize) {
       const iTwinsResponse = await iTwinsAccessClient.queryAsync(
         accessToken,
-        iTwinSubClass.Asset,
+        ITwinSubClass.Asset,
         {
           top: pageSize,
           skip,
@@ -358,7 +357,7 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinsResponse = await iTwinsAccessClient.queryAsync(
       accessToken,
-      iTwinSubClass.Asset,
+      ITwinSubClass.Asset,
       {
         displayName: iTwinName,
       }
@@ -382,8 +381,9 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinsResponse = await iTwinsAccessClient.queryAsync(
       accessToken,
-      iTwinSubClass.Asset,
+      ITwinSubClass.Asset,
       {
+        // eslint-disable-next-line id-blacklist
         number: iTwinNumber,
       }
     );
@@ -406,7 +406,7 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinsResponse = await iTwinsAccessClient.queryAsync(
       accessToken,
-      iTwinSubClass.Asset,
+      ITwinSubClass.Asset,
       {
         search: iTwinSearchString,
       }
@@ -425,10 +425,10 @@ describe("iTwinsClient", () => {
 
   it("should get a list of recent asset iTwins", async () => {
     // Act
-    const iTwinsResponse: iTwinsAPIResponse<iTwin[]> =
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
       await iTwinsAccessClient.queryRecentsAsync(
         accessToken,
-        iTwinSubClass.Asset
+        ITwinSubClass.Asset
       );
 
     // Assert
@@ -442,10 +442,10 @@ describe("iTwinsClient", () => {
 
   it("should get a list of favorited asset iTwins", async () => {
     // Act
-    const iTwinsResponse: iTwinsAPIResponse<iTwin[]> =
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
       await iTwinsAccessClient.queryFavoritesAsync(
         accessToken,
-        iTwinSubClass.Asset
+        ITwinSubClass.Asset
       );
 
     // Assert
@@ -459,8 +459,8 @@ describe("iTwinsClient", () => {
 
   // it("should get a list of account iTwins", async () => {
   //   // Act
-  //   const iTwinsResponse: iTwinsAPIResponse<iTwin[]> =
-  //     await iTwinsAccessClient.queryAsync(accessToken, iTwinSubClass.Account);
+  //   const iTwinsResponse: ITwinsAPIResponse<iTwin[]> =
+  //     await iTwinsAccessClient.queryAsync(accessToken, ITwinSubClass.Account);
 
   //   // Assert
   //   chai.expect(iTwinsResponse.status).to.be.eq(200);
@@ -469,7 +469,7 @@ describe("iTwinsClient", () => {
 
   it("should get the primary account iTwin", async () => {
     // Act
-    const iTwinsResponse: iTwinsAPIResponse<iTwin> =
+    const iTwinsResponse: ITwinsAPIResponse<ITwin> =
       await iTwinsAccessClient.getPrimaryAccountAsync(accessToken);
 
     // Assert

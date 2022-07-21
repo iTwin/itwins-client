@@ -11,66 +11,66 @@ import type { AccessToken } from "@itwin/core-bentley";
 /** Methods for accessing itwins
  * @beta
  */
-export interface iTwinsAccess {
+export interface ITwinsAccess {
   /** Get iTwins */
   queryAsync(
     accessToken: AccessToken,
-    subClass: iTwinSubClass,
-    arg?: iTwinsQueryArg
-  ): Promise<iTwinsAPIResponse<iTwin[]>>;
+    subClass: ITwinSubClass,
+    arg?: ITwinsQueryArg
+  ): Promise<ITwinsAPIResponse<ITwin[]>>;
 
-  /** Get an iTwin */
+  /** Get an ITwin */
   getAsync(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<iTwinsAPIResponse<iTwin>>;
+  ): Promise<ITwinsAPIResponse<ITwin>>;
 
   /** Get favorited iTwins */
   queryFavoritesAsync(
     accessToken: AccessToken,
-    subClass: iTwinSubClass,
-    arg?: iTwinsQueryArg
-  ): Promise<iTwinsAPIResponse<iTwin[]>>;
+    subClass: ITwinSubClass,
+    arg?: ITwinsQueryArg
+  ): Promise<ITwinsAPIResponse<ITwin[]>>;
 
   /** Get recent iTwins */
   queryRecentsAsync(
     accessToken: AccessToken,
-    subClass: iTwinSubClass,
-    arg?: iTwinsQueryArg
-  ): Promise<iTwinsAPIResponse<iTwin[]>>;
+    subClass: ITwinSubClass,
+    arg?: ITwinsQueryArg
+  ): Promise<ITwinsAPIResponse<ITwin[]>>;
 
-  /** Get the primary account iTwin */
+  /** Get the primary account ITwin */
   getPrimaryAccountAsync(
     accessToken: AccessToken
-  ): Promise<iTwinsAPIResponse<iTwin>>;
+  ): Promise<ITwinsAPIResponse<ITwin>>;
 }
 
-export interface iTwinsAPIResponse<T> {
+export interface ITwinsAPIResponse<T> {
   data?: T;
   status: number;
-  statusText: string;
   error?: Error;
 }
 
-/** The a simplified iTwin object
+/** The a simplified ITwin object
  * @beta
  */
-export interface iTwin {
+export interface ITwin {
   id: string;
-  class: string;
-  subClass: string;
+  class: ITwinSubClass;
+  subClass: ITwinClass;
   type: string;
   displayName: string;
+  // eslint-disable-next-line id-blacklist
   number: string;
 }
 
-export enum iTwinSubClass {
+export enum ITwinSubClass {
   Account = "Account",
   Asset = "Asset",
   Project = "Project",
 }
 
-export enum iTwinClass {
+export enum ITwinClass {
   Account = "Account",
   Thing = "Thing",
   Endeavor = "Endeavor",
@@ -79,11 +79,12 @@ export enum iTwinClass {
 /** Set of optional arguments used for querying the iTwins API
  * @beta
  */
-export interface iTwinsQueryArg {
+export interface ITwinsQueryArg {
   top?: number;
   skip?: number;
   search?: string;
   displayName?: string;
+  // eslint-disable-next-line id-blacklist
   number?: string;
   type?: string;
 }

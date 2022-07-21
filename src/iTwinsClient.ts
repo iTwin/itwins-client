@@ -10,17 +10,17 @@ import type { Method } from "axios";
 import type { AxiosRequestConfig } from "axios";
 import axios from "axios";
 import type {
-  iTwin,
-  iTwinsAccess,
-  iTwinsAPIResponse,
-  iTwinsQueryArg,
-  iTwinSubClass,
+  ITwin,
+  ITwinsAccess,
+  ITwinsAPIResponse,
+  ITwinsQueryArg,
+  ITwinSubClass,
 } from "./iTwinsAccessProps";
 
 /** Client API to access the itwin service.
  * @beta
  */
-export class ITwinsAccessClient implements iTwinsAccess {
+export class ITwinsAccessClient implements ITwinsAccess {
   private _baseUrl: string = "https://api.bentley.com/itwins";
 
   public constructor() {
@@ -40,9 +40,9 @@ export class ITwinsAccessClient implements iTwinsAccess {
    */
   public async queryAsync(
     accessToken: AccessToken,
-    subClass: iTwinSubClass,
-    arg?: iTwinsQueryArg
-  ): Promise<iTwinsAPIResponse<iTwin[]>> {
+    subClass: ITwinSubClass,
+    arg?: ITwinsQueryArg
+  ): Promise<ITwinsAPIResponse<ITwin[]>> {
     let url = `${this._baseUrl}?subClass=${subClass}`;
     if (arg) url += this.getQueryString(arg);
     return this.sendGETManyAPIRequest(accessToken, url);
@@ -56,7 +56,7 @@ export class ITwinsAccessClient implements iTwinsAccess {
   public async getAsync(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<iTwinsAPIResponse<iTwin>> {
+  ): Promise<ITwinsAPIResponse<ITwin>> {
     const url = `${this._baseUrl}/${iTwinId}`;
     return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
@@ -69,9 +69,9 @@ export class ITwinsAccessClient implements iTwinsAccess {
    */
   public async queryFavoritesAsync(
     accessToken: AccessToken,
-    subClass: iTwinSubClass,
-    arg?: iTwinsQueryArg
-  ): Promise<iTwinsAPIResponse<iTwin[]>> {
+    subClass: ITwinSubClass,
+    arg?: ITwinsQueryArg
+  ): Promise<ITwinsAPIResponse<ITwin[]>> {
     let url = `${this._baseUrl}/favorites?subClass=${subClass}`;
     if (arg) url += this.getQueryString(arg);
     return this.sendGETManyAPIRequest(accessToken, url);
@@ -85,9 +85,9 @@ export class ITwinsAccessClient implements iTwinsAccess {
    */
   public async queryRecentsAsync(
     accessToken: AccessToken,
-    subClass: iTwinSubClass,
-    arg?: iTwinsQueryArg
-  ): Promise<iTwinsAPIResponse<iTwin[]>> {
+    subClass: ITwinSubClass,
+    arg?: ITwinsQueryArg
+  ): Promise<ITwinsAPIResponse<ITwin[]>> {
     let url = `${this._baseUrl}/recents?subClass=${subClass}`;
     if (arg) url += this.getQueryString(arg);
     return this.sendGETManyAPIRequest(accessToken, url);
@@ -101,7 +101,7 @@ export class ITwinsAccessClient implements iTwinsAccess {
    */
   public async getPrimaryAccountAsync(
     accessToken: AccessToken
-  ): Promise<iTwinsAPIResponse<iTwin>> {
+  ): Promise<ITwinsAPIResponse<ITwin>> {
     const url = `${this._baseUrl}/myprimaryaccount`;
     return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
@@ -111,13 +111,13 @@ export class ITwinsAccessClient implements iTwinsAccess {
   //  * @param arg Optional object containing queryable properties
   //  * @returns Projects and links meeting the query's requirements
   //  */
-  // public async getByQuery(accessToken: AccessToken, subClass: iTwinSubClass, arg?: iTwinsQueryArg): Promise<iTwinsQueryResult> {
+  // public async getByQuery(accessToken: AccessToken, subClass: ITwinSubClass, arg?: ITwinsQueryArg): Promise<iTwinsQueryResult> {
   // }
 
   private async sendGETManyAPIRequest(
     accessToken: AccessToken,
     url: string
-  ): Promise<iTwinsAPIResponse<iTwin[]>> {
+  ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const requestOptions = this.getRequestOptions(accessToken);
 
     try {
@@ -125,14 +125,12 @@ export class ITwinsAccessClient implements iTwinsAccess {
 
       return {
         status: response.status,
-        statusText: response.statusText,
         data: response.data.iTwins,
         error: response.data.error,
       };
     } catch (err) {
       return {
         status: 500,
-        statusText: "Internal Server Error",
         error: {
           code: "InternalServerError",
           message:
@@ -146,7 +144,7 @@ export class ITwinsAccessClient implements iTwinsAccess {
     accessToken: AccessToken,
     method: Method,
     url: string
-  ): Promise<iTwinsAPIResponse<iTwin>> {
+  ): Promise<ITwinsAPIResponse<ITwin>> {
     const requestOptions = this.getRequestOptions(accessToken);
     requestOptions.method = method;
     requestOptions.url = url;
@@ -156,14 +154,12 @@ export class ITwinsAccessClient implements iTwinsAccess {
 
       return {
         status: response.status,
-        statusText: response.statusText,
         data: response.data.iTwin,
         error: response.data.error,
       };
     } catch (err) {
       return {
         status: 500,
-        statusText: "Internal Server Error",
         error: {
           code: "InternalServerError",
           message:
@@ -181,7 +177,7 @@ export class ITwinsAccessClient implements iTwinsAccess {
     return {
       method: "GET",
       headers: {
-        authorization: accessTokenString,
+        "authorization": accessTokenString,
         "content-type": "application/json",
       },
       validateStatus(status) {
@@ -195,7 +191,7 @@ export class ITwinsAccessClient implements iTwinsAccess {
    * @param queryArg Object container queryable properties
    * @returns query string with iTwinQueryArgs applied, which should be appended to a url
    */
-  private getQueryString(queryArg: iTwinsQueryArg): string {
+  private getQueryString(queryArg: ITwinsQueryArg): string {
     let queryString = "";
 
     if (queryArg.search) {
