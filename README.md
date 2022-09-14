@@ -8,4 +8,10 @@ If you have questions, or wish to contribute to iTwin.js, see our [Contributing 
 
 ## About this Repository
 
-Contains the __@itwin/itwins-client__ package that wraps sending requests to the iTwins service. Visit the [iTwins API](https://developer.bentley.com/apis/itwins/) for more documentation on the iTwins service.
+Contains the **@itwin/itwins-client** package that wraps sending requests to the iTwins service. Visit the [iTwins API](https://developer.bentley.com/apis/itwins/) for more documentation on the iTwins service.
+
+## Integration Tests
+
+Integration Tests are stored in `/test/integration` directory.
+
+[Read more](./test/integration/README.md)
