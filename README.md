@@ -10,8 +10,16 @@ If you have questions, or wish to contribute to iTwin.js, see our [Contributing 
 
 Contains the **@itwin/itwins-client** package that wraps sending requests to the iTwins service. Visit the [iTwins API](https://developer.bentley.com/apis/itwins/) for more documentation on the iTwins service.
 
-## Integration Tests
+## Integration Test Setup
 
-Integration Tests are stored in `/src/test/integration` directory.
+Make sure a `.env` file is created in the root folder.
 
-[Read more](./src/test/integration/README.md)
+Run the following npm commands from the root folder in order.
+
+```
+npm i
+npm build
+npm run test
+```
+
+`npm run test` runs a script defined in `package.json`.
