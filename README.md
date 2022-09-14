@@ -18,7 +18,7 @@ Run the following npm commands from the root folder in order.
 
 ```
 npm i
-npm build
+npm run build
 npm run test
 ```
 
