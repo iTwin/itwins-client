@@ -12,6 +12,6 @@ Contains the **@itwin/itwins-client** package that wraps sending requests to the
 
 ## Integration Tests
 
-Integration Tests are stored in `/test/integration` directory.
+Integration Tests are stored in `/src/test/integration` directory.
 
-[Read more](./test/integration/README.md)
+[Read more](./src/test/integration/README.md)
