@@ -50,6 +50,11 @@ export class ITwinsAccessClient implements ITwinsAccess {
     return this.sendGETManyAPIRequest(accessToken, url);
   }
 
+  /** Get Repositories accessible to user
+   * @param accessToken The client access token string
+   * @param arg Optional query arguments, for class and subclass
+   * @returns Array of Repositories, may be empty
+   */
   public async queryRepositoriesAsync(
     accessToken: AccessToken,
     iTwinId: string,
