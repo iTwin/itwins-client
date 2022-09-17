@@ -19,6 +19,12 @@ export interface ITwinsAccess {
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>>;
 
+  /** Get iTwins */
+  queryRepositoriesAsync(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<ITwinsAPIResponse<Repository[]>>;
+
   /** Get an ITwin */
   getAsync(
     accessToken: AccessToken,
@@ -56,12 +62,19 @@ export interface ITwinsAPIResponse<T> {
  */
 export interface ITwin {
   id: string;
-  class: ITwinSubClass;
-  subClass: ITwinClass;
+  class: ITwinClass;
+  subClass: ITwinSubClass;
   type: string;
   displayName: string;
   // eslint-disable-next-line id-blacklist
   number: string;
+}
+
+export interface Repository {
+  id: string;
+  class: RepositoryClass;
+  subClass: RepositorySubClass;
+  uri: string;
 }
 
 export enum ITwinSubClass {
@@ -76,6 +89,21 @@ export enum ITwinClass {
   Endeavor = "Endeavor",
 }
 
+export enum RepositoryClass {
+  iModels = "iModels",
+  Storage = "Storage",
+  Forms = "Forms",
+  Issues = "Issues",
+  RealityData = "RealityData",
+  GeographicInformationSystem = "GeographicInformationSystem"
+}
+
+export enum RepositorySubClass {
+  WebMapService = "WebMapService",
+  WebMapTileService = "WebMapTileService",
+  MapServer = "MapServer"
+}
+
 /** Set of optional arguments used for querying the iTwins API
  * @beta
  */
@@ -87,6 +115,14 @@ export interface ITwinsQueryArg {
   // eslint-disable-next-line id-blacklist
   number?: string;
   type?: string;
+}
+
+/** Set of optional arguments used for querying Respositories API
+ *
+ */
+export interface RepositoriesQueryArg{
+  class?: string;
+  subClass?: string;
 }
 
 export interface Error {

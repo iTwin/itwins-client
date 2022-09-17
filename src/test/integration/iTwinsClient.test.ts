@@ -5,7 +5,9 @@
 import * as chai from "chai";
 import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
-import type { ITwin, ITwinsAPIResponse } from "../../iTwinsAccessProps";
+import type { ITwin, ITwinsAPIResponse} from "../../iTwinsAccessProps";
+import { RepositorySubClass} from "../../iTwinsAccessProps";
+import { RepositoryClass } from "../../iTwinsAccessProps";
 import { ITwinSubClass } from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
 
@@ -17,6 +19,65 @@ describe("iTwinsClient", () => {
   before(async function () {
     this.timeout(0);
     accessToken = await TestConfig.getAccessToken();
+  });
+
+  it("should get iTwin repositories by id", async () => {
+    // Arrange
+    const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
+
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+      accessToken,
+      iTwinId
+    );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+  });
+
+  it("should get iTwin repositories by id and class", async () => {
+    // Arrange
+    const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
+
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+      accessToken,
+      iTwinId,
+      {
+        class: RepositoryClass.iModels,
+      }
+    );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    iTwinsResponse.data!.forEach((actualRepository) => {
+      chai.expect(actualRepository.class).to.be.eq("iModels");
+    });
+  });
+
+  it("should get iTwin repositories by id, class, and subClass", async () => {
+    // Arrange
+    const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
+
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+      accessToken,
+      iTwinId,
+      {
+        class: RepositoryClass.GeographicInformationSystem,
+        subClass: RepositorySubClass.MapServer,
+      }
+    );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    iTwinsResponse.data!.forEach((actualRepository) => {
+      chai.expect(actualRepository.class).to.be.eq("GeographicInformationSystem");
+      chai.expect(actualRepository.subClass).to.be.eq("MapServer");
+    });
   });
 
   it("should get a 404 when trying to get an iTwin", async () => {

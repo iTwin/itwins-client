@@ -15,6 +15,8 @@ import type {
   ITwinsAPIResponse,
   ITwinsQueryArg,
   ITwinSubClass,
+  RepositoriesQueryArg,
+  Repository,
 } from "./iTwinsAccessProps";
 
 /** Client API to access the itwin service.
@@ -46,6 +48,16 @@ export class ITwinsAccessClient implements ITwinsAccess {
     let url = `${this._baseUrl}?subClass=${subClass}`;
     if (arg) url += this.getQueryString(arg);
     return this.sendGETManyAPIRequest(accessToken, url);
+  }
+
+  public async queryRepositoriesAsync(
+    accessToken: AccessToken,
+    iTwinId: string,
+    arg?: RepositoriesQueryArg
+  ): Promise<ITwinsAPIResponse<Repository[]>> {
+    let url = `${this._baseUrl}/${iTwinId}/repositories`;
+    if (arg) url += this.getRepositoryQueryString(arg);
+    return this.sendGETManyAPIRequestRepositories(accessToken, url);
   }
 
   /** Get itwin accessible to the user
@@ -140,6 +152,32 @@ export class ITwinsAccessClient implements ITwinsAccess {
     }
   }
 
+  private async sendGETManyAPIRequestRepositories(
+    accessToken: AccessToken,
+    url: string
+  ): Promise<ITwinsAPIResponse<Repository[]>> {
+    const requestOptions = this.getRequestOptions(accessToken);
+
+    try {
+      const response = await axios.get(url, requestOptions);
+
+      return {
+        status: response.status,
+        data: response.data.repositories,
+        error: response.data.error,
+      };
+    } catch (err) {
+      return {
+        status: 500,
+        error: {
+          code: "InternalServerError",
+          message:
+            "An internal exception happened while calling iTwins Service",
+        },
+      };
+    }
+  }
+
   private async sendGenericAPIRequest(
     accessToken: AccessToken,
     method: Method,
@@ -216,6 +254,28 @@ export class ITwinsAccessClient implements ITwinsAccess {
 
     if (queryArg.type) {
       queryString += `&type=${queryArg.type}`;
+    }
+
+    // trim & from start of string
+    queryString.replace(/^&+/, "");
+
+    return queryString;
+  }
+
+  /**
+   * Build a query to be appended to the URL for iTwin Repositories
+   * @param queryArg Object container queryable properties
+   * @returns query string with RepositoriesQueryArg applied, which should be appended to a url
+   */
+  private getRepositoryQueryString(queryArg: RepositoriesQueryArg): string {
+    let queryString = "";
+
+    if (queryArg.class) {
+      queryString += `?class=${queryArg.class}`;
+    }
+
+    if (queryArg.subClass) {
+      queryString += `&subClass=${queryArg.subClass}`;
     }
 
     // trim & from start of string
