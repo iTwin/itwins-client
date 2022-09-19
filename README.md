@@ -35,6 +35,36 @@ async function printiTwinIds(): Promise<void> {
 }
 ```
 
+### Get paged list of iTwins using top/skip
+```typescript
+import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
+
+/** Function that queries all iTwins and prints their ids to the console. */
+async function printiTwinIds(): Promise<void> {
+  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  let accessToken: AccessToken;
+
+  before(async function () {
+    this.timeout(0);
+    accessToken = { get_access_token_logic_here }
+  });
+  
+  const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+    await iTwinsAccessClient.queryAsync(
+      accessToken, 
+      "Project",
+      {
+        top: 25,
+        skip: 13,
+      }
+    );
+    
+   iTwinsResponse.data!.forEach((actualiTwin) => {
+    console.log(actualiTwin.id);
+  });
+}
+```
+
 ### Get iTwin by Id
 ```typescript
 import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
@@ -74,6 +104,35 @@ async function printiTwinIds(): Promise<void> {
   const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
     accessToken,
     iTwinId
+  );
+    
+   iTwinsResponse.data!.forEach((actualRepository) => {
+    console.log(actualRepository.id);
+  });
+}
+```
+
+### Get list of Repositories by Id, Class, and Sub Class
+```typescript
+import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
+
+/** Function that queries all iTwin Repositories and prints their ids to the console. */
+async function printiTwinIds(): Promise<void> {
+  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  let accessToken: AccessToken;
+
+  before(async function () {
+    this.timeout(0);
+    accessToken = { get_access_token_logic_here }
+  });
+  
+  const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+    accessToken,
+    iTwinId,
+    {
+      class: "GeographicInformationSystem",
+      subClass: "MapServer",
+    }
   );
     
    iTwinsResponse.data!.forEach((actualRepository) => {
