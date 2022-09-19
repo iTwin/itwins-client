@@ -89,7 +89,7 @@ async function printiTwinIds(): Promise<void> {
 
 ### Get list of Repositories by Id
 ```typescript
-import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
+import { ITwinsAccessClient, Repository, ITwinsAPIResponse } from "@itwin/itwins-client";
 
 /** Function that queries all iTwin Repositories and prints their ids to the console. */
 async function printiTwinIds(): Promise<void> {
@@ -114,7 +114,7 @@ async function printiTwinIds(): Promise<void> {
 
 ### Get list of Repositories by Id, Class, and Sub Class
 ```typescript
-import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
+import { ITwinsAccessClient, Repository, ITwinsAPIResponse } from "@itwin/itwins-client";
 
 /** Function that queries all iTwin Repositories and prints their ids to the console. */
 async function printiTwinIds(): Promise<void> {
