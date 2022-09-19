@@ -10,6 +10,78 @@ If you have questions, or wish to contribute to iTwin.js, see our [Contributing 
 
 Contains the **@itwin/itwins-client** package that wraps sending requests to the iTwins service. Visit the [iTwins API](https://developer.bentley.com/apis/itwins/) for more documentation on the iTwins service.
 
+## Usage examples
+
+### Get list of iTwins
+```typescript
+import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
+
+/** Function that queries all iTwins and prints their ids to the console. */
+async function printiTwinIds(): Promise<void> {
+  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  let accessToken: AccessToken;
+
+  before(async function () {
+    this.timeout(0);
+    accessToken = { get_access_token_logic_here }
+  });
+  
+  const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+    await iTwinsAccessClient.queryAsync(accessToken, ITwinSubClass.Project);
+    
+   iTwinsResponse.data!.forEach((actualiTwin) => {
+    console.log(actualiTwin.id);
+  });
+}
+```
+
+### Get iTwin by Id
+```typescript
+import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
+
+/** Function that gets iTwin by id and prints the id and displayName. */
+async function printiTwinIds(): Promise<void> {
+  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  let accessToken: AccessToken;
+
+  before(async function () {
+    this.timeout(0);
+    accessToken = { get_access_token_logic_here }
+  });
+  
+  const iTwinsResponse: ITwinsAPIResponse<ITwin> =
+    await iTwinsAccessClient.getAsync(accessToken, "3865240b-cfd9-4ba1-a9e5-65e8813d006b");
+  const actualiTwin = iTwinsResponse.data!;
+  console.log(actualiTwin.id, actualiTwin.displayName);
+  });
+}
+```
+
+### Get list of Repositories by Id
+```typescript
+import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
+
+/** Function that queries all iTwin Repositories and prints their ids to the console. */
+async function printiTwinIds(): Promise<void> {
+  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  let accessToken: AccessToken;
+
+  before(async function () {
+    this.timeout(0);
+    accessToken = { get_access_token_logic_here }
+  });
+  
+  const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+    accessToken,
+    iTwinId
+  );
+    
+   iTwinsResponse.data!.forEach((actualRepository) => {
+    console.log(actualRepository.id);
+  });
+}
+```
+
 ## Integration Test Setup
 
 Make sure a `.env` file is created in the root folder.
