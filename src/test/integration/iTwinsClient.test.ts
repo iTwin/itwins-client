@@ -5,10 +5,8 @@
 import * as chai from "chai";
 import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
-import type { ITwin, ITwinsAPIResponse} from "../../iTwinsAccessProps";
-import { RepositorySubClass} from "../../iTwinsAccessProps";
-import { RepositoryClass } from "../../iTwinsAccessProps";
-import { ITwinSubClass } from "../../iTwinsAccessProps";
+import type { ITwin, ITwinsAPIResponse, Repository} from "../../iTwinsAccessProps";
+import { ITwinSubClass, RepositoryClass, RepositorySubClass} from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
 
 chai.should();
@@ -26,7 +24,7 @@ describe("iTwinsClient", () => {
     const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+    const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
       accessToken,
       iTwinId
     );
@@ -41,7 +39,7 @@ describe("iTwinsClient", () => {
     const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+    const iTwinsResponse:  ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
       accessToken,
       iTwinId,
       {
@@ -62,7 +60,7 @@ describe("iTwinsClient", () => {
     const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+    const iTwinsResponse:  ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
       accessToken,
       iTwinId,
       {
