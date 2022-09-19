@@ -87,7 +87,7 @@ async function printiTwinIds(): Promise<void> {
 }
 ```
 
-### Get list of Repositories by Id
+### Get list of Repositories by iTwin Id
 ```typescript
 import { ITwinsAccessClient, Repository, ITwinsAPIResponse } from "@itwin/itwins-client";
 
@@ -103,7 +103,7 @@ async function printiTwinIds(): Promise<void> {
   
   const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
     accessToken,
-    iTwinId
+    "e36e29fa-11c0-4ac8-9ead-e8678ebc393c"
   );
     
    iTwinsResponse.data!.forEach((actualRepository) => {
@@ -112,7 +112,7 @@ async function printiTwinIds(): Promise<void> {
 }
 ```
 
-### Get list of Repositories by Id, Class, and Sub Class
+### Get list of Repositories by iTwin Id, Class, and Sub Class
 ```typescript
 import { ITwinsAccessClient, Repository, ITwinsAPIResponse } from "@itwin/itwins-client";
 
@@ -128,7 +128,7 @@ async function printiTwinIds(): Promise<void> {
   
   const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
     accessToken,
-    iTwinId,
+    "e36e29fa-11c0-4ac8-9ead-e8678ebc393c",
     {
       class: "GeographicInformationSystem",
       subClass: "MapServer",
