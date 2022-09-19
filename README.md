@@ -101,7 +101,7 @@ async function printiTwinIds(): Promise<void> {
     accessToken = { get_access_token_logic_here }
   });
   
-  const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+  const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
     accessToken,
     "e36e29fa-11c0-4ac8-9ead-e8678ebc393c"
   );
@@ -126,7 +126,7 @@ async function printiTwinIds(): Promise<void> {
     accessToken = { get_access_token_logic_here }
   });
   
-  const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+  const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
     accessToken,
     "e36e29fa-11c0-4ac8-9ead-e8678ebc393c",
     {
