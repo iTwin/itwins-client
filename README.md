@@ -27,7 +27,7 @@ async function printiTwinIds(): Promise<void> {
   });
   
   const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
-    await iTwinsAccessClient.queryAsync(accessToken, ITwinSubClass.Project);
+    await iTwinsAccessClient.queryAsync(accessToken, "Project");
     
    iTwinsResponse.data!.forEach((actualiTwin) => {
     console.log(actualiTwin.id);
