@@ -144,5 +144,3 @@ async function printiTwinIds(): Promise<void> {
 ## Contributing to this Repository
 
 For information on how to contribute to this project, please read [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, [GETTINGSTARTED.md](GETTINGSTARTED.md) for information on working with the documentation in this repository.
-
-In the future, [HELPWANTED.md](HELPWANTED.md) may contain a list of contributions we would like to see to this project.
