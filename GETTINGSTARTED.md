@@ -3,7 +3,6 @@
 
 Make sure an `.env` file is created in the root folder.  The following are the keys without the values:
 ```
-IMJS_BUDDI_RESOLVE_URL_USING_REGION=""
 IMJS_AUTH_AUTHORITY=""
 IMJS_URL_PREFIX=""
 IMJS_OIDC_AUTHING_BROWSER_TEST_AUTHORITY=""
