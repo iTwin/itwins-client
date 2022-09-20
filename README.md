@@ -14,6 +14,7 @@ Contains the **@itwin/itwins-client** package that wraps sending requests to the
 
 ### Get list of iTwins
 ```typescript
+import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
 
 /** Function that queries all iTwins and prints their ids to the console. */
@@ -32,6 +33,7 @@ async function printiTwinIds(): Promise<void> {
 
 ### Get paged list of iTwins using top/skip
 ```typescript
+import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
 
 /** Function that queries all iTwins and prints their ids to the console. */
@@ -57,6 +59,7 @@ async function printiTwinIds(): Promise<void> {
 
 ### Get iTwin by Id
 ```typescript
+import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
 
 /** Function that gets iTwin by id and prints the id and displayName. */
@@ -68,12 +71,12 @@ async function printiTwinIds(): Promise<void> {
     await iTwinsAccessClient.getAsync(accessToken, "3865240b-cfd9-4ba1-a9e5-65e8813d006b");
   const actualiTwin = iTwinsResponse.data!;
   console.log(actualiTwin.id, actualiTwin.displayName);
-  });
 }
 ```
 
 ### Get list of Repositories by iTwin Id
 ```typescript
+import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient, Repository, ITwinsAPIResponse } from "@itwin/itwins-client";
 
 /** Function that queries all iTwin Repositories and prints their ids to the console. */
@@ -94,6 +97,7 @@ async function printiTwinIds(): Promise<void> {
 
 ### Get list of Repositories by iTwin Id, Class, and Sub Class
 ```typescript
+import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient, Repository, ITwinsAPIResponse } from "@itwin/itwins-client";
 
 /** Function that queries all iTwin Repositories and prints their ids to the console. */
