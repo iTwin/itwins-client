@@ -19,12 +19,7 @@ import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-clie
 /** Function that queries all iTwins and prints their ids to the console. */
 async function printiTwinIds(): Promise<void> {
   const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
-  let accessToken: AccessToken;
-
-  before(async function () {
-    this.timeout(0);
-    accessToken = { get_access_token_logic_here }
-  });
+  const accessToken: AccessToken = { get_access_token_logic_here };
   
   const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
     await iTwinsAccessClient.queryAsync(accessToken, "Project");
@@ -42,12 +37,7 @@ import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-clie
 /** Function that queries all iTwins and prints their ids to the console. */
 async function printiTwinIds(): Promise<void> {
   const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
-  let accessToken: AccessToken;
-
-  before(async function () {
-    this.timeout(0);
-    accessToken = { get_access_token_logic_here }
-  });
+  const accessToken: AccessToken = { get_access_token_logic_here };
   
   const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
     await iTwinsAccessClient.queryAsync(
@@ -72,12 +62,7 @@ import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-clie
 /** Function that gets iTwin by id and prints the id and displayName. */
 async function printiTwinIds(): Promise<void> {
   const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
-  let accessToken: AccessToken;
-
-  before(async function () {
-    this.timeout(0);
-    accessToken = { get_access_token_logic_here }
-  });
+  const accessToken: AccessToken = { get_access_token_logic_here };
   
   const iTwinsResponse: ITwinsAPIResponse<ITwin> =
     await iTwinsAccessClient.getAsync(accessToken, "3865240b-cfd9-4ba1-a9e5-65e8813d006b");
@@ -94,12 +79,7 @@ import { ITwinsAccessClient, Repository, ITwinsAPIResponse } from "@itwin/itwins
 /** Function that queries all iTwin Repositories and prints their ids to the console. */
 async function printiTwinIds(): Promise<void> {
   const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
-  let accessToken: AccessToken;
-
-  before(async function () {
-    this.timeout(0);
-    accessToken = { get_access_token_logic_here }
-  });
+  const accessToken: AccessToken = { get_access_token_logic_here };
   
   const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
     accessToken,
@@ -119,12 +99,7 @@ import { ITwinsAccessClient, Repository, ITwinsAPIResponse } from "@itwin/itwins
 /** Function that queries all iTwin Repositories and prints their ids to the console. */
 async function printiTwinIds(): Promise<void> {
   const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
-  let accessToken: AccessToken;
-
-  before(async function () {
-    this.timeout(0);
-    accessToken = { get_access_token_logic_here }
-  });
+  const accessToken: AccessToken = { get_access_token_logic_here };
   
   const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
     accessToken,
