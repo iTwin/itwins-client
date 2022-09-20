@@ -68,16 +68,13 @@ These two blogs posts on contributing code to open source projects are good too:
 
 ## File Headers
 
-The following file headers are used in this project. Please use it for new files and update the copyright year for changes.
+The following file headers are used in this project. Please use it for new files.
 
-```C#
-/*--------------------------------------------------------------------------------------+
-|
-|     $Source: Filename.cs $
-|
-|  $Copyright: (c) 2018 Bentley Systems, Incorporated. All rights reserved. $
-|
-+--------------------------------------------------------------------------------------*/
+```typescript
+/*---------------------------------------------------------------------------------------------
+ * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+ * See LICENSE.md in the project root for license terms and full copyright notice.
+ *--------------------------------------------------------------------------------------------*/
 ```
 
 ## Editor Config
