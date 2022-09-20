@@ -5,8 +5,8 @@
 import * as chai from "chai";
 import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
-import type { ITwin, ITwinsAPIResponse } from "../../iTwinsAccessProps";
-import { ITwinSubClass } from "../../iTwinsAccessProps";
+import type { ITwin, ITwinsAPIResponse, Repository} from "../../iTwinsAccessProps";
+import { ITwinSubClass, RepositoryClass, RepositorySubClass} from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
 
 chai.should();
@@ -17,6 +17,103 @@ describe("iTwinsClient", () => {
   before(async function () {
     this.timeout(0);
     accessToken = await TestConfig.getAccessToken();
+  });
+
+  it("should get iTwin repositories by id", async () => {
+    // Arrange
+    const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
+
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
+      accessToken,
+      iTwinId
+    );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+  });
+
+  it("should get iTwin repositories by id and class", async () => {
+    // Arrange
+    const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
+
+    // Act
+    const iTwinsResponse:  ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
+      accessToken,
+      iTwinId,
+      {
+        class: RepositoryClass.iModels,
+      }
+    );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    iTwinsResponse.data!.forEach((actualRepository) => {
+      chai.expect(actualRepository.class).to.be.eq("iModels");
+    });
+  });
+
+  it("should get iTwin repositories by id, class, and subClass", async () => {
+    // Arrange
+    const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
+
+    // Act
+    const iTwinsResponse:  ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
+      accessToken,
+      iTwinId,
+      {
+        class: RepositoryClass.GeographicInformationSystem,
+        subClass: RepositorySubClass.MapServer,
+      }
+    );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    iTwinsResponse.data!.forEach((actualRepository) => {
+      chai.expect(actualRepository.class).to.be.eq("GeographicInformationSystem");
+      chai.expect(actualRepository.subClass).to.be.eq("MapServer");
+    });
+  });
+
+  it("should get a 404 when trying to get iTwin Repositories", async () => {
+    // Arrange
+    const iTwinId = "22acf21e-0575-4faf-849b-bcd538718269";
+
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+      accessToken,
+      iTwinId
+    );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(404);
+    chai.expect(iTwinsResponse.data).to.be.undefined;
+    chai.expect(iTwinsResponse.error!.code).to.be.eq("iTwinNotFound");
+  });
+
+  it("should get a 422 when querying iTwin Repositories with unsupported class", async () => {
+    // Arrange
+    const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
+
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryRepositoriesAsync(
+      accessToken,
+      iTwinId,
+      {
+        class: "Invalid" as ITwinSubClass,
+      }
+    );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(422);
+    chai.expect(iTwinsResponse.data).to.be.undefined;
+    chai.expect(iTwinsResponse.error).to.not.be.undefined;
+    chai.expect(iTwinsResponse.error!.code).to.be.eq("InvalidiTwinsRequest");
+    chai.expect(iTwinsResponse.error!.details![0].code).to.be.eq("InvalidValue");
+    chai.expect(iTwinsResponse.error!.details![0].target).to.be.eq("class");
   });
 
   it("should get a 404 when trying to get an iTwin", async () => {
