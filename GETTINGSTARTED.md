@@ -4,7 +4,6 @@
 Make sure a `.env` file is created in the root folder.
 
 ```
-IMJS_BUDDI_RESOLVE_URL_USING_REGION="{region_code_here}"
 IMJS_AUTH_AUTHORITY="{ims_authority_url_here}"
 IMJS_URL_PREFIX="qa-"
 IMJS_OIDC_AUTHING_BROWSER_TEST_AUTHORITY="{ims_authority_url_here}"
