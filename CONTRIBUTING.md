@@ -70,7 +70,7 @@ These two blogs posts on contributing code to open source projects are good too:
 
 The following file headers are used in this project. Please use it for new files.
 
-```C#
+```typescript
 /*---------------------------------------------------------------------------------------------
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
