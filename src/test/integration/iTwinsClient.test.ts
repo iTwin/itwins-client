@@ -3,9 +3,10 @@
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 import * as chai from "chai";
-import type { AccessToken } from "@itwin/core-bentley";
+import type { AccessToken} from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
-import type { ITwin, ITwinsAPIResponse, Repository} from "../../iTwinsAccessProps";
+import type { ITwin, ITwinsAPIResponse, NewiTwin, NewRepository, Repository} from "../../iTwinsAccessProps";
+import { ITwinClass} from "../../iTwinsAccessProps";
 import { ITwinSubClass, RepositoryClass, RepositorySubClass} from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
 
@@ -554,16 +555,6 @@ describe("iTwinsClient", () => {
     });
   });
 
-  // it("should get a list of account iTwins", async () => {
-  //   // Act
-  //   const iTwinsResponse: ITwinsAPIResponse<iTwin[]> =
-  //     await iTwinsAccessClient.queryAsync(accessToken, ITwinSubClass.Account);
-
-  //   // Assert
-  //   chai.expect(iTwinsResponse.status).to.be.eq(200);
-  //   chai.expect(iTwinsResponse.data).to.not.be.empty;
-  // });
-
   it("should get the primary account iTwin", async () => {
     // Act
     const iTwinsResponse: ITwinsAPIResponse<ITwin> =
@@ -574,5 +565,85 @@ describe("iTwinsClient", () => {
     chai.expect(iTwinsResponse.data).to.not.be.empty;
     const actualiTwin = iTwinsResponse.data!;
     chai.expect(actualiTwin.id).to.not.be.empty;
+  });
+
+  it("should create and delete an iTwin Repository", async () =>{
+    /* CREATE THE ITWIN REPOSITORY */
+    // Arrange
+    const iTwinId = process.env.IMJS_TEST_ASSET_ID;
+    const newRepository: NewRepository = {
+      class: RepositoryClass.GeographicInformationSystem,
+      subClass: RepositorySubClass.WebMapService,
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+    };
+
+    // Act
+    const createResponse: ITwinsAPIResponse<Repository> =
+      await iTwinsAccessClient.createRepository(accessToken, iTwinId!, newRepository);
+
+    // Assert
+    chai.expect(createResponse.status).to.be.eq(201);
+    chai.expect(createResponse.data!.class).to.be.eq(newRepository.class);
+    chai.expect(createResponse.data!.subClass).to.be.eq(newRepository.subClass);
+    chai.expect(createResponse.data!.uri).to.be.eq(newRepository.uri);
+
+    /* DELETE ITWIN REPOSITORY */
+    // Act
+    const deleteResponse: ITwinsAPIResponse<undefined> =
+      await iTwinsAccessClient.deleteRepository(accessToken, iTwinId!, createResponse.data!.id);
+
+    // Assert
+    chai.expect(deleteResponse.status).to.be.eq(204);
+    chai.expect(deleteResponse.data).to.be.undefined;
+  });
+
+  it("should create, update, and delete an iTwin", async () =>{
+    /* CREATE THE ITWIN */
+    // Arrange
+    const newiTwin: NewiTwin = {
+      displayName: "APIM iTwin Test Display Name dlfjalsdfasf",
+      // eslint-disable-next-line id-blacklist
+      number: "APIM iTwin Test Number fjkdlsfjlsadfdas",
+      type: "Bridge",
+      subClass: ITwinSubClass.Asset,
+      class: ITwinClass.Thing,
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+
+    // Act
+    const createResponse: ITwinsAPIResponse<ITwin> =
+      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
+    // eslint-disable-next-line no-console
+    const iTwinId = createResponse.data!.id;
+
+    // Assert
+    chai.expect(createResponse.status).to.be.eq(201);
+    chai.expect(createResponse.data!.displayName).to.be.eq(newiTwin.displayName);
+    chai.expect(createResponse.data!.class).to.be.eq(newiTwin.class);
+    chai.expect(createResponse.data!.subClass).to.be.eq(newiTwin.subClass);
+
+    /* UPDATE ITWIN */
+    // Arrange
+    const updatediTwin: NewiTwin = {
+      displayName: "UPDATED APIM iTwin Test Display Name",
+    };
+
+    // Act
+    const updateResponse: ITwinsAPIResponse<ITwin> =
+      await iTwinsAccessClient.updateiTwin(accessToken, iTwinId, updatediTwin);
+
+    // Assert
+    chai.expect(updateResponse.status).to.be.eq(200);
+    chai.expect(updateResponse.data!.displayName).to.be.eq(updatediTwin.displayName);
+
+    /* DELETE ITWIN */
+    // Act
+    const deleteResponse: ITwinsAPIResponse<undefined> =
+      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+
+    // Assert
+    chai.expect(deleteResponse.status).to.be.eq(204);
+    chai.expect(deleteResponse.data).to.be.undefined;
   });
 });

@@ -74,14 +74,14 @@ export interface ITwin {
  * @beta
 */
 export interface NewiTwin {
-  class: ITwinClass;
-  subClass: ITwinSubClass;
-  type: string;
+  class?: ITwinClass;
+  subClass?: ITwinSubClass;
+  type?: string;
   // eslint-disable-next-line id-blacklist
-  number: string;
-  displayName: string;
-  dataCenterLocation: string;
-  status: string;
+  number?: string;
+  displayName?: string;
+  dataCenterLocation?: string;
+  status?: string;
 }
 
 /** The simplified Repository object
@@ -97,11 +97,7 @@ export interface Repository {
 /** Repository object used for POST/PATCH
  * @beta
  */
-export interface NewRepository {
-  class: RepositoryClass;
-  subClass: RepositorySubClass;
-  uri: string;
-}
+export type NewRepository = Omit<Repository, "id">;
 
 export enum ITwinSubClass {
   Account = "Account",

@@ -13,6 +13,8 @@ import type {
   ITwinsAPIResponse,
   ITwinsQueryArg,
   ITwinSubClass,
+  NewiTwin,
+  NewRepository,
   RepositoriesQueryArg,
   Repository,
 } from "./iTwinsAccessProps";
@@ -37,8 +39,80 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins");
   }
 
+  /** Create a new iTwin
+   * @param accessToken The client access token string
+   * @param iTwin The iTwin to be created
+   * @returns ITwin
+   */
+  public async createiTwin(
+    accessToken: AccessToken,
+    iTwin: NewiTwin
+  ): Promise<ITwinsAPIResponse<ITwin>>{
+    const url = `${this._baseUrl}/`;
+    return this.sendGenericAPIRequest(accessToken, "POST", url, iTwin, "iTwin");
+  }
+
+  /** Update the specified iTwin
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @param iTwin The iTwin to be created
+   * @returns ITwin
+   */
+  public async updateiTwin(
+    accessToken: AccessToken,
+    iTwinId: string,
+    iTwin: NewiTwin
+  ): Promise<ITwinsAPIResponse<ITwin>>{
+    const url = `${this._baseUrl}/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "PATCH", url, iTwin, "iTwin");
+  }
+
+  /** Delete the specified iTwin
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @returns No Content
+   */
+  public async deleteiTwin(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<ITwinsAPIResponse<undefined>>{
+    const url = `${this._baseUrl}/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "DELETE", url);
+  }
+
+  /** Create a new iTwin Repository
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @param repository The Repository to be created
+   * @return Repository
+   */
+  public async createRepository(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repository: NewRepository
+  ): Promise<ITwinsAPIResponse<Repository>>{
+    const url = `${this._baseUrl}/${iTwinId}/repositories`;
+    return this.sendGenericAPIRequest(accessToken, "POST", url, repository, "repository");
+  }
+
+  /** Delete the specified iTwin Repository
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @param repositoryId The id of the Repository
+   * @return No Content
+   */
+  public async deleteRepository(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string
+  ): Promise<ITwinsAPIResponse<undefined>>{
+    const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}`;
+    return this.sendGenericAPIRequest(accessToken, "DELETE", url);
+  }
+
   /** Get Repositories accessible to user
    * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
    * @param arg Optional query arguments, for class and subclass
    * @returns Array of Repositories, may be empty
    */
