@@ -70,8 +70,34 @@ export interface ITwin {
   number: string;
 }
 
+/** iTwin object used for POST/PATCH
+ * @beta
+*/
+export interface NewiTwin {
+  class: ITwinClass;
+  subClass: ITwinSubClass;
+  type: string;
+  // eslint-disable-next-line id-blacklist
+  number: string;
+  displayName: string;
+  dataCenterLocation: string;
+  status: string;
+}
+
+/** The simplified Repository object
+ * @beta
+ */
 export interface Repository {
   id: string;
+  class: RepositoryClass;
+  subClass: RepositorySubClass;
+  uri: string;
+}
+
+/** Repository object used for POST/PATCH
+ * @beta
+ */
+export interface NewRepository {
   class: RepositoryClass;
   subClass: RepositorySubClass;
   uri: string;
