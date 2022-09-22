@@ -123,10 +123,14 @@ async function printiTwinIds(): Promise<void> {
 ### Add, Update, and Delete an iTwin
 ```typescript
 import type { AccessToken } from "@itwin/core-bentley";
-import { ITwinsAccessClient, ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
+import type { ITwin, NewiTwin, ITwinsAPIResponse } from "@itwin/itwins-client";
+import { ITwinsAccessClient, ITwinClass, ITwinSubClass } from "@itwin/itwins-client";
 
 /** Function that creates, updates, and then deletes an iTwin. */
 async function demoCRUD(): Promise<void> {
+  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  const accessToken: AccessToken = { get_access_token_logic_here };
+  
   /* Create the iTwin */
   const newiTwin: NewiTwin = {
     displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
