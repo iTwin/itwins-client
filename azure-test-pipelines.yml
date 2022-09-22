@@ -37,7 +37,7 @@ jobs:
           echo "##vso[task.setvariable variable=USER_WITH_ACCESS_PASSWORD;]$test_reg_password"
         displayName: 'Add config to environment'
         env:
-          test_reg_password: $(imjs_regular_user_password)
+          test_reg_password: $(imjs_super_manager_user_password)
 
       - script: npm install -g pnpm@6.19.0
         displayName: install pnpm globally
