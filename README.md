@@ -120,6 +120,44 @@ async function printiTwinIds(): Promise<void> {
 }
 ```
 
+### Add, Update, and Delete an iTwin
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import type { ITwin, NewiTwin, ITwinsAPIResponse } from "@itwin/itwins-client";
+import { ITwinsAccessClient, ITwinClass, ITwinSubClass } from "@itwin/itwins-client";
+
+/** Function that creates, updates, and then deletes an iTwin. */
+async function demoCRUD(): Promise<void> {
+  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  const accessToken: AccessToken = { get_access_token_logic_here };
+  
+  /* Create the iTwin */
+  const newiTwin: NewiTwin = {
+    displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+    number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+    type: "Bridge",
+    subClass: ITwinSubClass.Asset,
+    class: ITwinClass.Thing,
+    dataCenterLocation: "East US",
+    status: "Trial",
+  };
+  const createResponse: ITwinsAPIResponse<ITwin> =
+    await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
+  const iTwinId = createResponse.data!.id;
+  
+  /* Update the iTwin */
+  const updatediTwin: NewiTwin = {
+    displayName: "UPDATED APIM iTwin Test Display Name",
+  };
+  const updateResponse: ITwinsAPIResponse<ITwin> =
+    await iTwinsAccessClient.updateiTwin(accessToken, iTwinId, updatediTwin);
+    
+  /* Delete the iTwin */
+  const deleteResponse: ITwinsAPIResponse<undefined> =
+    await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+}
+```
+
 ## Contributing to this Repository
 
 For information on how to contribute to this project, please read [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, [GETTINGSTARTED.md](GETTINGSTARTED.md) for information on working with the documentation in this repository.
