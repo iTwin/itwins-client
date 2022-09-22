@@ -21,7 +21,7 @@ export class TestConfig {
 
   /** Login the specified user and return the AuthorizationToken */
   public static async getAccessToken(
-    user: TestUserCredentials = TestUsers.manager
+    user: TestUserCredentials = TestUsers.superManager
   ): Promise<AccessToken> {
     return getAccessTokenFromBackend(user);
   }
