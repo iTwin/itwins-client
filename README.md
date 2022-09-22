@@ -120,7 +120,7 @@ async function printiTwinIds(): Promise<void> {
 }
 ```
 
-### Add, Update, and Delete an iTwin
+### Create, Update, and Delete an iTwin
 ```typescript
 import type { AccessToken } from "@itwin/core-bentley";
 import type { ITwin, NewiTwin, ITwinsAPIResponse } from "@itwin/itwins-client";
@@ -154,6 +154,50 @@ async function demoCRUD(): Promise<void> {
     
   /* Delete the iTwin */
   const deleteResponse: ITwinsAPIResponse<undefined> =
+    await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+}
+```
+
+### Create and Delete an iTwin Repository
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import type { ITwin, NewiTwin, NewRepository, Repository, ITwinsAPIResponse } from "@itwin/itwins-client";
+import { ITwinsAccessClient, ITwinClass, ITwinSubClass, RepositoryClass, RepositorySubClass } from "@itwin/itwins-client";
+
+/** Function that creates, updates, and then deletes an iTwin. */
+async function demoCRUD(): Promise<void> {
+  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  const accessToken: AccessToken = { get_access_token_logic_here };
+  
+  /* Create the iTwin Repository */
+  // Create an iTwin first
+  const newiTwin: NewiTwin = {
+    displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+    number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+    type: "Bridge",
+    subClass: ITwinSubClass.Asset,
+    class: ITwinClass.Thing,
+    dataCenterLocation: "East US",
+    status: "Trial",
+  };
+  const createResponse: ITwinsAPIResponse<ITwin> =
+    await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
+  const iTwinId = createResponse.data!.id;
+  
+  // Now create the iTwin Repository
+  const newRepository: NewRepository = {
+    class: RepositoryClass.GeographicInformationSystem,
+    subClass: RepositorySubClass.WebMapService,
+    uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+  };
+  const createResponse: ITwinsAPIResponse<Repository> =
+    await iTwinsAccessClient.createRepository(accessToken, iTwinId, newRepository);
+    
+  /* Delete the iTwin Repository */
+  const repositoryDeleteResponse: ITwinsAPIResponse<undefined> =
+    await iTwinsAccessClient.deleteRepository(accessToken, iTwinId, createResponse.data!.id);
+  // Cleanup:  deleting iTwin
+  const iTwinDeleteResponse: ITwinsAPIResponse<undefined> =
     await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
 }
 ```
