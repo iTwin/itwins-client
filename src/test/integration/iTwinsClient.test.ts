@@ -9,7 +9,6 @@ import type { ITwin, ITwinsAPIResponse, NewiTwin, NewRepository, Repository} fro
 import { ITwinClass} from "../../iTwinsAccessProps";
 import { ITwinSubClass, RepositoryClass, RepositorySubClass} from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
-import { access } from "fs";
 
 chai.should();
 describe("iTwinsClient", () => {
