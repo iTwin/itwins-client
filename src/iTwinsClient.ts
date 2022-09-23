@@ -6,9 +6,7 @@
  * @module iTwinsClient
  */
 import type { AccessToken } from "@itwin/core-bentley";
-import type { Method } from "axios";
-import type { AxiosRequestConfig } from "axios";
-import axios from "axios";
+import { BaseClient } from "./BaseClient";
 import type {
   ITwin,
   ITwinsAccess,
@@ -22,18 +20,7 @@ import type {
 /** Client API to access the itwin service.
  * @beta
  */
-export class ITwinsAccessClient implements ITwinsAccess {
-  private _baseUrl: string = "https://api.bentley.com/itwins";
-
-  public constructor() {
-    const urlPrefix = process.env.IMJS_URL_PREFIX;
-    if (urlPrefix) {
-      const baseUrl = new URL(this._baseUrl);
-      baseUrl.hostname = urlPrefix + baseUrl.hostname;
-      this._baseUrl = baseUrl.href;
-    }
-  }
-
+export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   /** Get itwins accessible to the user
    * @param accessToken The client access token string
    * @param subClass Required parameter to search a specific iTwin subClass
@@ -47,11 +34,83 @@ export class ITwinsAccessClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     let url = `${this._baseUrl}?subClass=${subClass}`;
     if (arg) url += this.getQueryString(arg);
-    return this.sendGETManyAPIRequest(accessToken, url);
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins");
+  }
+
+  /** Create a new iTwin
+   * @param accessToken The client access token string
+   * @param iTwin The iTwin to be created
+   * @returns ITwin
+   */
+  public async createiTwin(
+    accessToken: AccessToken,
+    iTwin: ITwin
+  ): Promise<ITwinsAPIResponse<ITwin>>{
+    const url = `${this._baseUrl}/`;
+    return this.sendGenericAPIRequest(accessToken, "POST", url, iTwin, "iTwin");
+  }
+
+  /** Update the specified iTwin
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @param iTwin The iTwin to be created
+   * @returns ITwin
+   */
+  public async updateiTwin(
+    accessToken: AccessToken,
+    iTwinId: string,
+    iTwin: ITwin
+  ): Promise<ITwinsAPIResponse<ITwin>>{
+    const url = `${this._baseUrl}/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "PATCH", url, iTwin, "iTwin");
+  }
+
+  /** Delete the specified iTwin
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @returns No Content
+   */
+  public async deleteiTwin(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<ITwinsAPIResponse<undefined>>{
+    const url = `${this._baseUrl}/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "DELETE", url);
+  }
+
+  /** Create a new iTwin Repository
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @param repository The Repository to be created
+   * @return Repository
+   */
+  public async createRepository(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repository: Repository
+  ): Promise<ITwinsAPIResponse<Repository>>{
+    const url = `${this._baseUrl}/${iTwinId}/repositories`;
+    return this.sendGenericAPIRequest(accessToken, "POST", url, repository, "repository");
+  }
+
+  /** Delete the specified iTwin Repository
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @param repositoryId The id of the Repository
+   * @return No Content
+   */
+  public async deleteRepository(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string
+  ): Promise<ITwinsAPIResponse<undefined>>{
+    const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}`;
+    return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
 
   /** Get Repositories accessible to user
    * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
    * @param arg Optional query arguments, for class and subclass
    * @returns Array of Repositories, may be empty
    */
@@ -62,7 +121,7 @@ export class ITwinsAccessClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<Repository[]>> {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
     if (arg) url += this.getRepositoryQueryString(arg);
-    return this.sendGETManyAPIRequestRepositories(accessToken, url);
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "repositories");
   }
 
   /** Get itwin accessible to the user
@@ -75,7 +134,7 @@ export class ITwinsAccessClient implements ITwinsAccess {
     iTwinId: string
   ): Promise<ITwinsAPIResponse<ITwin>> {
     const url = `${this._baseUrl}/${iTwinId}`;
-    return this.sendGenericAPIRequest(accessToken, "GET", url);
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwin");
   }
 
   /** Get itwins accessible to the user
@@ -91,7 +150,7 @@ export class ITwinsAccessClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     let url = `${this._baseUrl}/favorites?subClass=${subClass}`;
     if (arg) url += this.getQueryString(arg);
-    return this.sendGETManyAPIRequest(accessToken, url);
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins");
   }
 
   /** Get itwins accessible to the user
@@ -107,185 +166,16 @@ export class ITwinsAccessClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     let url = `${this._baseUrl}/recents?subClass=${subClass}`;
     if (arg) url += this.getQueryString(arg);
-    return this.sendGETManyAPIRequest(accessToken, url);
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins");
   }
 
-  /** Get itwins accessible to the user
-   * @param accessToken The client access token string
-   * @param subClass Required parameter to search a specific iTwin subClass
-   * @param arg Optional query arguments, for paging, searching, and filtering
-   * @returns Array of projects, may be empty
+  /** Get primary account accessible to the user
+   * @returns Primary account
    */
   public async getPrimaryAccountAsync(
     accessToken: AccessToken
   ): Promise<ITwinsAPIResponse<ITwin>> {
     const url = `${this._baseUrl}/myprimaryaccount`;
-    return this.sendGenericAPIRequest(accessToken, "GET", url);
-  }
-
-  // /** Gets projects using the given query options
-  //  * @param accessToken The client access token string
-  //  * @param arg Optional object containing queryable properties
-  //  * @returns Projects and links meeting the query's requirements
-  //  */
-  // public async getByQuery(accessToken: AccessToken, subClass: ITwinSubClass, arg?: ITwinsQueryArg): Promise<iTwinsQueryResult> {
-  // }
-
-  private async sendGETManyAPIRequest(
-    accessToken: AccessToken,
-    url: string
-  ): Promise<ITwinsAPIResponse<ITwin[]>> {
-    const requestOptions = this.getRequestOptions(accessToken);
-
-    try {
-      const response = await axios.get(url, requestOptions);
-
-      return {
-        status: response.status,
-        data: response.data.iTwins,
-        error: response.data.error,
-      };
-    } catch (err) {
-      return {
-        status: 500,
-        error: {
-          code: "InternalServerError",
-          message:
-            "An internal exception happened while calling iTwins Service",
-        },
-      };
-    }
-  }
-
-  private async sendGETManyAPIRequestRepositories(
-    accessToken: AccessToken,
-    url: string
-  ): Promise<ITwinsAPIResponse<Repository[]>> {
-    const requestOptions = this.getRequestOptions(accessToken);
-
-    try {
-      const response = await axios.get(url, requestOptions);
-
-      return {
-        status: response.status,
-        data: response.data.repositories,
-        error: response.data.error,
-      };
-    } catch (err) {
-      return {
-        status: 500,
-        error: {
-          code: "InternalServerError",
-          message:
-            "An internal exception happened while calling iTwins Service",
-        },
-      };
-    }
-  }
-
-  private async sendGenericAPIRequest(
-    accessToken: AccessToken,
-    method: Method,
-    url: string
-  ): Promise<ITwinsAPIResponse<ITwin>> {
-    const requestOptions = this.getRequestOptions(accessToken);
-    requestOptions.method = method;
-    requestOptions.url = url;
-
-    try {
-      const response = await axios(requestOptions);
-
-      return {
-        status: response.status,
-        data: response.data.iTwin,
-        error: response.data.error,
-      };
-    } catch (err) {
-      return {
-        status: 500,
-        error: {
-          code: "InternalServerError",
-          message:
-            "An internal exception happened while calling iTwins Service",
-        },
-      };
-    }
-  }
-
-  /**
-   * Build the request methods, headers, and other options
-   * @param accessTokenString The client access token string
-   */
-  private getRequestOptions(accessTokenString: string): AxiosRequestConfig {
-    return {
-      method: "GET",
-      headers: {
-        "authorization": accessTokenString,
-        "content-type": "application/json",
-      },
-      validateStatus(status) {
-        return status < 500; // Resolve only if the status code is less than 500
-      },
-    };
-  }
-
-  /**
-   * Build a query to be appended to a URL
-   * @param queryArg Object container queryable properties
-   * @returns query string with iTwinQueryArgs applied, which should be appended to a url
-   */
-  private getQueryString(queryArg: ITwinsQueryArg): string {
-    let queryString = "";
-
-    if (queryArg.search) {
-      queryString += `&$search=${queryArg.search}`;
-    }
-
-    if (queryArg.top) {
-      queryString += `&$top=${queryArg.top}`;
-    }
-
-    if (queryArg.skip) {
-      queryString += `&$skip=${queryArg.skip}`;
-    }
-
-    if (queryArg.displayName) {
-      queryString += `&displayName=${queryArg.displayName}`;
-    }
-
-    if (queryArg.number) {
-      queryString += `&number=${queryArg.number}`;
-    }
-
-    if (queryArg.type) {
-      queryString += `&type=${queryArg.type}`;
-    }
-
-    // trim & from start of string
-    queryString.replace(/^&+/, "");
-
-    return queryString;
-  }
-
-  /**
-   * Build a query to be appended to the URL for iTwin Repositories
-   * @param queryArg Object container queryable properties
-   * @returns query string with RepositoriesQueryArg applied, which should be appended to a url
-   */
-  private getRepositoryQueryString(queryArg: RepositoriesQueryArg): string {
-    let queryString = "";
-
-    if (queryArg.class) {
-      queryString += `?class=${queryArg.class}`;
-    }
-
-    if (queryArg.subClass) {
-      queryString += `&subClass=${queryArg.subClass}`;
-    }
-
-    // trim & from start of string
-    queryString.replace(/^&+/, "");
-
-    return queryString;
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwin");
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@itwin/itwins-client",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "iTwins client for the iTwin platform",
   "main": "lib/cjs/itwins-client.js",
   "module": "lib/esm/itwins-client.js",

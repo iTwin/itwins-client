@@ -61,17 +61,22 @@ export interface ITwinsAPIResponse<T> {
  * @beta
  */
 export interface ITwin {
-  id: string;
-  class: ITwinClass;
-  subClass: ITwinSubClass;
-  type: string;
-  displayName: string;
+  id?: string;
+  class?: ITwinClass;
+  subClass?: ITwinSubClass;
+  type?: string;
+  displayName?: string;
   // eslint-disable-next-line id-blacklist
-  number: string;
+  number?: string;
+  dataCenterLocation?: string;
+  status?: string;
 }
 
+/** The simplified Repository object
+ * @beta
+ */
 export interface Repository {
-  id: string;
+  id?: string;
   class: RepositoryClass;
   subClass: RepositorySubClass;
   uri: string;

@@ -9,7 +9,7 @@ pr:
 
 variables:
   - group: iTwin.js non-secret config variables
-  - group: iTwin.js Integration Test Users
+  - group: iTwins Client Integration Test Users
 
 jobs:
 
@@ -33,11 +33,11 @@ jobs:
           #
           #  This is done so that we can keep the values secret within the build pipeline but then decrypt them in the environment when actually running the tests.
           #   > A better solution would be to figure out how to decrypt in Node itself
-          echo "##vso[task.setvariable variable=imjs_test_regular_user_password;]$test_reg_password"
-          echo "##vso[task.setvariable variable=USER_WITH_ACCESS_PASSWORD;]$test_reg_password"
+          echo "##vso[task.setvariable variable=imjs_itwin_test_user_password;]$test_itwin_password"
+          echo "##vso[task.setvariable variable=USER_WITH_ACCESS_PASSWORD;]$test_itwin_password"
         displayName: 'Add config to environment'
         env:
-          test_reg_password: $(imjs_regular_user_password)
+          test_itwin_password: $(imjs_itwin_user_password)
 
       - script: npm install -g pnpm@6.19.0
         displayName: install pnpm globally
@@ -71,11 +71,11 @@ jobs:
           #
           #  This is done so that we can keep the values secret within the build pipeline but then decrypt them in the environment when actually running the tests.
           #   > A better solution would be to figure out how to decrypt in Node itself
-          echo "##vso[task.setvariable variable=imjs_test_regular_user_password;]$test_reg_password"
-          echo "##vso[task.setvariable variable=USER_WITH_ACCESS_PASSWORD;]$test_reg_password"
+          echo "##vso[task.setvariable variable=imjs_itwin_test_user_password;]$test_itwin_password"
+          echo "##vso[task.setvariable variable=USER_WITH_ACCESS_PASSWORD;]$test_itwin_password"
         displayName: 'Add config to environment'
         env:
-          test_reg_password: $(imjs_regular_user_password)
+          test_itwin_password: $(imjs_itwin_user_password)
 
       - script: npm install -g pnpm@6.19.0
         displayName: install pnpm globally
