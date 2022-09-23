@@ -24,6 +24,11 @@ describe("iTwinsClient", () => {
     // Arrange
     const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
 
+    // eslint-disable-next-line no-console
+    console.log(`USER:  ${process.env.IMJS_TEST_IMODELHUB_USER_NAME!}`);
+    // eslint-disable-next-line no-console
+    console.log(`PASSWORD:  ${process.env.IMJS_TEST_IMODELHUB_USER_PASSWORD!}`);
+
     // Act
     const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
       accessToken,
