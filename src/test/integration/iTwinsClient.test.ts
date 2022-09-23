@@ -5,7 +5,7 @@
 import * as chai from "chai";
 import type { AccessToken} from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
-import type { ITwin, ITwinsAPIResponse, NewRepository, Repository} from "../../iTwinsAccessProps";
+import type { ITwin, ITwinsAPIResponse, Repository} from "../../iTwinsAccessProps";
 import { ITwinClass} from "../../iTwinsAccessProps";
 import { ITwinSubClass, RepositoryClass, RepositorySubClass} from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
@@ -636,7 +636,7 @@ describe("iTwinsClient", () => {
     // eslint-disable-next-line no-console
     const iTwinId = iTwinResponse.data!.id!;
 
-    const newRepository: NewRepository = {
+    const newRepository: Repository = {
       class: RepositoryClass.GeographicInformationSystem,
       subClass: RepositorySubClass.WebMapService,
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -655,7 +655,7 @@ describe("iTwinsClient", () => {
     /* DELETE ITWIN REPOSITORY */
     // Act
     const repositoryDeleteResponse: ITwinsAPIResponse<undefined> =
-      await iTwinsAccessClient.deleteRepository(accessToken, iTwinId, createResponse.data!.id);
+      await iTwinsAccessClient.deleteRepository(accessToken, iTwinId, createResponse.data!.id!);
 
     const iTwinDeleteResponse: ITwinsAPIResponse<undefined> =
       await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
@@ -745,7 +745,7 @@ describe("iTwinsClient", () => {
   it("should get a 404 not found when trying to create a repository with an iTwin that doesn't exist", async () =>{
     // Arrange
     const someRandomId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
-    const newRepository: NewRepository = {
+    const newRepository: Repository = {
       class: RepositoryClass.GeographicInformationSystem,
       subClass: RepositorySubClass.WebMapService,
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -779,7 +779,7 @@ describe("iTwinsClient", () => {
 
     const iTwinId = iTwinResponse.data!.id!;
 
-    const newRepository: NewRepository = {
+    const newRepository: Repository = {
       class: RepositoryClass.GeographicInformationSystem,
       subClass: RepositorySubClass.WebMapService,
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -823,7 +823,7 @@ describe("iTwinsClient", () => {
 
     const iTwinId = iTwinResponse.data!.id!;
 
-    const newRepository: NewRepository = {
+    const newRepository: Repository = {
       class: RepositoryClass.GeographicInformationSystem,
       subClass: RepositorySubClass.WebMapService,
       uri: "",

@@ -13,7 +13,6 @@ import type {
   ITwinsAPIResponse,
   ITwinsQueryArg,
   ITwinSubClass,
-  NewRepository,
   RepositoriesQueryArg,
   Repository,
 } from "./iTwinsAccessProps";
@@ -88,7 +87,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async createRepository(
     accessToken: AccessToken,
     iTwinId: string,
-    repository: NewRepository
+    repository: Repository
   ): Promise<ITwinsAPIResponse<Repository>>{
     const url = `${this._baseUrl}/${iTwinId}/repositories`;
     return this.sendGenericAPIRequest(accessToken, "POST", url, repository, "repository");

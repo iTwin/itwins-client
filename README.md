@@ -195,7 +195,6 @@ async function demoCRUD(): Promise<void> {
 import type { AccessToken } from "@itwin/core-bentley";
 import type {
   ITwin,
-  NewRepository,
   Repository,
   ITwinsAPIResponse,
 } from "@itwin/itwins-client";
@@ -228,7 +227,7 @@ async function demoCRUD(): Promise<void> {
   const iTwinId = createResponse.data!.id;
 
   // Now create the iTwin Repository
-  const newRepository: NewRepository = {
+  const newRepository: Repository = {
     class: RepositoryClass.GeographicInformationSystem,
     subClass: RepositorySubClass.WebMapService,
     uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",

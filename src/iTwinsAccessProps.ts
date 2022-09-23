@@ -76,16 +76,11 @@ export interface ITwin {
  * @beta
  */
 export interface Repository {
-  id: string;
+  id?: string;
   class: RepositoryClass;
   subClass: RepositorySubClass;
   uri: string;
 }
-
-/** Repository object used for POST/PATCH
- * @beta
- */
-export type NewRepository = Omit<Repository, "id">;
 
 export enum ITwinSubClass {
   Account = "Account",
