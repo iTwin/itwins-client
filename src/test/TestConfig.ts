@@ -22,8 +22,8 @@ export class TestConfig {
   ): Promise<AccessToken> {
     return getAccessTokenFromBackend(
       {
-        email: process.env.IMJS_TEST_IMODELHUB_USER_NAME!,
-        password: process.env.IMJS_TEST_IMODELHUB_USER_PASSWORD!,
+        email: process.env.IMJS_ITWIN_TEST_USER!,
+        password: process.env.IMJS_ITWIN_TEST_USER_PASSWORD!,
       });
   }
 }

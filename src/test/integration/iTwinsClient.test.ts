@@ -17,6 +17,8 @@ describe("iTwinsClient", () => {
 
   before(async function () {
     this.timeout(0);
+    // eslint-disable-next-line no-console
+    console.log(process.env.IMJS_ITWIN_TEST_USER_PASSWORD!);
     accessToken = await TestConfig.getAccessToken();
   });
 
