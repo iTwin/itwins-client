@@ -8,4 +8,4 @@
 
 ## 0.9.0
 
-- Initial commit.
+- Initial commit with only iTwin query operaitons.
