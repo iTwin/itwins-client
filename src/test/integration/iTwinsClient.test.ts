@@ -5,7 +5,7 @@
 import * as chai from "chai";
 import type { AccessToken} from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
-import type { ITwin, ITwinsAPIResponse, NewiTwin, NewRepository, Repository} from "../../iTwinsAccessProps";
+import type { ITwin, ITwinsAPIResponse, NewRepository, Repository} from "../../iTwinsAccessProps";
 import { ITwinClass} from "../../iTwinsAccessProps";
 import { ITwinSubClass, RepositoryClass, RepositorySubClass} from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
@@ -570,7 +570,7 @@ describe("iTwinsClient", () => {
   it("should create, update, and delete an iTwin", async () =>{
     /* CREATE THE ITWIN */
     // Arrange
-    const newiTwin: NewiTwin = {
+    const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
@@ -585,7 +585,7 @@ describe("iTwinsClient", () => {
     const createResponse: ITwinsAPIResponse<ITwin> =
       await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
     // eslint-disable-next-line no-console
-    const iTwinId = createResponse.data!.id;
+    const iTwinId = createResponse.data!.id!;
 
     // Assert
     chai.expect(createResponse.status).to.be.eq(201);
@@ -595,7 +595,7 @@ describe("iTwinsClient", () => {
 
     /* UPDATE ITWIN */
     // Arrange
-    const updatediTwin: NewiTwin = {
+    const updatediTwin: ITwin = {
       displayName: "UPDATED APIM iTwin Test Display Name",
     };
 
@@ -620,7 +620,7 @@ describe("iTwinsClient", () => {
   it("should create and delete an iTwin Repository", async () =>{
     /* CREATE THE ITWIN REPOSITORY */
     // Arrange
-    const newiTwin: NewiTwin = {
+    const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
@@ -634,7 +634,7 @@ describe("iTwinsClient", () => {
      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
 
     // eslint-disable-next-line no-console
-    const iTwinId = iTwinResponse.data!.id;
+    const iTwinId = iTwinResponse.data!.id!;
 
     const newRepository: NewRepository = {
       class: RepositoryClass.GeographicInformationSystem,
@@ -669,7 +669,7 @@ describe("iTwinsClient", () => {
 
   it("should get a 409 conflict when trying to create a duplicate", async () => {
     // Arrange
-    const newiTwin: NewiTwin = {
+    const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
@@ -688,7 +688,7 @@ describe("iTwinsClient", () => {
     const iTwinResponse2: ITwinsAPIResponse<ITwin> =
       await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
     const deleteResponse: ITwinsAPIResponse<undefined> =
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinResponse.data!.id);
+      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinResponse.data!.id!);
 
     // Assert
     chai.expect(iTwinResponse.status).to.be.eq(201);
@@ -704,7 +704,7 @@ describe("iTwinsClient", () => {
 
   it("should get a 422 unprocessable entity when trying to create an iTwin without a class specified", async () => {
     // Arrange
-    const newiTwin: NewiTwin = {
+    const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
@@ -764,7 +764,7 @@ describe("iTwinsClient", () => {
 
   it("should get a 409 conflict when trying to create a duplicate repository", async () =>{
     // Arrange
-    const newiTwin: NewiTwin = {
+    const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
@@ -777,7 +777,7 @@ describe("iTwinsClient", () => {
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
 
-    const iTwinId = iTwinResponse.data!.id;
+    const iTwinId = iTwinResponse.data!.id!;
 
     const newRepository: NewRepository = {
       class: RepositoryClass.GeographicInformationSystem,
@@ -808,7 +808,7 @@ describe("iTwinsClient", () => {
 
   it("should get a 422 unprocessable entity when trying to create a repository without the uri property", async () =>{
     // Arrange
-    const newiTwin: NewiTwin = {
+    const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
@@ -821,7 +821,7 @@ describe("iTwinsClient", () => {
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
 
-    const iTwinId = iTwinResponse.data!.id;
+    const iTwinId = iTwinResponse.data!.id!;
 
     const newRepository: NewRepository = {
       class: RepositoryClass.GeographicInformationSystem,
@@ -849,7 +849,7 @@ describe("iTwinsClient", () => {
   it("should get a 404 not found when trying to delete an repository that doesn't exist", async () => {
     // Arrange
     const someRandomId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
-    const newiTwin: NewiTwin = {
+    const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
@@ -862,7 +862,7 @@ describe("iTwinsClient", () => {
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
 
-    const iTwinId = iTwinResponse.data!.id;
+    const iTwinId = iTwinResponse.data!.id!;
 
     // Act
     const deleteResponse: ITwinsAPIResponse<undefined> =

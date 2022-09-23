@@ -13,7 +13,6 @@ import type {
   ITwinsAPIResponse,
   ITwinsQueryArg,
   ITwinSubClass,
-  NewiTwin,
   NewRepository,
   RepositoriesQueryArg,
   Repository,
@@ -46,7 +45,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    */
   public async createiTwin(
     accessToken: AccessToken,
-    iTwin: NewiTwin
+    iTwin: ITwin
   ): Promise<ITwinsAPIResponse<ITwin>>{
     const url = `${this._baseUrl}/`;
     return this.sendGenericAPIRequest(accessToken, "POST", url, iTwin, "iTwin");
@@ -61,7 +60,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async updateiTwin(
     accessToken: AccessToken,
     iTwinId: string,
-    iTwin: NewiTwin
+    iTwin: ITwin
   ): Promise<ITwinsAPIResponse<ITwin>>{
     const url = `${this._baseUrl}/${iTwinId}`;
     return this.sendGenericAPIRequest(accessToken, "PATCH", url, iTwin, "iTwin");

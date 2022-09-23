@@ -61,25 +61,13 @@ export interface ITwinsAPIResponse<T> {
  * @beta
  */
 export interface ITwin {
-  id: string;
-  class: ITwinClass;
-  subClass: ITwinSubClass;
-  type: string;
-  displayName: string;
-  // eslint-disable-next-line id-blacklist
-  number: string;
-}
-
-/** iTwin object used for POST/PATCH
- * @beta
-*/
-export interface NewiTwin {
+  id?: string;
   class?: ITwinClass;
   subClass?: ITwinSubClass;
   type?: string;
+  displayName?: string;
   // eslint-disable-next-line id-blacklist
   number?: string;
-  displayName?: string;
   dataCenterLocation?: string;
   status?: string;
 }
