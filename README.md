@@ -36,6 +36,30 @@ async function printiTwinIds(): Promise<void> {
 }
 ```
 
+### Get list of iTwins (constructor supplied base url)
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import {
+  ITwinsAccessClient,
+  ITwin,
+  ITwinsAPIResponse,
+} from "@itwin/itwins-client";
+
+/** Function that queries all iTwins and prints their ids to the console. */
+async function printiTwinIds(): Promise<void> {
+  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient("https://api.bentley.com/itwins");
+  const accessToken: AccessToken = { get_access_token_logic_here };
+
+  const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+    await iTwinsAccessClient.queryAsync(accessToken, "Project");
+
+  iTwinsResponse.data!.forEach((actualiTwin) => {
+    console.log(actualiTwin.id);
+  });
+}
+```
+
 ### Get paged list of iTwins using top/skip
 
 ```typescript
