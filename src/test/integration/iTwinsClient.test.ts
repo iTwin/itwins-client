@@ -12,12 +12,30 @@ import { TestConfig } from "../TestConfig";
 
 chai.should();
 describe("iTwinsClient", () => {
+  let baseUrl: string = "https://api.bentley.com/itwins";
+  const urlPrefix = process.env.IMJS_URL_PREFIX;
+  if (urlPrefix) {
+    const url = new URL(baseUrl);
+    url.hostname = urlPrefix + url.hostname;
+    baseUrl = url.href;
+  }
   const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  const iTwinsCustomClient: ITwinsAccessClient = new ITwinsAccessClient(baseUrl);
   let accessToken: AccessToken;
 
   before(async function () {
     this.timeout(0);
     accessToken = await TestConfig.getAccessToken();
+  });
+
+  it("should get a list of project iTwins with custom url", async () => {
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsCustomClient.queryAsync(accessToken, ITwinSubClass.Project);
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
   });
 
   it("should get iTwin repositories by id", async () => {

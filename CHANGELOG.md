@@ -1,5 +1,9 @@
 # Change Log - @itwin/itwins-client
 
+## 1.0.2
+
+- Added constructor parameter to iTwinsClient for custom url.
+
 ## 1.0.1
 
 - Updated code owners.
