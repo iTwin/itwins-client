@@ -17,12 +17,13 @@ export class BaseClient {
   public constructor(url?: string) {
     if(url !== undefined){
       this._baseUrl = url;
-    }
-    const urlPrefix = process.env.IMJS_URL_PREFIX;
-    if (urlPrefix && url === undefined) {
-      const baseUrl = new URL(this._baseUrl);
-      baseUrl.hostname = urlPrefix + baseUrl.hostname;
-      this._baseUrl = baseUrl.href;
+    } else {
+      const urlPrefix = process.env.IMJS_URL_PREFIX;
+      if (urlPrefix) {
+        const baseUrl = new URL(this._baseUrl);
+        baseUrl.hostname = urlPrefix + baseUrl.hostname;
+        this._baseUrl = baseUrl.href;
+      }
     }
   }
 
