@@ -21,6 +21,10 @@ import type {
  * @beta
  */
 export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
+  public constructor(url?: string) {
+    super(url);
+  }
+
   /** Get itwins accessible to the user
    * @param accessToken The client access token string
    * @param subClass Required parameter to search a specific iTwin subClass

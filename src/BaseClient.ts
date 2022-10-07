@@ -14,12 +14,16 @@ import type { ITwinsAPIResponse, ITwinsQueryArg, RepositoriesQueryArg } from "./
 export class BaseClient {
   protected _baseUrl: string = "https://api.bentley.com/itwins";
 
-  public constructor() {
-    const urlPrefix = process.env.IMJS_URL_PREFIX;
-    if (urlPrefix) {
-      const baseUrl = new URL(this._baseUrl);
-      baseUrl.hostname = urlPrefix + baseUrl.hostname;
-      this._baseUrl = baseUrl.href;
+  public constructor(url?: string) {
+    if(url !== undefined){
+      this._baseUrl = url;
+    } else {
+      const urlPrefix = process.env.IMJS_URL_PREFIX;
+      if (urlPrefix) {
+        const baseUrl = new URL(this._baseUrl);
+        baseUrl.hostname = urlPrefix + baseUrl.hostname;
+        this._baseUrl = baseUrl.href;
+      }
     }
   }
 
