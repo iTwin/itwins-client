@@ -42,7 +42,7 @@
     "@itwin/certa": "^3.0.0",
     "@itwin/core-bentley": "^3.0.0",
     "@itwin/eslint-plugin": "^3.0.0",
-    "@itwin/oidc-signin-tool": "^3.2.0",
+    "@itwin/oidc-signin-tool": "^3.3.0",
     "@types/chai": "^4.1.4",
     "@types/mocha": "^8.2.2",
     "@types/node": "14.14.31",
