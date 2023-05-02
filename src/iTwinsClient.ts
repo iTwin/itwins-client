@@ -17,7 +17,7 @@ import type {
   Repository,
 } from "./iTwinsAccessProps";
 
-/** Client API to access the itwin service.
+/** Client API to access the itwins service.
  * @beta
  */
 export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
