@@ -3,11 +3,11 @@
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 import * as chai from "chai";
-import type { AccessToken} from "@itwin/core-bentley";
+import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
-import type { ITwin, ITwinsAPIResponse, Repository} from "../../iTwinsAccessProps";
-import { ITwinClass} from "../../iTwinsAccessProps";
-import { ITwinSubClass, RepositoryClass, RepositorySubClass} from "../../iTwinsAccessProps";
+import type { ITwin, ITwinsAPIResponse, Repository } from "../../iTwinsAccessProps";
+import { ITwinClass } from "../../iTwinsAccessProps";
+import { ITwinSubClass, RepositoryClass, RepositorySubClass } from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
 
 chai.should();
@@ -58,7 +58,7 @@ describe("iTwinsClient", () => {
     const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
 
     // Act
-    const iTwinsResponse:  ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
+    const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
       accessToken,
       iTwinId,
       {
@@ -79,7 +79,7 @@ describe("iTwinsClient", () => {
     const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
 
     // Act
-    const iTwinsResponse:  ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
+    const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
       accessToken,
       iTwinId,
       {
@@ -585,7 +585,7 @@ describe("iTwinsClient", () => {
     chai.expect(actualiTwin.id).to.not.be.empty;
   });
 
-  it("should create, update, and delete an iTwin", async () =>{
+  it("should create, update, and delete an iTwin", async () => {
     /* CREATE THE ITWIN */
     // Arrange
     const newiTwin: ITwin = {
@@ -635,7 +635,7 @@ describe("iTwinsClient", () => {
     chai.expect(deleteResponse.data).to.be.undefined;
   });
 
-  it("should create and delete an iTwin Repository", async () =>{
+  it("should create and delete an iTwin Repository", async () => {
     /* CREATE THE ITWIN REPOSITORY */
     // Arrange
     const newiTwin: ITwin = {
@@ -649,7 +649,7 @@ describe("iTwinsClient", () => {
       status: "Trial",
     };
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
-     await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
+      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
 
     // eslint-disable-next-line no-console
     const iTwinId = iTwinResponse.data!.id!;
@@ -701,8 +701,6 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
       await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    // eslint-disable-next-line id-blacklist
-    newiTwin.number += `${new Date().toISOString()}`;
     const iTwinResponse2: ITwinsAPIResponse<ITwin> =
       await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
     const deleteResponse: ITwinsAPIResponse<undefined> =
@@ -760,7 +758,7 @@ describe("iTwinsClient", () => {
     chai.expect(deleteResponse.error!.code).to.be.eq("iTwinNotFound");
   });
 
-  it("should get a 404 not found when trying to create a repository with an iTwin that doesn't exist", async () =>{
+  it("should get a 404 not found when trying to create a repository with an iTwin that doesn't exist", async () => {
     // Arrange
     const someRandomId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
     const newRepository: Repository = {
@@ -780,7 +778,7 @@ describe("iTwinsClient", () => {
     chai.expect(createResponse.error!.code).to.be.eq("iTwinNotFound");
   });
 
-  it("should get a 409 conflict when trying to create a duplicate repository", async () =>{
+  it("should get a 409 conflict when trying to create a duplicate repository", async () => {
     // Arrange
     const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
@@ -793,7 +791,7 @@ describe("iTwinsClient", () => {
       status: "Trial",
     };
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
-     await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
+      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
 
     const iTwinId = iTwinResponse.data!.id!;
 
@@ -824,7 +822,7 @@ describe("iTwinsClient", () => {
     chai.expect(deleteResponse.data).to.be.undefined;
   });
 
-  it("should get a 422 unprocessable entity when trying to create a repository without the uri property", async () =>{
+  it("should get a 422 unprocessable entity when trying to create a repository without the uri property", async () => {
     // Arrange
     const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
@@ -837,7 +835,7 @@ describe("iTwinsClient", () => {
       status: "Trial",
     };
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
-     await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
+      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
 
     const iTwinId = iTwinResponse.data!.id!;
 
@@ -878,7 +876,7 @@ describe("iTwinsClient", () => {
       status: "Trial",
     };
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
-     await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
+      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
 
     const iTwinId = iTwinResponse.data!.id!;
 
