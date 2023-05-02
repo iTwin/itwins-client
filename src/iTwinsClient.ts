@@ -17,7 +17,7 @@ import type {
   Repository,
 } from "./iTwinsAccessProps";
 
-/** Client API to access the itwin service.
+/** Client API to access the itwins service.
  * @beta
  */
 export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
@@ -37,7 +37,8 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     let url = `${this._baseUrl}?subClass=${subClass}`;
-    if (arg) url += this.getQueryString(arg);
+    if (arg)
+      url += this.getQueryString(arg);
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins");
   }
 
@@ -49,7 +50,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async createiTwin(
     accessToken: AccessToken,
     iTwin: ITwin
-  ): Promise<ITwinsAPIResponse<ITwin>>{
+  ): Promise<ITwinsAPIResponse<ITwin>> {
     const url = `${this._baseUrl}/`;
     return this.sendGenericAPIRequest(accessToken, "POST", url, iTwin, "iTwin");
   }
@@ -64,7 +65,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     accessToken: AccessToken,
     iTwinId: string,
     iTwin: ITwin
-  ): Promise<ITwinsAPIResponse<ITwin>>{
+  ): Promise<ITwinsAPIResponse<ITwin>> {
     const url = `${this._baseUrl}/${iTwinId}`;
     return this.sendGenericAPIRequest(accessToken, "PATCH", url, iTwin, "iTwin");
   }
@@ -77,7 +78,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async deleteiTwin(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<ITwinsAPIResponse<undefined>>{
+  ): Promise<ITwinsAPIResponse<undefined>> {
     const url = `${this._baseUrl}/${iTwinId}`;
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
@@ -92,7 +93,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     accessToken: AccessToken,
     iTwinId: string,
     repository: Repository
-  ): Promise<ITwinsAPIResponse<Repository>>{
+  ): Promise<ITwinsAPIResponse<Repository>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories`;
     return this.sendGenericAPIRequest(accessToken, "POST", url, repository, "repository");
   }
@@ -107,7 +108,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     accessToken: AccessToken,
     iTwinId: string,
     repositoryId: string
-  ): Promise<ITwinsAPIResponse<undefined>>{
+  ): Promise<ITwinsAPIResponse<undefined>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}`;
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
@@ -124,7 +125,8 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     arg?: RepositoriesQueryArg
   ): Promise<ITwinsAPIResponse<Repository[]>> {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
-    if (arg) url += this.getRepositoryQueryString(arg);
+    if (arg)
+      url += this.getRepositoryQueryString(arg);
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "repositories");
   }
 
@@ -153,7 +155,8 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     let url = `${this._baseUrl}/favorites?subClass=${subClass}`;
-    if (arg) url += this.getQueryString(arg);
+    if (arg)
+      url += this.getQueryString(arg);
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins");
   }
 
@@ -169,7 +172,8 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     let url = `${this._baseUrl}/recents?subClass=${subClass}`;
-    if (arg) url += this.getQueryString(arg);
+    if (arg)
+      url += this.getQueryString(arg);
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins");
   }
 
