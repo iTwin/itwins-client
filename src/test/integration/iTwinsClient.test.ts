@@ -713,7 +713,7 @@ describe("iTwinsClient", () => {
     chai.expect(iTwinResponse2.error).to.not.be.undefined;
     chai.expect(iTwinResponse2.error!.code).to.be.eq("iTwinExists");
     chai.expect(iTwinResponse2.error!.details![0].code).to.be.eq("InvalidValue");
-    chai.expect(iTwinResponse2.error!.details![0].target).to.be.eq("displayName");
+    chai.expect(iTwinResponse2.error!.details![0].target).to.be.eq("number");
     chai.expect(deleteResponse.status).to.be.eq(204);
     chai.expect(deleteResponse.data).to.be.undefined;
   });
