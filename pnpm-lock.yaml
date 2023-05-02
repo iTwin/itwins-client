@@ -19,8 +19,8 @@ devDependencies:
     specifier: ^3.0.0
     version: 3.2.4(eslint@7.32.0)(typescript@4.4.4)
   '@itwin/oidc-signin-tool':
-    specifier: ^3.3.0
-    version: 3.3.0(@itwin/core-bentley@3.7.4)
+    specifier: ^3.6.0
+    version: 3.6.0(@itwin/core-bentley@3.7.4)
   '@types/chai':
     specifier: ^4.1.4
     version: 4.3.1
@@ -220,17 +220,17 @@ packages:
       - supports-color
     dev: true
 
-  /@itwin/oidc-signin-tool@3.3.0(@itwin/core-bentley@3.7.4):
-    resolution: {integrity: sha512-mXY45oqbCD8WVaTw6Gae+ffS6Q5ULlGMelJu5jAspDPmZVfEeC98L51vsAYD+Vt3QNeV6hhQu3/Imm/uofpVVA==}
+  /@itwin/oidc-signin-tool@3.6.0(@itwin/core-bentley@3.7.4):
+    resolution: {integrity: sha512-Zvdmckc+EzSEuY7pFakhhbUFkUM56RaHdce5b5OBOhIKB97Yxier9rMl6g7z1Ariahai2VXgpOrLb62fDk8qLg==}
     peerDependencies:
-      '@itwin/core-bentley': ^3.0.0
+      '@itwin/core-bentley': ^3.3.0
     dependencies:
       '@itwin/certa': 3.7.4
       '@itwin/core-bentley': 3.7.4
       dotenv: 10.0.0
       dotenv-expand: 5.1.0
       openid-client: 4.9.1
-      puppeteer: 5.3.1
+      puppeteer: 13.7.0
     transitivePeerDependencies:
       - bufferutil
       - electron
@@ -756,11 +756,6 @@ packages:
   /address@1.2.0:
     resolution: {integrity: sha512-tNEZYz5G/zYunxFm7sfhAxkXEuLj3K6BKwv6ZURlsF6yiUQ65z0Q2wZW9L5cPUl9ocofGvXOdFYbFHp0+6MOig==}
     engines: {node: '>= 10.0.0'}
-    dev: true
-
-  /agent-base@5.1.1:
-    resolution: {integrity: sha512-TMeqbNl2fMW0nMjTEPOwe3J/PRFP4vqeoNuQMG0HlMrtm5QxKqdvAkZ1pRBQ/ulIyDD5Yq0nJ7YbdD8ey0TO3g==}
-    engines: {node: '>= 6.0.0'}
     dev: true
 
   /agent-base@6.0.2:
@@ -1844,8 +1839,8 @@ packages:
     resolution: {integrity: sha512-wvq+KscQ7/6spEV7czhnZc9RM/woz1AY+/Vpd8/h2HFMwJSdTliu7f/yr1A6vDdJfKICZsShqsYpEQbdhg8AFQ==}
     dev: true
 
-  /devtools-protocol@0.0.799653:
-    resolution: {integrity: sha512-t1CcaZbvm8pOlikqrsIM9GOa7Ipp07+4h/q9u0JXBWjPCjHdBl9KkddX87Vv9vBHoBGtwV79sYQNGnQM6iS5gg==}
+  /devtools-protocol@0.0.981744:
+    resolution: {integrity: sha512-0cuGS8+jhR67Fy7qG3i3Pc7Aw494sb9yG9QgpG97SFVWwolgYjlhJg7n+UaHxOQT30d1TYu/EYe9k01ivLErIg==}
     dev: true
 
   /diff@5.0.0:
@@ -3044,16 +3039,6 @@ packages:
 
   /https-browserify@1.0.0:
     resolution: {integrity: sha512-J+FkSdyD+0mA0N+81tMotaRMfSL9SGi+xpD3T6YApKsc3bGSXJlfXri3VyFOeYkfLRQisDk1W+jIFFKBeUBbBg==}
-    dev: true
-
-  /https-proxy-agent@4.0.0:
-    resolution: {integrity: sha512-zoDhWrkR3of1l9QAL8/scJZyLu8j/gBkcwcaQOZh7Gyh/+uJQzGVETdgT30akuwkpL8HTRfssqI3BZuV18teDg==}
-    engines: {node: '>= 6.0.0'}
-    dependencies:
-      agent-base: 5.1.1
-      debug: 4.3.4(supports-color@8.1.1)
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /https-proxy-agent@5.0.1:
@@ -4591,6 +4576,31 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
+  /puppeteer@13.7.0:
+    resolution: {integrity: sha512-U1uufzBjz3+PkpCxFrWzh4OrMIdIb2ztzCu0YEPfRHjHswcSwHZswnK+WdsOQJsRV8WeTg3jLhJR4D867+fjsA==}
+    engines: {node: '>=10.18.1'}
+    deprecated: < 19.4.0 is no longer supported
+    requiresBuild: true
+    dependencies:
+      cross-fetch: 3.1.5
+      debug: 4.3.4(supports-color@8.1.1)
+      devtools-protocol: 0.0.981744
+      extract-zip: 2.0.1
+      https-proxy-agent: 5.0.1
+      pkg-dir: 4.2.0
+      progress: 2.0.3
+      proxy-from-env: 1.1.0
+      rimraf: 3.0.2
+      tar-fs: 2.1.1
+      unbzip2-stream: 1.4.3
+      ws: 8.5.0
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - supports-color
+      - utf-8-validate
+    dev: true
+
   /puppeteer@15.5.0:
     resolution: {integrity: sha512-+vZPU8iBSdCx1Kn5hHas80fyo0TiVyMeqLGv/1dygX2HKhAZjO9YThadbRTCoTYq0yWw+w/CysldPsEekDtjDQ==}
     engines: {node: '>=14.1.0'}
@@ -4612,29 +4622,6 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
-      - supports-color
-      - utf-8-validate
-    dev: true
-
-  /puppeteer@5.3.1:
-    resolution: {integrity: sha512-YTM1RaBeYrj6n7IlRXRYLqJHF+GM7tasbvrNFx6w1S16G76NrPq7oYFKLDO+BQsXNtS8kW2GxWCXjIMPvfDyaQ==}
-    engines: {node: '>=10.18.1'}
-    deprecated: < 19.4.0 is no longer supported
-    requiresBuild: true
-    dependencies:
-      debug: 4.3.4(supports-color@8.1.1)
-      devtools-protocol: 0.0.799653
-      extract-zip: 2.0.1
-      https-proxy-agent: 4.0.0
-      pkg-dir: 4.2.0
-      progress: 2.0.3
-      proxy-from-env: 1.1.0
-      rimraf: 3.0.2
-      tar-fs: 2.1.1
-      unbzip2-stream: 1.4.3
-      ws: 7.5.9
-    transitivePeerDependencies:
-      - bufferutil
       - supports-color
       - utf-8-validate
     dev: true
@@ -5966,9 +5953,9 @@ packages:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: true
 
-  /ws@7.5.9:
-    resolution: {integrity: sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==}
-    engines: {node: '>=8.3.0'}
+  /ws@8.5.0:
+    resolution: {integrity: sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg==}
+    engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
       utf-8-validate: ^5.0.2
