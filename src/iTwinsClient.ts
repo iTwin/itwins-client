@@ -18,7 +18,7 @@ import type {
   Repository,
 } from "./iTwinsAccessProps";
 
-/** Client API to access the itwin service.
+/** Client API to access the itwins service.
  * @beta
  */
 export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
@@ -39,7 +39,8 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getResultModeHeaders(arg && arg.resultMode);
     let url = `${this._baseUrl}?subClass=${subClass}`;
-    if (arg) url += this.getQueryString(arg);
+    if (arg)
+      url += this.getQueryString(arg);
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
   }
 
@@ -126,7 +127,8 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     arg?: RepositoriesQueryArg
   ): Promise<ITwinsAPIResponse<Repository[]>> {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
-    if (arg) url += this.getRepositoryQueryString(arg);
+    if (arg)
+      url += this.getRepositoryQueryString(arg);
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "repositories");
   }
 
@@ -159,7 +161,8 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getResultModeHeaders(arg && arg.resultMode);
     let url = `${this._baseUrl}/favorites?subClass=${subClass}`;
-    if (arg) url += this.getQueryString(arg);
+    if (arg)
+      url += this.getQueryString(arg);
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
   }
 
@@ -176,7 +179,8 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getResultModeHeaders(arg && arg.resultMode);
     let url = `${this._baseUrl}/recents?subClass=${subClass}`;
-    if (arg) url += this.getQueryString(arg);
+    if (arg)
+      url += this.getQueryString(arg);
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
   }
 
