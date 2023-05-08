@@ -28,7 +28,8 @@ export interface ITwinsAccess {
   /** Get an ITwin */
   getAsync(
     accessToken: AccessToken,
-    iTwinId: string
+    iTwinId: string,
+    resultMode?: ITwinResultMode
   ): Promise<ITwinsAPIResponse<ITwin>>;
 
   /** Get favorited iTwins */
@@ -57,7 +58,7 @@ export interface ITwinsAPIResponse<T> {
   error?: Error;
 }
 
-/** The a simplified ITwin object
+/** The ITwin object. Contains extra properties with "representation" result mode.
  * @beta
  */
 export interface ITwin {
@@ -70,6 +71,12 @@ export interface ITwin {
   number?: string;
   dataCenterLocation?: string;
   status?: string;
+
+  // extra properties available with "representation" result mode:
+  parentId?: string;
+  iTwinAccountId?: string;
+  createdDateTime?: string;
+  createdBy?: string;
 }
 
 /** The simplified Repository object
@@ -109,6 +116,11 @@ export enum RepositorySubClass {
   MapServer = "MapServer"
 }
 
+/**
+ * Optional result mode. Minimal is the default, representation returns extra properties
+ */
+export type ITwinResultMode = "minimal" | "representation";
+
 /** Set of optional arguments used for querying the iTwins API
  * @beta
  */
@@ -120,6 +132,7 @@ export interface ITwinsQueryArg {
   // eslint-disable-next-line id-blacklist
   number?: string;
   type?: string;
+  resultMode?: ITwinResultMode;
 }
 
 /** Set of optional arguments used for querying Respositories API

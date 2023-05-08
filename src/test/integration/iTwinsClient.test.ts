@@ -195,6 +195,22 @@ describe("iTwinsClient", () => {
     chai.expect(actualiTwin.subClass).to.be.eq("Project");
   });
 
+  it("should get more project iTwin properties in representation result mode", async () => {
+    // Arrange
+    const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
+
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin> =
+      await iTwinsAccessClient.getAsync(accessToken, iTwinId!, "representation");
+
+    // Assert
+    const actualiTwin = iTwinsResponse.data!;
+    chai.expect(actualiTwin.parentId).to.be.a("string");
+    chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+    chai.expect(actualiTwin.createdDateTime).to.be.a("string");
+    chai.expect(actualiTwin.createdBy).to.be.a("string");
+  });
+
   it("should get a paged list of project iTwins using top", async () => {
     // Arrange
     const numberOfiTwins = 3;
@@ -339,6 +355,33 @@ describe("iTwinsClient", () => {
     });
   });
 
+  it("should get more properties of iTwins in representation result mode", async () => {
+    // Arrange
+    const iTwinSearchString = TestConfig.iTwinSearchString;
+
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryAsync(
+      accessToken,
+      ITwinSubClass.Project,
+      {
+        search: iTwinSearchString,
+        resultMode: "representation",
+      }
+    );
+
+    const iTwins = iTwinsResponse.data!;
+
+    // Assert
+    chai.expect(iTwins).to.not.be.empty;
+
+    iTwins.forEach((actualiTwin) => {
+      chai.expect(actualiTwin.parentId).to.be.a("string");
+      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+      chai.expect(actualiTwin.createdDateTime).to.be.a("string");
+      chai.expect(actualiTwin.createdBy).to.be.a("string");
+    });
+  });
+
   it("should get a list of recent project iTwins", async () => {
     // Act
     const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
@@ -350,6 +393,29 @@ describe("iTwinsClient", () => {
     // Assert
     chai.expect(iTwinsResponse.status).to.be.eq(200);
     chai.expect(iTwinsResponse.data).to.not.be.empty;
+  });
+
+  it("should get more properties of recent project iTwins in representation result mode", async () => {
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsAccessClient.queryRecentsAsync(
+        accessToken,
+        ITwinSubClass.Project,
+        { resultMode: "representation" }
+      );
+
+    const iTwins = iTwinsResponse.data!;
+
+    // Assert
+    chai.expect(iTwins).to.not.be.empty;
+
+    // All items have the field "createdDateTime"
+    iTwins.forEach((actualiTwin) => {
+      chai.expect(actualiTwin.parentId).to.be.a("string");
+      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+      chai.expect(actualiTwin.createdDateTime).to.be.a("string");
+      chai.expect(actualiTwin.createdBy).to.be.a("string");
+    });
   });
 
   it("should get a list of favorited project iTwins", async () => {
@@ -369,6 +435,26 @@ describe("iTwinsClient", () => {
     });
   });
 
+  it("should get more properties of favorited project iTwins in representation result mode", async () => {
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsAccessClient.queryFavoritesAsync(
+        accessToken,
+        ITwinSubClass.Project,
+        { resultMode: "representation" }
+      );
+
+    // Assert
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+
+    iTwinsResponse.data!.forEach((actualiTwin) => {
+      chai.expect(actualiTwin.parentId).to.be.a("string");
+      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+      chai.expect(actualiTwin.createdDateTime).to.be.a("string");
+      chai.expect(actualiTwin.createdBy).to.be.a("string");
+    });
+  });
+
   it("should get a list of asset iTwins", async () => {
     // Act
     const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
@@ -377,6 +463,22 @@ describe("iTwinsClient", () => {
     // Assert
     chai.expect(iTwinsResponse.status).to.be.eq(200);
     chai.expect(iTwinsResponse.data).to.not.be.empty;
+  });
+
+  it("should get more properties of asset iTwins in representation result mode", async () => {
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsAccessClient.queryAsync(accessToken, ITwinSubClass.Asset, { resultMode: "representation" });
+
+    // Assert
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+
+    iTwinsResponse.data!.forEach((actualiTwin) => {
+      chai.expect(actualiTwin.parentId).to.be.a("string");
+      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+      chai.expect(actualiTwin.createdDateTime).to.be.a("string");
+      chai.expect(actualiTwin.createdBy).to.be.a("string");
+    });
   });
 
   it("should get a asset iTwin", async () => {
@@ -392,6 +494,22 @@ describe("iTwinsClient", () => {
     chai.expect(iTwinsResponse.data).to.not.be.empty;
     const actualiTwin = iTwinsResponse.data!;
     chai.expect(iTwinId).to.be.eq(actualiTwin.id);
+  });
+
+  it("should get more asset iTwin properties in representation result mode", async () => {
+    // Arrange
+    const iTwinId = process.env.IMJS_TEST_ASSET_ID;
+
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin> =
+      await iTwinsAccessClient.getAsync(accessToken, iTwinId!, "representation");
+
+    // Assert
+    const actualiTwin = iTwinsResponse.data!;
+    chai.expect(actualiTwin.parentId).to.be.a("string");
+    chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+    chai.expect(actualiTwin.createdDateTime).to.be.a("string");
+    chai.expect(actualiTwin.createdBy).to.be.a("string");
   });
 
   it("should get a paged list of asset iTwins using top", async () => {

@@ -29,18 +29,22 @@ export class BaseClient {
 
   /**
     * Sends a basic API request
-    * @param accessTokenString The client access token string
-    * @param method The method type of the request (ex. GET, POST, DELETE, etc)
+    * @param accessToken The client access token string
+    * @param method The method type of the request (ex. GET, POST, DELETE, etc.)
     * @param url The url of the request
+    * @param data (Optional) The payload of the request
+    * @param property (Optional) The target property (ex. iTwins, repositories, etc.)
+    * @param headers (Optional) Extra request headers.
     */
   protected async sendGenericAPIRequest(
     accessToken: AccessToken,
     method: Method,
     url: string,
     data?: any,
-    property?: string
+    property?: string,
+    headers?: Record<string, string | number | boolean>
   ): Promise<ITwinsAPIResponse<any>> { // TODO: Change any response
-    const requestOptions = this.getRequestOptions(accessToken, method, url, data);
+    const requestOptions = this.getRequestOptions(accessToken, method, url, data, headers);
 
     try {
       const response = await axios(requestOptions);
@@ -65,13 +69,24 @@ export class BaseClient {
   /**
     * Build the request methods, headers, and other options
     * @param accessTokenString The client access token string
+    * @param method The method type of the request (ex. GET, POST, DELETE, etc.)
+    * @param url The url of the request
+    * @param data (Optional) The payload of the request
+    * @param headers (Optional) Extra request headers.
     */
-  protected getRequestOptions(accessTokenString: string, method: Method, url: string, data?: any): AxiosRequestConfig {
+  protected getRequestOptions(
+    accessTokenString: string,
+    method: Method,
+    url: string,
+    data?: any,
+    headers: Record<string, string | number | boolean> = {}
+  ): AxiosRequestConfig {
     return {
       method,
       url,
       data,
       headers: {
+        ...headers,
         "authorization": accessTokenString,
         "content-type": "application/json",
       },
