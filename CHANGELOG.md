@@ -1,5 +1,9 @@
 # Change Log - @itwin/itwins-client
 
+## 1.2.0
+
+- Added optional iTwin result mode parameter to enable fetching data in "representation" mode.
+
 ## 1.1.0
 
 - Added constructor parameter to iTwinsClient for custom url.
