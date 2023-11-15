@@ -1,5 +1,9 @@
 # Change Log - @itwin/itwins-client
 
+## 1.2.2
+
+- Fixed pnpm lockfile version.
+
 ## 1.2.1
 
 - Upgraded axios dependency due to vulnerabilities in earlier versions.
