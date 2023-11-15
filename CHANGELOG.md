@@ -1,5 +1,9 @@
 # Change Log - @itwin/itwins-client
 
+## 1.2.1
+
+- Upgraded axios dependency due to vulnerabilities in earlier versions.
+
 ## 1.2.0
 
 - Added optional iTwin result mode parameter to enable fetching data in "representation" mode.
