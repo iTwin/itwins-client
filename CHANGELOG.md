@@ -1,5 +1,9 @@
 # Change Log - @itwin/itwins-client
 
+## 1.3.0
+
+- Added Query Scope query argument, to allow for querying to be expanded outside of just the iTwins you are a member of (which only applies to Administrators).
+
 ## 1.2.1
 
 - Upgraded axios dependency due to vulnerabilities in earlier versions.
