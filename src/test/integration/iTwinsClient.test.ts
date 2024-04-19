@@ -382,6 +382,26 @@ describe("iTwinsClient", () => {
     });
   });
 
+  it("should get iTwins in query scope of all", async () => {
+    // Arrange
+    const iTwinSearchString = TestConfig.iTwinSearchString;
+
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.queryAsync(
+      accessToken,
+      ITwinSubClass.Project,
+      {
+        search: iTwinSearchString,
+        queryScope: "all",
+      }
+    );
+
+    const iTwins = iTwinsResponse.data!;
+
+    // Assert
+    chai.expect(iTwins).to.not.be.empty;
+  });
+
   it("should get a list of recent project iTwins", async () => {
     // Act
     const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
@@ -452,6 +472,24 @@ describe("iTwinsClient", () => {
       chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
       chai.expect(actualiTwin.createdDateTime).to.be.a("string");
       chai.expect(actualiTwin.createdBy).to.be.a("string");
+    });
+  });
+
+  it("should get a list of favorited project iTwins using all query scope", async () => {
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsAccessClient.queryFavoritesAsync(
+        accessToken,
+        ITwinSubClass.Project,
+        { queryScope: "all" }
+      );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    iTwinsResponse.data!.forEach((actualiTwin) => {
+      chai.expect(actualiTwin.class).to.be.eq("Endeavor");
+      chai.expect(actualiTwin.subClass).to.be.eq("Project");
     });
   });
 
@@ -663,6 +701,24 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.queryRecentsAsync(
         accessToken,
         ITwinSubClass.Asset
+      );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    iTwinsResponse.data!.forEach((actualiTwin) => {
+      chai.expect(actualiTwin.class).to.be.eq("Thing");
+      chai.expect(actualiTwin.subClass).to.be.eq("Asset");
+    });
+  });
+
+  it("should get a list of recent asset iTwins using all query scope", async () => {
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsAccessClient.queryRecentsAsync(
+        accessToken,
+        ITwinSubClass.Asset,
+        { queryScope: "all"}
       );
 
     // Assert
