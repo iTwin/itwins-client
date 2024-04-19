@@ -9,6 +9,7 @@ import type { AccessToken } from "@itwin/core-bentley";
 import { BaseClient } from "./BaseClient";
 import type {
   ITwin,
+  ITwinQueryScope,
   ITwinResultMode,
   ITwinsAccess,
   ITwinsAPIResponse,
@@ -37,7 +38,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     subClass: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
-    const headers = this.getResultModeHeaders(arg && arg.resultMode);
+    const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}?subClass=${subClass}`;
     if (arg)
       url += this.getQueryString(arg);
@@ -159,7 +160,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     subClass: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
-    const headers = this.getResultModeHeaders(arg && arg.resultMode);
+    const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites?subClass=${subClass}`;
     if (arg)
       url += this.getQueryString(arg);
@@ -177,7 +178,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     subClass: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
-    const headers = this.getResultModeHeaders(arg && arg.resultMode);
+    const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents?subClass=${subClass}`;
     if (arg)
       url += this.getQueryString(arg);
@@ -195,6 +196,15 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   }
 
   /**
+   * Format headers from query arguments
+   * @param arg (Optional) iTwin query arguments
+   * @protected
+   */
+  protected getHeaders(arg?: ITwinsQueryArg): Record<string, string> {
+    return {...this.getQueryScopeHeaders(arg && arg.queryScope), ...this.getResultModeHeaders(arg && arg.resultMode)};
+  }
+
+  /**
    * Format result mode parameter into a headers entry
    * @param resultMode (Optional) iTwin result mode
    * @protected
@@ -202,6 +212,17 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   protected getResultModeHeaders(resultMode: ITwinResultMode = "minimal"): Record<string, string> {
     return {
       prefer: `return=${resultMode}`,
+    };
+  }
+
+  /**
+   * Format query scope parameter into a headers entry
+   * @param queryScope (Optional) iTwin query scope
+   * @protected
+   */
+  protected getQueryScopeHeaders(queryScope: ITwinQueryScope = "memberOfItwin"): Record<string, string> {
+    return {
+      "x-itwin-query-scope": queryScope,
     };
   }
 }

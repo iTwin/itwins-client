@@ -121,6 +121,11 @@ export enum RepositorySubClass {
  */
 export type ITwinResultMode = "minimal" | "representation";
 
+/**
+ * Optional query scope. MemberOfITwin is the default. This is used to expand the scope of the query to all iTwins you have access to, not just ones that you are a member of, which only applies to organization administrators.
+ */
+export type ITwinQueryScope = "memberOfItwin" | "all";
+
 /** Set of optional arguments used for querying the iTwins API
  * @beta
  */
@@ -133,6 +138,7 @@ export interface ITwinsQueryArg {
   number?: string;
   type?: string;
   resultMode?: ITwinResultMode;
+  queryScope?: ITwinQueryScope;
 }
 
 /** Set of optional arguments used for querying Respositories API
