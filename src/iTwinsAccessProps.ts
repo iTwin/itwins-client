@@ -50,6 +50,13 @@ export interface ITwinsAccess {
   getPrimaryAccountAsync(
     accessToken: AccessToken
   ): Promise<ITwinsAPIResponse<ITwin>>;
+
+  /* Get the account for an iTwin */
+  getAccountAsync(
+    accessToken: AccessToken,
+    iTwinId: string,
+    resultMode?: ITwinResultMode
+  ): Promise<ITwinsAPIResponse<ITwin>>;
 }
 
 export interface ITwinsAPIResponse<T> {
@@ -144,7 +151,7 @@ export interface ITwinsQueryArg {
 /** Set of optional arguments used for querying Respositories API
  *
  */
-export interface RepositoriesQueryArg{
+export interface RepositoriesQueryArg {
   class?: string;
   subClass?: string;
 }

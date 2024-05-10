@@ -211,6 +211,23 @@ describe("iTwinsClient", () => {
     chai.expect(actualiTwin.createdBy).to.be.a("string");
   });
 
+  it("should get an account", async () => {
+    // Arrange
+    const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
+
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin> =
+      await iTwinsAccessClient.getAccountAsync(accessToken, iTwinId!);
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    const actualiTwin = iTwinsResponse.data!;
+    chai.expect(actualiTwin.id).to.not.be.eq(iTwinId); //should be a different entity
+    chai.expect(actualiTwin.class).to.be.eq("Account");
+    chai.expect(actualiTwin.subClass).to.be.eq("Account");
+  });
+
   it("should get a paged list of project iTwins using top", async () => {
     // Arrange
     const numberOfiTwins = 3;

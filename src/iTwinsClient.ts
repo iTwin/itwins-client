@@ -196,6 +196,22 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   }
 
   /**
+   * Gets the Account for the specified iTwin.
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @returns Account
+   */
+  public async getAccountAsync(
+    accessToken: AccessToken,
+    iTwinId: string,
+    resultMode?: ITwinResultMode
+  ): Promise<ITwinsAPIResponse<ITwin>> {
+    const headers = this.getResultModeHeaders(resultMode);
+    const url = `${this._baseUrl}/${iTwinId}/account`;
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwin", headers);
+  }
+
+  /**
    * Format headers from query arguments
    * @param arg (Optional) iTwin query arguments
    * @protected
