@@ -240,7 +240,7 @@ describe("iTwinsClient", () => {
     chai.expect(iTwinsResponse.status).to.be.eq(200);
     chai.expect(iTwinsResponse.data).to.not.be.empty;
     const actualiTwin = iTwinsResponse.data!;
-    chai.expect(actualiTwin.id).to.not.be.eq(iTwinId); //should be a different entity
+    chai.expect(actualiTwin.id).to.not.be.eq(iTwinId); // should be a different entity
     chai.expect(actualiTwin.class).to.be.eq("Account");
     chai.expect(actualiTwin.subClass).to.be.eq("Account");
     chai.expect(actualiTwin.createdDateTime).to.be.a("string");
@@ -271,7 +271,7 @@ describe("iTwinsClient", () => {
     chai.expect(actualiTwin.id).to.be.eq(iTwinId);
     chai.expect(actualiTwin.class).to.be.eq("Endeavor");
     chai.expect(actualiTwin.subClass).to.be.eq("Project");
-    
+
     chai.expect(actualiTwin.iTwinAccountId).to.be.eq(actualAccount.id);
   });
 
