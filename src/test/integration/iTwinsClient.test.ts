@@ -255,7 +255,7 @@ describe("iTwinsClient", () => {
     const accountResponse: ITwinsAPIResponse<ITwin> =
       await iTwinsAccessClient.getAccountAsync(accessToken, iTwinId!);
     const iTwinsResponse: ITwinsAPIResponse<ITwin> =
-      await iTwinsAccessClient.getAsync(accessToken, iTwinId!);
+      await iTwinsAccessClient.getAsync(accessToken, iTwinId!, "representation");
 
     // Assert
     chai.expect(accountResponse.status).to.be.eq(200);
