@@ -211,6 +211,70 @@ describe("iTwinsClient", () => {
     chai.expect(actualiTwin.createdBy).to.be.a("string");
   });
 
+  it("should get an account", async () => {
+    // Arrange
+    const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
+
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin> =
+      await iTwinsAccessClient.getAccountAsync(accessToken, iTwinId!);
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    const actualiTwin = iTwinsResponse.data!;
+    chai.expect(actualiTwin.id).to.not.be.eq(iTwinId); // should be a different entity
+    chai.expect(actualiTwin.class).to.be.eq("Account");
+    chai.expect(actualiTwin.subClass).to.be.eq("Account");
+  });
+
+  it("should get more details for an account in represenatation result mode", async () => {
+    // Arrange
+    const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
+
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin> =
+      await iTwinsAccessClient.getAccountAsync(accessToken, iTwinId!, "representation");
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    const actualiTwin = iTwinsResponse.data!;
+    chai.expect(actualiTwin.id).to.not.be.eq(iTwinId); // should be a different entity
+    chai.expect(actualiTwin.class).to.be.eq("Account");
+    chai.expect(actualiTwin.subClass).to.be.eq("Account");
+    chai.expect(actualiTwin.createdDateTime).to.be.a("string");
+    chai.expect(actualiTwin.createdBy).to.be.a("string");
+  });
+
+  it("should get the account specified by the iTwinAccountId", async () => {
+    // Arrange
+    const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
+
+    // Act
+    const accountResponse: ITwinsAPIResponse<ITwin> =
+      await iTwinsAccessClient.getAccountAsync(accessToken, iTwinId!);
+    const iTwinsResponse: ITwinsAPIResponse<ITwin> =
+      await iTwinsAccessClient.getAsync(accessToken, iTwinId!, "representation");
+
+    // Assert
+    chai.expect(accountResponse.status).to.be.eq(200);
+    chai.expect(accountResponse.data).to.not.be.empty;
+    const actualAccount = accountResponse.data!;
+    chai.expect(actualAccount.id).to.not.be.eq(iTwinId); // should be a different entity
+    chai.expect(actualAccount.class).to.be.eq("Account");
+    chai.expect(actualAccount.subClass).to.be.eq("Account");
+
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    const actualiTwin = iTwinsResponse.data!;
+    chai.expect(actualiTwin.id).to.be.eq(iTwinId);
+    chai.expect(actualiTwin.class).to.be.eq("Endeavor");
+    chai.expect(actualiTwin.subClass).to.be.eq("Project");
+
+    chai.expect(actualiTwin.iTwinAccountId).to.be.eq(actualAccount.id);
+  });
+
   it("should get a paged list of project iTwins using top", async () => {
     // Arrange
     const numberOfiTwins = 3;
