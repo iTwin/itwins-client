@@ -1,5 +1,9 @@
 # Change Log - @itwin/itwins-client
 
+## 1.4.0
+
+- Added `getAccountAsync` method on `ITwinsAccessClient`
+
 ## 1.3.0
 
 - Added Query Scope query argument, to allow for querying to be expanded outside of just the iTwins you are a member of (which only applies to Administrators).
