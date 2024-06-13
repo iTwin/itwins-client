@@ -66,24 +66,29 @@ export interface ITwinsAPIResponse<T> {
 }
 
 /** The ITwin object. Contains extra properties with "representation" result mode.
+ * Based on https://developer.bentley.com/apis/itwins/operations/get-my-itwins/#itwin
  * @beta
  */
 export interface ITwin {
-  id?: string;
-  class?: ITwinClass;
-  subClass?: ITwinSubClass;
-  type?: string;
-  displayName?: string;
+  id: string;
+  class: ITwinClass;
+  subClass: ITwinSubClass;
+  type: string | null;
+  displayName: string;
   // eslint-disable-next-line id-blacklist
-  number?: string;
-  dataCenterLocation?: string;
-  status?: string;
+  number: string;
+  dataCenterLocation: string;
+  status: "Active" | "Inactive" | "Trial";
 
   // extra properties available with "representation" result mode:
-  parentId?: string;
-  iTwinAccountId?: string;
-  createdDateTime?: string;
-  createdBy?: string;
+  parentId: string | null;
+  iTwinAccountId: string | null;
+  createdDateTime: string;
+  createdBy: string | null;
+  geographicLocation: string | null;
+  ianaTimeZone: string | null;
+  imageName: string | null;
+  image: string | null;
 }
 
 /** The simplified Repository object
