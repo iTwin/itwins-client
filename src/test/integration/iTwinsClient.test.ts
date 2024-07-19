@@ -207,6 +207,8 @@ describe("iTwinsClient", () => {
     const actualiTwin = iTwinsResponse.data!;
     chai.expect(actualiTwin.parentId).to.be.a("string");
     chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+    chai.expect(actualiTwin.imageName).to.be.null;
+    chai.expect(actualiTwin.image).to.be.null;
     chai.expect(actualiTwin.createdDateTime).to.be.a("string");
     chai.expect(actualiTwin.createdBy).to.be.a("string");
   });
@@ -441,6 +443,8 @@ describe("iTwinsClient", () => {
     iTwins.forEach((actualiTwin) => {
       chai.expect(actualiTwin.parentId).to.be.a("string");
       chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+      chai.expect(actualiTwin.imageName).to.be.null;
+      chai.expect(actualiTwin.image).to.be.null;
       chai.expect(actualiTwin.createdDateTime).to.be.a("string");
       chai.expect(actualiTwin.createdBy).to.be.a("string");
     });
@@ -497,6 +501,8 @@ describe("iTwinsClient", () => {
     iTwins.forEach((actualiTwin) => {
       chai.expect(actualiTwin.parentId).to.be.a("string");
       chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+      chai.expect(actualiTwin.imageName).to.be.null;
+      chai.expect(actualiTwin.image).to.be.null;
       chai.expect(actualiTwin.createdDateTime).to.be.a("string");
       chai.expect(actualiTwin.createdBy).to.be.a("string");
     });
@@ -534,6 +540,8 @@ describe("iTwinsClient", () => {
     iTwinsResponse.data!.forEach((actualiTwin) => {
       chai.expect(actualiTwin.parentId).to.be.a("string");
       chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+      chai.expect(actualiTwin.imageName).to.be.null;
+      chai.expect(actualiTwin.image).to.be.null;
       chai.expect(actualiTwin.createdDateTime).to.be.a("string");
       chai.expect(actualiTwin.createdBy).to.be.a("string");
     });
@@ -578,6 +586,8 @@ describe("iTwinsClient", () => {
     iTwinsResponse.data!.forEach((actualiTwin) => {
       chai.expect(actualiTwin.parentId).to.be.a("string");
       chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+      chai.expect(actualiTwin.imageName).to.be.null;
+      chai.expect(actualiTwin.image).to.be.null;
       chai.expect(actualiTwin.createdDateTime).to.be.a("string");
       chai.expect(actualiTwin.createdBy).to.be.a("string");
     });
@@ -610,6 +620,8 @@ describe("iTwinsClient", () => {
     const actualiTwin = iTwinsResponse.data!;
     chai.expect(actualiTwin.parentId).to.be.a("string");
     chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
+    chai.expect(actualiTwin.imageName).to.be.null;
+    chai.expect(actualiTwin.image).to.be.null;
     chai.expect(actualiTwin.createdDateTime).to.be.a("string");
     chai.expect(actualiTwin.createdBy).to.be.a("string");
   });
@@ -834,6 +846,7 @@ describe("iTwinsClient", () => {
       subClass: ITwinSubClass.Asset,
       class: ITwinClass.Thing,
       dataCenterLocation: "East US",
+      ianaTimeZone: "America/New_York",
       status: "Trial",
     };
 
@@ -884,6 +897,7 @@ describe("iTwinsClient", () => {
       subClass: ITwinSubClass.Asset,
       class: ITwinClass.Thing,
       dataCenterLocation: "East US",
+      ianaTimeZone: "America/New_York",
       status: "Trial",
     };
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
@@ -932,7 +946,7 @@ describe("iTwinsClient", () => {
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
       class: ITwinClass.Thing,
-      dataCenterLocation: "East US",
+      dataCenterLocation: "East US",      
       status: "Trial",
     };
 
@@ -964,7 +978,7 @@ describe("iTwinsClient", () => {
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
-      dataCenterLocation: "East US",
+      dataCenterLocation: "East US",      
       status: "Trial",
     };
 
@@ -1025,7 +1039,7 @@ describe("iTwinsClient", () => {
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
       class: ITwinClass.Thing,
-      dataCenterLocation: "East US",
+      dataCenterLocation: "East US",      
       status: "Trial",
     };
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
@@ -1069,7 +1083,7 @@ describe("iTwinsClient", () => {
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
       class: ITwinClass.Thing,
-      dataCenterLocation: "East US",
+      dataCenterLocation: "East US",      
       status: "Trial",
     };
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
@@ -1110,7 +1124,7 @@ describe("iTwinsClient", () => {
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
       class: ITwinClass.Thing,
-      dataCenterLocation: "East US",
+      dataCenterLocation: "East US",      
       status: "Trial",
     };
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
