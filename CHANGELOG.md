@@ -1,5 +1,17 @@
 # Change Log - @itwin/itwins-client
 
+## 1.5.0
+
+- Added three new properties to the `iTwin` interface.
+  - `ianaTimeZone`
+  - `imageName`
+  - `image`
+ 
+- Added three new values to the `iTwinSubClass` enum.
+  - Portfolio
+  - Program
+  - WorkPackage
+
 ## 1.4.0
 
 - Added `getAccountAsync` method on `ITwinsAccessClient`
@@ -33,4 +45,4 @@
 
 ## 0.9.0
 
-- Initial commit with only iTwin query operaitons.
+- Initial commit with only iTwin query operations.
