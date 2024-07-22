@@ -946,7 +946,7 @@ describe("iTwinsClient", () => {
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
       class: ITwinClass.Thing,
-      dataCenterLocation: "East US",      
+      dataCenterLocation: "East US",
       status: "Trial",
     };
 
@@ -978,7 +978,7 @@ describe("iTwinsClient", () => {
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
-      dataCenterLocation: "East US",      
+      dataCenterLocation: "East US",
       status: "Trial",
     };
 
@@ -1039,7 +1039,7 @@ describe("iTwinsClient", () => {
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
       class: ITwinClass.Thing,
-      dataCenterLocation: "East US",      
+      dataCenterLocation: "East US",
       status: "Trial",
     };
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
@@ -1083,7 +1083,7 @@ describe("iTwinsClient", () => {
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
       class: ITwinClass.Thing,
-      dataCenterLocation: "East US",      
+      dataCenterLocation: "East US",
       status: "Trial",
     };
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
@@ -1124,7 +1124,7 @@ describe("iTwinsClient", () => {
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
       class: ITwinClass.Thing,
-      dataCenterLocation: "East US",      
+      dataCenterLocation: "East US",
       status: "Trial",
     };
     const iTwinResponse: ITwinsAPIResponse<ITwin> =

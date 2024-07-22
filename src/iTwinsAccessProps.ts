@@ -82,7 +82,7 @@ export interface ITwin {
   // extra properties available with "representation" result mode:
   parentId?: string;
   iTwinAccountId?: string;
-  ianaTimeZone?: string | null;  
+  ianaTimeZone?: string | null;
   imageName?: string | null;
   image?: string | null;
   createdDateTime?: string;
