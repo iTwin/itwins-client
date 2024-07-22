@@ -82,6 +82,9 @@ export interface ITwin {
   // extra properties available with "representation" result mode:
   parentId?: string;
   iTwinAccountId?: string;
+  ianaTimeZone?: string | null;
+  imageName?: string | null;
+  image?: string | null;
   createdDateTime?: string;
   createdBy?: string;
 }
@@ -100,6 +103,9 @@ export enum ITwinSubClass {
   Account = "Account",
   Asset = "Asset",
   Project = "Project",
+  Portfolio = "Portfolio",
+  Program = "Program",
+  WorkPackage = "WorkPackage",
 }
 
 export enum ITwinClass {
