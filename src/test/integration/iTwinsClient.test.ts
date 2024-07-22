@@ -442,7 +442,7 @@ describe("iTwinsClient", () => {
 
     iTwins.forEach((actualiTwin) => {
       chai.expect(actualiTwin.parentId).to.be.a("string");
-      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");     
+      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
       chai.expect(actualiTwin.createdDateTime).to.be.a("string");
       chai.expect(actualiTwin.createdBy).to.be.a("string");
     });
@@ -498,7 +498,7 @@ describe("iTwinsClient", () => {
     // All items have the field "createdDateTime"
     iTwins.forEach((actualiTwin) => {
       chai.expect(actualiTwin.parentId).to.be.a("string");
-      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");      
+      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
       chai.expect(actualiTwin.createdDateTime).to.be.a("string");
       chai.expect(actualiTwin.createdBy).to.be.a("string");
     });
@@ -535,7 +535,7 @@ describe("iTwinsClient", () => {
 
     iTwinsResponse.data!.forEach((actualiTwin) => {
       chai.expect(actualiTwin.parentId).to.be.a("string");
-      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");      
+      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
       chai.expect(actualiTwin.createdDateTime).to.be.a("string");
       chai.expect(actualiTwin.createdBy).to.be.a("string");
     });
@@ -579,7 +579,7 @@ describe("iTwinsClient", () => {
 
     iTwinsResponse.data!.forEach((actualiTwin) => {
       chai.expect(actualiTwin.parentId).to.be.a("string");
-      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");      
+      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
       chai.expect(actualiTwin.createdDateTime).to.be.a("string");
       chai.expect(actualiTwin.createdBy).to.be.a("string");
     });
