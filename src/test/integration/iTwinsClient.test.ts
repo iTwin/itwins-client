@@ -501,8 +501,8 @@ describe("iTwinsClient", () => {
     iTwins.forEach((actualiTwin) => {
       chai.expect(actualiTwin.parentId).to.be.a("string");
       chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
-      chai.expect(actualiTwin.imageName).to.be.null;
-      chai.expect(actualiTwin.image).to.be.null;
+      chai.expect(actualiTwin.imageName).to.be.a("string");
+      chai.expect(actualiTwin.image).to.be.a("string");
       chai.expect(actualiTwin.createdDateTime).to.be.a("string");
       chai.expect(actualiTwin.createdBy).to.be.a("string");
     });

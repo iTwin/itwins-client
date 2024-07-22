@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\.github",
+    "\\src",
+    "\\src\\test",
+    "\\src\\test\\integration"
+  ],
+  "SelectedNode": "\\CHANGELOG.md",
+  "PreviewInSolutionExplorer": false
+}
