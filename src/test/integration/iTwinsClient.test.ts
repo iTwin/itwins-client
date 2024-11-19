@@ -38,6 +38,16 @@ describe("iTwinsClient", () => {
     chai.expect(iTwinsResponse.data).to.not.be.empty;
   });
 
+  it("should get a list of project iTwins without provided subClass", async () => {
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsCustomClient.queryAsync(accessToken);
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+  });
+
   it("should get iTwin repositories by id", async () => {
     // Arrange
     const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
@@ -172,6 +182,16 @@ describe("iTwinsClient", () => {
     // Act
     const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
       await iTwinsAccessClient.queryAsync(accessToken, ITwinSubClass.Project);
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+  });
+
+  it("should get a list of project iTwins without providing subClass", async () => {
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsAccessClient.queryAsync(accessToken);
 
     // Assert
     chai.expect(iTwinsResponse.status).to.be.eq(200);
@@ -481,6 +501,18 @@ describe("iTwinsClient", () => {
     chai.expect(iTwinsResponse.data).to.not.be.empty;
   });
 
+  it("should get a list of recent project iTwins without subClass query", async () => {
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsAccessClient.queryRecentsAsync(
+        accessToken
+      );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+  });
+
   it("should get more properties of recent project iTwins in representation result mode", async () => {
     // Act
     const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
@@ -510,6 +542,22 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.queryFavoritesAsync(
         accessToken,
         ITwinSubClass.Project
+      );
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    iTwinsResponse.data!.forEach((actualiTwin) => {
+      chai.expect(actualiTwin.class).to.be.eq("Endeavor");
+      chai.expect(actualiTwin.subClass).to.be.eq("Project");
+    });
+  });
+
+  it("should get a list of favorited project iTwins without subClass query", async () => {
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsAccessClient.queryFavoritesAsync(
+        accessToken
       );
 
     // Assert

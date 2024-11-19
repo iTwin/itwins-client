@@ -29,19 +29,25 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
 
   /** Get itwins accessible to the user
    * @param accessToken The client access token string
-   * @param subClass Required parameter to search a specific iTwin subClass
+   * @param subClass Optional parameter to search a specific iTwin subClass
    * @param arg Optional query arguments, for paging, searching, and filtering
    * @returns Array of projects, may be empty
    */
   public async queryAsync(
     accessToken: AccessToken,
-    subClass: ITwinSubClass,
+    subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
-    let url = `${this._baseUrl}?subClass=${subClass}`;
+    let url = this._baseUrl;
+    let query = "";
+    if (subClass)
+      query += `subClass=${subClass}`;
     if (arg)
-      url += this.getQueryString(arg);
+      query += this.getQueryString(arg);
+    if (query !== "")
+      url += `?${query}`;
+
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
   }
 
@@ -151,37 +157,49 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
 
   /** Get itwins accessible to the user
    * @param accessToken The client access token string
-   * @param subClass Required parameter to search a specific iTwin subClass
+   * @param subClass Optional parameter to search a specific iTwin subClass
    * @param arg Optional query arguments, for paging, searching, and filtering
    * @returns Array of projects, may be empty
    */
   public async queryFavoritesAsync(
     accessToken: AccessToken,
-    subClass: ITwinSubClass,
+    subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
-    let url = `${this._baseUrl}/favorites?subClass=${subClass}`;
+    let url = `${this._baseUrl}/favorites`;
+    let query = "";
+    if (subClass)
+      query += `subClass=${subClass}`;
     if (arg)
-      url += this.getQueryString(arg);
+      query += this.getQueryString(arg);
+    if (query !== "")
+      url += `?${query}`;
+
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
   }
 
   /** Get itwins accessible to the user
    * @param accessToken The client access token string
-   * @param subClass Required parameter to search a specific iTwin subClass
+   * @param subClass Optional parameter to search a specific iTwin subClass
    * @param arg Optional query arguments, for paging, searching, and filtering
    * @returns Array of projects, may be empty
    */
   public async queryRecentsAsync(
     accessToken: AccessToken,
-    subClass: ITwinSubClass,
+    subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
-    let url = `${this._baseUrl}/recents?subClass=${subClass}`;
+    let url = `${this._baseUrl}/recents`;
+    let query = "";
+    if (subClass)
+      query += `subClass=${subClass}`;
     if (arg)
-      url += this.getQueryString(arg);
+      query += this.getQueryString(arg);
+    if (query !== "")
+      url += `?${query}`;
+
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
   }
 
