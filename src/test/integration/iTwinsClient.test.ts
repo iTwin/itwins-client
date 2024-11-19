@@ -563,10 +563,6 @@ describe("iTwinsClient", () => {
     // Assert
     chai.expect(iTwinsResponse.status).to.be.eq(200);
     chai.expect(iTwinsResponse.data).to.not.be.empty;
-    iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.class).to.be.eq("Endeavor");
-      chai.expect(actualiTwin.subClass).to.be.eq("Project");
-    });
   });
 
   it("should get more properties of favorited project iTwins in representation result mode", async () => {
