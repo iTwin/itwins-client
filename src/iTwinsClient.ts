@@ -14,6 +14,7 @@ import type {
   ITwinsAccess,
   ITwinsAPIResponse,
   ITwinsQueryArg,
+  ITwinsQueryArgBase,
   ITwinSubClass,
   RepositoriesQueryArg,
   Repository,
@@ -158,12 +159,12 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async queryFavoritesAsync(
     accessToken: AccessToken,
     subClass: ITwinSubClass,
-    arg?: ITwinsQueryArg
+    arg?: ITwinsQueryArgBase
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites?subClass=${subClass}`;
     if (arg)
-      url += this.getQueryString(arg);
+      url += this.getQueryStringArgBase(arg);
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
   }
 
@@ -176,12 +177,12 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async queryRecentsAsync(
     accessToken: AccessToken,
     subClass: ITwinSubClass,
-    arg?: ITwinsQueryArg
+    arg?: ITwinsQueryArgBase
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents?subClass=${subClass}`;
     if (arg)
-      url += this.getQueryString(arg);
+      url += this.getQueryStringArgBase(arg);
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
   }
 
@@ -216,7 +217,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    * @param arg (Optional) iTwin query arguments
    * @protected
    */
-  protected getHeaders(arg?: ITwinsQueryArg): Record<string, string> {
+  protected getHeaders(arg?: ITwinsQueryArgBase): Record<string, string> {
     return {...this.getQueryScopeHeaders(arg && arg.queryScope), ...this.getResultModeHeaders(arg && arg.resultMode)};
   }
 

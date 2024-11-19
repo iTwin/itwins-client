@@ -36,14 +36,14 @@ export interface ITwinsAccess {
   queryFavoritesAsync(
     accessToken: AccessToken,
     subClass: ITwinSubClass,
-    arg?: ITwinsQueryArg
+    arg?: ITwinsQueryArgBase
   ): Promise<ITwinsAPIResponse<ITwin[]>>;
 
   /** Get recent iTwins */
   queryRecentsAsync(
     accessToken: AccessToken,
     subClass: ITwinSubClass,
-    arg?: ITwinsQueryArg
+    arg?: ITwinsQueryArgBase
   ): Promise<ITwinsAPIResponse<ITwin[]>>;
 
   /** Get the primary account ITwin */
@@ -87,6 +87,7 @@ export interface ITwin {
   image?: string | null;
   createdDateTime?: string;
   createdBy?: string;
+  geographicLocation?: string;
 }
 
 /** The simplified Repository object
@@ -142,14 +143,22 @@ export type ITwinQueryScope = "memberOfItwin" | "all";
 /** Set of optional arguments used for querying the iTwins API
  * @beta
  */
-export interface ITwinsQueryArg {
-  top?: number;
-  skip?: number;
+export interface ITwinsQueryArg extends ITwinsQueryArgBase {
   search?: string;
   displayName?: string;
   // eslint-disable-next-line id-blacklist
   number?: string;
+  parentId?: string;
+  iTwinAccountId?: string;
+}
+
+export interface ITwinsQueryArgBase {
+  subClass?: ITwinSubClass;
+  status?: string;
   type?: string;
+  top?: number;
+  skip?: number;
+  includeInactive: boolean;
   resultMode?: ITwinResultMode;
   queryScope?: ITwinQueryScope;
 }

@@ -9,7 +9,7 @@ import type { AccessToken } from "@itwin/core-bentley";
 import type { Method } from "axios";
 import type { AxiosRequestConfig } from "axios";
 import axios from "axios";
-import type { ITwinsAPIResponse, ITwinsQueryArg, RepositoriesQueryArg } from "./iTwinsAccessProps";
+import type { ITwinsAPIResponse, ITwinsQueryArg, ITwinsQueryArgBase, RepositoriesQueryArg } from "./iTwinsAccessProps";
 
 export class BaseClient {
   protected _baseUrl: string = "https://api.bentley.com/itwins";
@@ -104,8 +104,8 @@ export class BaseClient {
   protected getQueryString(queryArg: ITwinsQueryArg): string {
     let queryString = "";
 
-    if (queryArg.search) {
-      queryString += `&$search=${queryArg.search}`;
+    if (queryArg.includeInactive) {
+      queryString += `&includeInactive=${queryArg.includeInactive}`;
     }
 
     if (queryArg.top) {
@@ -116,12 +116,70 @@ export class BaseClient {
       queryString += `&$skip=${queryArg.skip}`;
     }
 
+    if (queryArg.status) {
+      queryString += `&status=${queryArg.status}`;
+    }
+
+    if (queryArg.subClass) {
+      queryString += `&subClass=${queryArg.subClass}`;
+    }
+
+    if (queryArg.type) {
+      queryString += `&type=${queryArg.type}`;
+    }
+
+    if (queryArg.search) {
+      queryString += `&$search=${queryArg.search}`;
+    }
+
     if (queryArg.displayName) {
       queryString += `&displayName=${queryArg.displayName}`;
     }
 
     if (queryArg.number) {
       queryString += `&number=${queryArg.number}`;
+    }
+
+    if (queryArg.parentId) {
+      queryString += `&parentId=${queryArg.parentId}`;
+    }
+
+    if (queryArg.iTwinAccountId) {
+      queryString += `&iTwinAccountId=${queryArg.iTwinAccountId}`;
+    }
+
+    // trim & from start of string
+    queryString.replace(/^&+/, "");
+
+    return queryString;
+  }
+
+  /**
+    * Build a query to be appended to a URL
+    * @param queryArg Object container queryable properties
+    * @returns query string with AccessControlQueryArg applied, which should be appended to a url
+    */
+  protected getQueryStringArgBase(queryArg: ITwinsQueryArgBase): string {
+    let queryString = "";
+
+    if (queryArg.includeInactive) {
+      queryString += `&includeInactive=${queryArg.includeInactive}`;
+    }
+
+    if (queryArg.top) {
+      queryString += `&$top=${queryArg.top}`;
+    }
+
+    if (queryArg.skip) {
+      queryString += `&$skip=${queryArg.skip}`;
+    }
+
+    if (queryArg.status) {
+      queryString += `&status=${queryArg.status}`;
+    }
+
+    if (queryArg.subClass) {
+      queryString += `&subClass=${queryArg.subClass}`;
     }
 
     if (queryArg.type) {
