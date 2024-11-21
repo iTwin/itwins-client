@@ -1,12 +1,19 @@
 # Change Log - @itwin/itwins-client
 
+## 1.6.0
+
+- Updated methods so that `subClass` is no longer mandatory
+  - `queryAsync`
+  - `queryFavoritesAsync`
+  - `queryRecentsAsync`
+
 ## 1.5.0
 
 - Added three new properties to the `iTwin` interface.
   - `ianaTimeZone`
   - `imageName`
   - `image`
- 
+
 - Added three new values to the `iTwinSubClass` enum.
   - Portfolio
   - Program
