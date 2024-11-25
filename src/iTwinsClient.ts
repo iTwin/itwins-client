@@ -36,7 +36,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async queryAsync(
     accessToken: AccessToken,
     /**
-     * @deprecated in 1.6 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
+     * @deprecated in 2.0 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
      */
     subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
@@ -44,7 +44,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     const headers = this.getHeaders(arg);
     let url = this._baseUrl;
     let query = "";
+    // eslint-disable-next-line deprecation/deprecation
     if (subClass || arg?.subClass)
+      // eslint-disable-next-line deprecation/deprecation
       query += `subClass=${subClass ?? arg?.subClass}`;
     if (arg)
       query += this.getQueryString(arg);
@@ -167,7 +169,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async queryFavoritesAsync(
     accessToken: AccessToken,
     /**
-     * @deprecated in 1.6 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
+     * @deprecated in 2.0 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
      */
     subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
@@ -175,7 +177,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites`;
     let query = "";
+    // eslint-disable-next-line deprecation/deprecation
     if (subClass || arg?.subClass)
+      // eslint-disable-next-line deprecation/deprecation
       query += `subClass=${subClass ?? arg?.subClass}`;
     if (arg)
       query += this.getQueryString(arg);
@@ -194,7 +198,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async queryRecentsAsync(
     accessToken: AccessToken,
     /**
-     * @deprecated in 1.6 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
+     * @deprecated in 2.0 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
      */
     subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
@@ -202,7 +206,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
     let query = "";
+    // eslint-disable-next-line deprecation/deprecation
     if (subClass || arg?.subClass)
+      // eslint-disable-next-line deprecation/deprecation
       query += `subClass=${subClass ?? arg?.subClass}`;
     if (arg)
       query += this.getQueryString(arg);
