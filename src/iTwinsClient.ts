@@ -45,9 +45,10 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let url = this._baseUrl;
     let query = "";
     // eslint-disable-next-line deprecation/deprecation
-    if (subClass || arg?.subClass)
+    if (subClass || arg?.subClass){
       // eslint-disable-next-line deprecation/deprecation
       query += `subClass=${subClass ?? arg?.subClass}`;
+    }
     if (arg)
       query += this.getQueryString(arg);
     if (query !== "")
@@ -178,9 +179,11 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let url = `${this._baseUrl}/favorites`;
     let query = "";
     // eslint-disable-next-line deprecation/deprecation
-    if (subClass || arg?.subClass)
+    if (subClass || arg?.subClass){
       // eslint-disable-next-line deprecation/deprecation
       query += `subClass=${subClass ?? arg?.subClass}`;
+    }
+
     if (arg)
       query += this.getQueryString(arg);
     if (query !== "")
@@ -207,9 +210,10 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let url = `${this._baseUrl}/recents`;
     let query = "";
     // eslint-disable-next-line deprecation/deprecation
-    if (subClass || arg?.subClass)
+    if (subClass || arg?.subClass){
       // eslint-disable-next-line deprecation/deprecation
       query += `subClass=${subClass ?? arg?.subClass}`;
+    }
     if (arg)
       query += this.getQueryString(arg);
     if (query !== "")
