@@ -46,7 +46,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let query = "";
     // eslint-disable-next-line deprecation/deprecation
     let resolvedSubClass = subClass;
-    if(arg !== undefined && arg.subClass !== undefined)
+    if(arg && arg.subClass)
       resolvedSubClass = arg.subClass;
     if (resolvedSubClass)
       query += `subClass=${resolvedSubClass}`;
@@ -181,7 +181,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let query = "";
     // eslint-disable-next-line deprecation/deprecation
     let resolvedSubClass = subClass;
-    if(arg !== undefined && arg.subClass !== undefined)
+    if(arg && arg.subClass)
       resolvedSubClass = arg.subClass;
     if (resolvedSubClass)
       query += `subClass=${resolvedSubClass}`;
@@ -212,7 +212,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let query = "";
     // eslint-disable-next-line deprecation/deprecation
     let resolvedSubClass = subClass;
-    if(arg !== undefined && arg.subClass !== undefined)
+    if(arg && arg.subClass)
       resolvedSubClass = arg.subClass;
     if (resolvedSubClass)
       query += `subClass=${resolvedSubClass}`;
