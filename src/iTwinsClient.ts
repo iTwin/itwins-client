@@ -35,14 +35,17 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    */
   public async queryAsync(
     accessToken: AccessToken,
+    /**
+     * @deprecated in 1.6 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
+     */
     subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = this._baseUrl;
     let query = "";
-    if (subClass)
-      query += `subClass=${subClass}`;
+    if (subClass || arg?.subClass)
+      query += `subClass=${subClass ?? arg?.subClass}`;
     if (arg)
       query += this.getQueryString(arg);
     if (query !== "")
@@ -163,14 +166,17 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    */
   public async queryFavoritesAsync(
     accessToken: AccessToken,
+    /**
+     * @deprecated in 1.6 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
+     */
     subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites`;
     let query = "";
-    if (subClass)
-      query += `subClass=${subClass}`;
+    if (subClass || arg?.subClass)
+      query += `subClass=${subClass ?? arg?.subClass}`;
     if (arg)
       query += this.getQueryString(arg);
     if (query !== "")
@@ -187,14 +193,17 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    */
   public async queryRecentsAsync(
     accessToken: AccessToken,
+    /**
+     * @deprecated in 1.6 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
+     */
     subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
     let query = "";
-    if (subClass)
-      query += `subClass=${subClass}`;
+    if (subClass || arg?.subClass)
+      query += `subClass=${subClass ?? arg?.subClass}`;
     if (arg)
       query += this.getQueryString(arg);
     if (query !== "")

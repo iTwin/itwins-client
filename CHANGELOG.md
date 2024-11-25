@@ -2,10 +2,12 @@
 
 ## 1.6.0
 
-- Updated methods so that `subClass` is no longer mandatory
+- Updated methods so that `subClass` is no longer mandatory.
   - `queryAsync`
   - `queryFavoritesAsync`
   - `queryRecentsAsync`
+- Marked `subClass` as a depricated property.
+- Included `subClass` to be provided from the `arg` property
 
 ## 1.5.0
 

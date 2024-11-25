@@ -48,6 +48,18 @@ describe("iTwinsClient", () => {
     chai.expect(iTwinsResponse.data).to.not.be.empty;
   });
 
+  it("should get a list of project iTwins with provided subClass inside arg", async () => {
+    // Act
+    const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
+      await iTwinsCustomClient.queryAsync(accessToken, undefined, {
+        subClass: ITwinSubClass.Project,
+      });
+
+    // Assert
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+  });
+
   it("should get iTwin repositories by id", async () => {
     // Arrange
     const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";

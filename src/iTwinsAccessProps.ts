@@ -152,6 +152,7 @@ export interface ITwinsQueryArg {
   type?: string;
   resultMode?: ITwinResultMode;
   queryScope?: ITwinQueryScope;
+  subClass?: ITwinSubClass;
 }
 
 /** Set of optional arguments used for querying Respositories API
