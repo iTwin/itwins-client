@@ -181,8 +181,6 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     const resolvedSubClass = subClass !== undefined ? subClass : arg?.subClass;
     if (resolvedSubClass)
       query += `subClass=${resolvedSubClass}`;
-
-
     if (arg)
       query += this.getQueryString(arg);
     if (query !== "")
@@ -209,7 +207,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let url = `${this._baseUrl}/recents`;
     let query = "";
     // eslint-disable-next-line deprecation/deprecation
-    const resolvedSubClass = subClass !== undefined ? subClass : arg?.subClass;;
+    const resolvedSubClass = subClass !== undefined ? subClass : arg?.subClass;
     if (resolvedSubClass)
       query += `subClass=${resolvedSubClass}`;
     if (arg)
