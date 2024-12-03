@@ -119,11 +119,20 @@ export class BaseClient {
    * @param queryArg Object container queryable properties
    * @returns query string with AccessControlQueryArg applied, which should be appended to a url
    */
-  protected getQueryString(queryArg: ITwinsQueryArg, subClass?: ITwinSubClass): string {
+  protected getQueryString(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
     let queryString = "";
 
-    if(subClass || queryArg.subClass) {
-      queryString += `&subClass=${subClass ?? queryArg.subClass}`;
+    if(subClass || (queryArg && queryArg.subClass)) {
+      let resolvedSubClass = subClass;
+      if(queryArg && queryArg.subClass) {
+        resolvedSubClass = queryArg?.subClass;
+      }
+
+      queryString += `&subClass=${resolvedSubClass}`;
+    }
+
+    if(!queryArg) {
+      return queryString;
     }
 
     if (queryArg.includeInactive) {
@@ -177,11 +186,20 @@ export class BaseClient {
     * @param queryArg Object container queryable properties
     * @returns query string with AccessControlQueryArg applied, which should be appended to a url
     */
-  protected getQueryStringArgBase(queryArg: ITwinsQueryArgBase, subClass?: ITwinSubClass): string {
+  protected getQueryStringArgBase(queryArg?: ITwinsQueryArgBase, subClass?: ITwinSubClass): string {
     let queryString = "";
 
-    if(subClass || queryArg.subClass) {
-      queryString += `&subClass=${subClass ?? queryArg.subClass}`;
+    if(subClass || (queryArg && queryArg.subClass)) {
+      let resolvedSubClass = subClass;
+      if(queryArg && queryArg.subClass) {
+        resolvedSubClass = queryArg?.subClass;
+      }
+
+      queryString += `&subClass=${resolvedSubClass}`;
+    }
+
+    if(!queryArg) {
+      return queryString;
     }
 
     if (queryArg.includeInactive) {

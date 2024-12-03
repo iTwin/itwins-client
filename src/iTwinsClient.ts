@@ -46,7 +46,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let url = this._baseUrl;
 
     // eslint-disable-next-line deprecation/deprecation
-    const query = arg ? this.getQueryStringArgBase(arg, subClass) : "";
+    const query = this.getQueryStringArgBase(arg, subClass);
     if (query !== "")
       url += `?${query}`;
 
@@ -175,7 +175,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let url = `${this._baseUrl}/favorites`;
 
     // eslint-disable-next-line deprecation/deprecation
-    const query = arg ? this.getQueryStringArgBase(arg, subClass) : "";
+    const query = this.getQueryStringArgBase(arg, subClass);
     if (query !== "")
       url += `?${query}`;
 
