@@ -7,11 +7,12 @@
   - `queryFavoritesAsync`
   - `queryRecentsAsync`
 - Marked `subClass` as a depricated property.
-- Included `subClass` to be provided from the `arg` property
+- Included `subClass` to be provided from the `arg` property.
 
 ## 1.5.0
 
 - Added three new properties to the `iTwin` interface.
+
   - `ianaTimeZone`
   - `imageName`
   - `image`
