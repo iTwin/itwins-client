@@ -66,8 +66,8 @@ export class BaseClient {
           response.data.error || response.data === ""
             ? undefined
             : property
-            ? response.data[property]
-            : response.data,
+              ? response.data[property]
+              : response.data,
         error: response.data.error,
       };
     } catch (err) {
@@ -103,7 +103,7 @@ export class BaseClient {
       data,
       headers: {
         ...headers,
-        authorization: accessTokenString,
+        "authorization": accessTokenString,
         "content-type": "application/json",
       },
       validateStatus(status: number) {
