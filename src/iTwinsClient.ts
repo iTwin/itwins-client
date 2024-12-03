@@ -44,15 +44,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = this._baseUrl;
-    let query = "";
+
     // eslint-disable-next-line deprecation/deprecation
-    let resolvedSubClass = subClass;
-    if(arg && arg.subClass)
-      resolvedSubClass = arg.subClass;
-    if (resolvedSubClass)
-      query += `subClass=${resolvedSubClass}`;
-    if (arg)
-      query += this.getQueryString(arg);
+    const query = arg ? this.getQueryStringArgBase(arg, subClass) : "";
     if (query !== "")
       url += `?${query}`;
 
@@ -179,15 +173,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites`;
-    let query = "";
+
     // eslint-disable-next-line deprecation/deprecation
-    let resolvedSubClass = subClass;
-    if(arg && arg.subClass)
-      resolvedSubClass = arg.subClass;
-    if (resolvedSubClass)
-      query += `subClass=${resolvedSubClass}`;
-    if (arg)
-      query += this.getQueryStringArgBase(arg);
+    const query = arg ? this.getQueryStringArgBase(arg, subClass) : "";
     if (query !== "")
       url += `?${query}`;
 
@@ -210,15 +198,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
-    let query = "";
+
     // eslint-disable-next-line deprecation/deprecation
-    let resolvedSubClass = subClass;
-    if(arg && arg.subClass)
-      resolvedSubClass = arg.subClass;
-    if (resolvedSubClass)
-      query += `subClass=${resolvedSubClass}`;
-    if (arg)
-      query += this.getQueryStringArgBase(arg);
+    const query = arg ? this.getQueryStringArgBase(arg, subClass) : "";
     if (query !== "")
       url += `?${query}`;
 

@@ -13,6 +13,7 @@ import type {
   ITwinsAPIResponse,
   ITwinsQueryArg,
   ITwinsQueryArgBase,
+  ITwinSubClass,
   RepositoriesQueryArg,
 } from "./iTwinsAccessProps";
 
@@ -118,8 +119,12 @@ export class BaseClient {
    * @param queryArg Object container queryable properties
    * @returns query string with AccessControlQueryArg applied, which should be appended to a url
    */
-  protected getQueryString(queryArg: ITwinsQueryArg): string {
+  protected getQueryString(queryArg: ITwinsQueryArg, subClass?: ITwinSubClass): string {
     let queryString = "";
+
+    if(subClass || queryArg.subClass) {
+      queryString += `&subClass=${subClass || queryArg.subClass}`;
+    }
 
     if (queryArg.includeInactive) {
       queryString += `&includeInactive=${queryArg.includeInactive}`;
@@ -135,10 +140,6 @@ export class BaseClient {
 
     if (queryArg.status) {
       queryString += `&status=${queryArg.status}`;
-    }
-
-    if (queryArg.subClass) {
-      queryString += `&subClass=${queryArg.subClass}`;
     }
 
     if (queryArg.type) {
@@ -176,8 +177,12 @@ export class BaseClient {
     * @param queryArg Object container queryable properties
     * @returns query string with AccessControlQueryArg applied, which should be appended to a url
     */
-  protected getQueryStringArgBase(queryArg: ITwinsQueryArgBase): string {
+  protected getQueryStringArgBase(queryArg: ITwinsQueryArgBase, subClass?: ITwinSubClass): string {
     let queryString = "";
+
+    if(subClass || queryArg.subClass) {
+      queryString += `&subClass=${subClass || queryArg.subClass}`;
+    }
 
     if (queryArg.includeInactive) {
       queryString += `&includeInactive=${queryArg.includeInactive}`;
@@ -193,10 +198,6 @@ export class BaseClient {
 
     if (queryArg.status) {
       queryString += `&status=${queryArg.status}`;
-    }
-
-    if (queryArg.subClass) {
-      queryString += `&subClass=${queryArg.subClass}`;
     }
 
     if (queryArg.type) {
