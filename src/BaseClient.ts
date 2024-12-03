@@ -123,7 +123,7 @@ export class BaseClient {
     let queryString = "";
 
     if(subClass || queryArg.subClass) {
-      queryString += `&subClass=${subClass || queryArg.subClass}`;
+      queryString += `&subClass=${subClass ?? queryArg.subClass}`;
     }
 
     if (queryArg.includeInactive) {
@@ -181,7 +181,7 @@ export class BaseClient {
     let queryString = "";
 
     if(subClass || queryArg.subClass) {
-      queryString += `&subClass=${subClass || queryArg.subClass}`;
+      queryString += `&subClass=${subClass ?? queryArg.subClass}`;
     }
 
     if (queryArg.includeInactive) {
