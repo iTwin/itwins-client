@@ -158,10 +158,9 @@ export interface ITwinsQueryArgBase {
   type?: string;
   top?: number;
   skip?: number;
-  includeInactive: boolean;
+  includeInactive?: boolean;
   resultMode?: ITwinResultMode;
   queryScope?: ITwinQueryScope;
-  subClass?: ITwinSubClass;
 }
 
 /** Set of optional arguments used for querying Respositories API

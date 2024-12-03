@@ -11,7 +11,8 @@ import type { AxiosRequestConfig } from "axios";
 import axios from "axios";
 import type {
   ITwinsAPIResponse,
-  ITwinsQueryArg, ITwinsQueryArgBase,
+  ITwinsQueryArg,
+  ITwinsQueryArgBase,
   RepositoriesQueryArg,
 } from "./iTwinsAccessProps";
 
