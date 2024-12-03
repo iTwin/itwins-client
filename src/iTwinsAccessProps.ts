@@ -15,7 +15,7 @@ export interface ITwinsAccess {
   /** Get iTwins */
   queryAsync(
     accessToken: AccessToken,
-    subClass: ITwinSubClass,
+    subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>>;
 
@@ -35,14 +35,14 @@ export interface ITwinsAccess {
   /** Get favorited iTwins */
   queryFavoritesAsync(
     accessToken: AccessToken,
-    subClass: ITwinSubClass,
+    subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>>;
 
   /** Get recent iTwins */
   queryRecentsAsync(
     accessToken: AccessToken,
-    subClass: ITwinSubClass,
+    subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
   ): Promise<ITwinsAPIResponse<ITwin[]>>;
 
@@ -152,6 +152,7 @@ export interface ITwinsQueryArg {
   type?: string;
   resultMode?: ITwinResultMode;
   queryScope?: ITwinQueryScope;
+  subClass?: ITwinSubClass;
 }
 
 /** Set of optional arguments used for querying Respositories API

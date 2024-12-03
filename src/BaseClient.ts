@@ -9,13 +9,17 @@ import type { AccessToken } from "@itwin/core-bentley";
 import type { Method } from "axios";
 import type { AxiosRequestConfig } from "axios";
 import axios from "axios";
-import type { ITwinsAPIResponse, ITwinsQueryArg, RepositoriesQueryArg } from "./iTwinsAccessProps";
+import type {
+  ITwinsAPIResponse,
+  ITwinsQueryArg,
+  RepositoriesQueryArg,
+} from "./iTwinsAccessProps";
 
 export class BaseClient {
   protected _baseUrl: string = "https://api.bentley.com/itwins";
 
   public constructor(url?: string) {
-    if(url !== undefined){
+    if (url !== undefined) {
       this._baseUrl = url;
     } else {
       const urlPrefix = process.env.IMJS_URL_PREFIX;
@@ -28,14 +32,14 @@ export class BaseClient {
   }
 
   /**
-    * Sends a basic API request
-    * @param accessToken The client access token string
-    * @param method The method type of the request (ex. GET, POST, DELETE, etc.)
-    * @param url The url of the request
-    * @param data (Optional) The payload of the request
-    * @param property (Optional) The target property (ex. iTwins, repositories, etc.)
-    * @param headers (Optional) Extra request headers.
-    */
+   * Sends a basic API request
+   * @param accessToken The client access token string
+   * @param method The method type of the request (ex. GET, POST, DELETE, etc.)
+   * @param url The url of the request
+   * @param data (Optional) The payload of the request
+   * @param property (Optional) The target property (ex. iTwins, repositories, etc.)
+   * @param headers (Optional) Extra request headers.
+   */
   protected async sendGenericAPIRequest(
     accessToken: AccessToken,
     method: Method,
@@ -43,15 +47,27 @@ export class BaseClient {
     data?: any,
     property?: string,
     headers?: Record<string, string | number | boolean>
-  ): Promise<ITwinsAPIResponse<any>> { // TODO: Change any response
-    const requestOptions = this.getRequestOptions(accessToken, method, url, data, headers);
+  ): Promise<ITwinsAPIResponse<any>> {
+    // TODO: Change any response
+    const requestOptions = this.getRequestOptions(
+      accessToken,
+      method,
+      url,
+      data,
+      headers
+    );
 
     try {
       const response = await axios(requestOptions);
 
       return {
         status: response.status,
-        data: response.data.error || response.data === "" ? undefined : property ? response.data[property] : response.data,
+        data:
+          response.data.error || response.data === ""
+            ? undefined
+            : property
+              ? response.data[property]
+              : response.data,
         error: response.data.error,
       };
     } catch (err) {
@@ -60,20 +76,20 @@ export class BaseClient {
         error: {
           code: "InternalServerError",
           message:
-             "An internal exception happened while calling iTwins Service",
+            "An internal exception happened while calling iTwins Service",
         },
       };
     }
   }
 
   /**
-    * Build the request methods, headers, and other options
-    * @param accessTokenString The client access token string
-    * @param method The method type of the request (ex. GET, POST, DELETE, etc.)
-    * @param url The url of the request
-    * @param data (Optional) The payload of the request
-    * @param headers (Optional) Extra request headers.
-    */
+   * Build the request methods, headers, and other options
+   * @param accessTokenString The client access token string
+   * @param method The method type of the request (ex. GET, POST, DELETE, etc.)
+   * @param url The url of the request
+   * @param data (Optional) The payload of the request
+   * @param headers (Optional) Extra request headers.
+   */
   protected getRequestOptions(
     accessTokenString: string,
     method: Method,
@@ -90,17 +106,17 @@ export class BaseClient {
         "authorization": accessTokenString,
         "content-type": "application/json",
       },
-      validateStatus(status) {
+      validateStatus(status: number) {
         return status < 500; // Resolve only if the status code is less than 500
       },
     };
   }
 
   /**
-    * Build a query to be appended to a URL
-    * @param queryArg Object container queryable properties
-    * @returns query string with AccessControlQueryArg applied, which should be appended to a url
-    */
+   * Build a query to be appended to a URL
+   * @param queryArg Object container queryable properties
+   * @returns query string with AccessControlQueryArg applied, which should be appended to a url
+   */
   protected getQueryString(queryArg: ITwinsQueryArg): string {
     let queryString = "";
 
