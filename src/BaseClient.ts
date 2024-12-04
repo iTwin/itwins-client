@@ -115,70 +115,6 @@ export class BaseClient {
   }
 
   /**
-   * Build a query to be appended to a URL
-   * @param queryArg Object container queryable properties
-   * @returns query string with AccessControlQueryArg applied, which should be appended to a url
-   */
-  protected getQueryString(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
-    let queryString = "";
-
-    if (subClass) {
-      queryString += `subClass=${subClass}`;
-    } else if (queryArg && queryArg.subClass) {
-      queryString += `subClass=${queryArg.subClass}`;
-    }
-
-    if(!queryArg) {
-      return queryString;
-    }
-
-    if (queryArg.includeInactive) {
-      queryString += `&includeInactive=${queryArg.includeInactive}`;
-    }
-
-    if (queryArg.top) {
-      queryString += `&$top=${queryArg.top}`;
-    }
-
-    if (queryArg.skip) {
-      queryString += `&$skip=${queryArg.skip}`;
-    }
-
-    if (queryArg.status) {
-      queryString += `&status=${queryArg.status}`;
-    }
-
-    if (queryArg.type) {
-      queryString += `&type=${queryArg.type}`;
-    }
-
-    if (queryArg.search) {
-      queryString += `&$search=${queryArg.search}`;
-    }
-
-    if (queryArg.displayName) {
-      queryString += `&displayName=${queryArg.displayName}`;
-    }
-
-    if (queryArg.number) {
-      queryString += `&number=${queryArg.number}`;
-    }
-
-    if (queryArg.parentId) {
-      queryString += `&parentId=${queryArg.parentId}`;
-    }
-
-    if (queryArg.iTwinAccountId) {
-      queryString += `&iTwinAccountId=${queryArg.iTwinAccountId}`;
-    }
-
-    // trim & from start of string
-    queryString.replace(/^&+/, "");
-
-    return queryString;
-  }
-
-  /**
     * Build a query to be appended to a URL
     * @param queryArg Object container queryable properties
     * @returns query string with AccessControlQueryArg applied, which should be appended to a url
@@ -214,6 +150,44 @@ export class BaseClient {
 
     if (queryArg.type) {
       queryString += `&type=${queryArg.type}`;
+    }
+
+    // trim & from start of string
+    queryString.replace(/^&+/, "");
+
+    return queryString;
+  }
+
+  /**
+   * Build a query to be appended to a URL
+   * @param queryArg Object container queryable properties
+   * @returns query string with AccessControlQueryArg applied, which should be appended to a url
+   */
+  protected getQueryStringArg(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
+    let queryString = this.getQueryStringArgBase(queryArg, subClass);
+
+    if(!queryArg) {
+      return queryString;
+    }
+
+    if (queryArg.search) {
+      queryString += `&includeInactive=${queryArg.search}`;
+    }
+
+    if (queryArg.displayName) {
+      queryString += `&$top=${queryArg.displayName}`;
+    }
+
+    if (queryArg.number) {
+      queryString += `&$skip=${queryArg.number}`;
+    }
+
+    if (queryArg.parentId) {
+      queryString += `&status=${queryArg.parentId}`;
+    }
+
+    if (queryArg.iTwinAccountId) {
+      queryString += `&type=${queryArg.iTwinAccountId}`;
     }
 
     // trim & from start of string
