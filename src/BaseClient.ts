@@ -125,7 +125,7 @@ export class BaseClient {
     if(subClass || (queryArg && queryArg.subClass)) {
       let resolvedSubClass = subClass;
       if(queryArg && queryArg.subClass) {
-        resolvedSubClass = queryArg?.subClass;
+        resolvedSubClass = queryArg.subClass;
       }
 
       queryString += `&subClass=${resolvedSubClass}`;
@@ -192,7 +192,7 @@ export class BaseClient {
     if(subClass || (queryArg && queryArg.subClass)) {
       let resolvedSubClass = subClass;
       if(queryArg && queryArg.subClass) {
-        resolvedSubClass = queryArg?.subClass;
+        resolvedSubClass = queryArg.subClass;
       }
 
       queryString += `&subClass=${resolvedSubClass}`;
