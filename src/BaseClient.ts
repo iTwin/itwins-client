@@ -123,9 +123,9 @@ export class BaseClient {
     let queryString = "";
 
     if (subClass) {
-      queryString += `&subClass=${subClass}`;
+      queryString += `subClass=${subClass}`;
     } else if (queryArg && queryArg.subClass) {
-      queryString += `&subClass=${queryArg.subClass}`;
+      queryString += `subClass=${queryArg.subClass}`;
     }
 
     if(!queryArg) {
@@ -187,9 +187,9 @@ export class BaseClient {
     let queryString = "";
 
     if (subClass) {
-      queryString += `&subClass=${subClass}`;
+      queryString += `subClass=${subClass}`;
     } else if (queryArg && queryArg.subClass) {
-      queryString += `&subClass=${queryArg.subClass}`;
+      queryString += `subClass=${queryArg.subClass}`;
     }
 
     if(!queryArg) {
