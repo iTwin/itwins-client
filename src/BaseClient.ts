@@ -122,13 +122,8 @@ export class BaseClient {
   protected getQueryString(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
     let queryString = "";
 
-    if(subClass || (queryArg && queryArg.subClass)) {
-      let resolvedSubClass = subClass;
-      if(queryArg && queryArg.subClass) {
-        resolvedSubClass = queryArg.subClass;
-      }
-
-      queryString += `&subClass=${resolvedSubClass}`;
+    if(subClass || queryArg?.subClass) {
+      queryString += `&subClass=${subClass ?? queryArg?.subClass}`;
     }
 
     if(!queryArg) {
@@ -189,13 +184,8 @@ export class BaseClient {
   protected getQueryStringArgBase(queryArg?: ITwinsQueryArgBase, subClass?: ITwinSubClass): string {
     let queryString = "";
 
-    if(subClass || (queryArg && queryArg.subClass)) {
-      let resolvedSubClass = subClass;
-      if(queryArg && queryArg.subClass) {
-        resolvedSubClass = queryArg.subClass;
-      }
-
-      queryString += `&subClass=${resolvedSubClass}`;
+    if(subClass || queryArg?.subClass) {
+      queryString += `&subClass=${subClass ?? queryArg?.subClass}`;
     }
 
     if(!queryArg) {
