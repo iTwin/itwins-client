@@ -12,6 +12,8 @@ import axios from "axios";
 import type {
   ITwinsAPIResponse,
   ITwinsQueryArg,
+  ITwinsQueryArgBase,
+  ITwinSubClass,
   RepositoriesQueryArg,
 } from "./iTwinsAccessProps";
 
@@ -113,35 +115,79 @@ export class BaseClient {
   }
 
   /**
+    * Build a query to be appended to a URL
+    * @param queryArg Object container queryable properties
+    * @returns query string with AccessControlQueryArg applied, which should be appended to a url
+    */
+  protected getQueryStringArgBase(queryArg?: ITwinsQueryArgBase, subClass?: ITwinSubClass): string {
+    let queryString = "";
+
+    if (subClass !== undefined ) {
+      queryString += `subClass=${subClass}`;
+    } else if (queryArg !== undefined && queryArg.subClass !== undefined) {
+      queryString += `subClass=${queryArg.subClass}`;
+    }
+
+    if(queryArg === undefined) {
+      return queryString;
+    }
+
+    if (queryArg.includeInactive !== undefined) {
+      queryString += `&includeInactive=${queryArg.includeInactive}`;
+    }
+
+    if (queryArg.top !== undefined) {
+      queryString += `&$top=${queryArg.top}`;
+    }
+
+    if (queryArg.skip !== undefined) {
+      queryString += `&$skip=${queryArg.skip}`;
+    }
+
+    if (queryArg.status !== undefined) {
+      queryString += `&status=${queryArg.status}`;
+    }
+
+    if (queryArg.type !== undefined) {
+      queryString += `&type=${queryArg.type}`;
+    }
+
+    // trim & from start of string
+    queryString.replace(/^&+/, "");
+
+    return queryString;
+  }
+
+  /**
    * Build a query to be appended to a URL
    * @param queryArg Object container queryable properties
    * @returns query string with AccessControlQueryArg applied, which should be appended to a url
    */
-  protected getQueryString(queryArg: ITwinsQueryArg): string {
-    let queryString = "";
+  protected getQueryStringArg(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
+    let queryString = this.getQueryStringArgBase(queryArg, subClass);
 
-    if (queryArg.search) {
-      queryString += `&$search=${queryArg.search}`;
+    if(queryArg === undefined) {
+      return queryString;
     }
 
-    if (queryArg.top) {
-      queryString += `&$top=${queryArg.top}`;
+    if (queryArg.search !== undefined) {
+      queryString += `&includeInactive=${queryArg.search}`;
     }
 
-    if (queryArg.skip) {
-      queryString += `&$skip=${queryArg.skip}`;
+    if (queryArg.displayName !== undefined) {
+      queryString += `&$top=${queryArg.displayName}`;
     }
 
-    if (queryArg.displayName) {
-      queryString += `&displayName=${queryArg.displayName}`;
+    if (queryArg.number !== undefined) {
+      queryString += `&$skip=${queryArg.number}`;
     }
 
-    if (queryArg.number) {
-      queryString += `&number=${queryArg.number}`;
+    if (queryArg.parentId !== undefined) {
+      queryString += `&status=${queryArg.parentId}`;
     }
 
-    if (queryArg.type) {
-      queryString += `&type=${queryArg.type}`;
+    if (queryArg.iTwinAccountId !== undefined) {
+      queryString += `&type=${queryArg.iTwinAccountId}`;
     }
 
     // trim & from start of string
@@ -158,11 +204,11 @@ export class BaseClient {
   protected getRepositoryQueryString(queryArg: RepositoriesQueryArg): string {
     let queryString = "";
 
-    if (queryArg.class) {
-      queryString += `?class=${queryArg.class}`;
+    if (queryArg.class !== undefined) {
+      queryString += `class=${queryArg.class}`;
     }
 
-    if (queryArg.subClass) {
+    if (queryArg.subClass !== undefined) {
       queryString += `&subClass=${queryArg.subClass}`;
     }
 

@@ -14,6 +14,7 @@ import type {
   ITwinsAccess,
   ITwinsAPIResponse,
   ITwinsQueryArg,
+  ITwinsQueryArgBase,
   ITwinSubClass,
   RepositoriesQueryArg,
   Repository,
@@ -43,15 +44,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = this._baseUrl;
-    let query = "";
+
     // eslint-disable-next-line deprecation/deprecation
-    let resolvedSubClass = subClass;
-    if(arg && arg.subClass)
-      resolvedSubClass = arg.subClass;
-    if (resolvedSubClass)
-      query += `subClass=${resolvedSubClass}`;
-    if (arg)
-      query += this.getQueryString(arg);
+    const query = this.getQueryStringArg(arg, subClass);
     if (query !== "")
       url += `?${query}`;
 
@@ -141,8 +136,14 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     arg?: RepositoriesQueryArg
   ): Promise<ITwinsAPIResponse<Repository[]>> {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
-    if (arg)
-      url += this.getRepositoryQueryString(arg);
+
+    if (arg) {
+      const query = this.getRepositoryQueryString(arg);
+      if(query !== "") {
+        url += `?${query}`;
+      }
+    }
+
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "repositories");
   }
 
@@ -174,19 +175,13 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
      * @deprecated in 2.0 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
      */
     subClass?: ITwinSubClass,
-    arg?: ITwinsQueryArg
+    arg?: ITwinsQueryArgBase
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites`;
-    let query = "";
+
     // eslint-disable-next-line deprecation/deprecation
-    let resolvedSubClass = subClass;
-    if(arg && arg.subClass)
-      resolvedSubClass = arg.subClass;
-    if (resolvedSubClass)
-      query += `subClass=${resolvedSubClass}`;
-    if (arg)
-      query += this.getQueryString(arg);
+    const query = this.getQueryStringArgBase(arg, subClass);
     if (query !== "")
       url += `?${query}`;
 
@@ -205,19 +200,13 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
      * @deprecated in 2.0 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
      */
     subClass?: ITwinSubClass,
-    arg?: ITwinsQueryArg
+    arg?: ITwinsQueryArgBase
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
-    let query = "";
+
     // eslint-disable-next-line deprecation/deprecation
-    let resolvedSubClass = subClass;
-    if(arg && arg.subClass)
-      resolvedSubClass = arg.subClass;
-    if (resolvedSubClass)
-      query += `subClass=${resolvedSubClass}`;
-    if (arg)
-      query += this.getQueryString(arg);
+    const query = arg ? this.getQueryStringArgBase(arg, subClass) : "";
     if (query !== "")
       url += `?${query}`;
 
@@ -255,7 +244,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    * @param arg (Optional) iTwin query arguments
    * @protected
    */
-  protected getHeaders(arg?: ITwinsQueryArg): Record<string, string> {
+  protected getHeaders(arg?: ITwinsQueryArgBase): Record<string, string> {
     return {...this.getQueryScopeHeaders(arg && arg.queryScope), ...this.getResultModeHeaders(arg && arg.resultMode)};
   }
 
