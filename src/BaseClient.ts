@@ -122,33 +122,33 @@ export class BaseClient {
   protected getQueryStringArgBase(queryArg?: ITwinsQueryArgBase, subClass?: ITwinSubClass): string {
     let queryString = "";
 
-    if (subClass) {
+    if (subClass !== undefined ) {
       queryString += `subClass=${subClass}`;
-    } else if (queryArg && queryArg.subClass) {
+    } else if (queryArg !== undefined && queryArg.subClass !== undefined) {
       queryString += `subClass=${queryArg.subClass}`;
     }
 
-    if(!queryArg) {
+    if(queryArg === undefined) {
       return queryString;
     }
 
-    if (queryArg.includeInactive) {
+    if (queryArg.includeInactive !== undefined) {
       queryString += `&includeInactive=${queryArg.includeInactive}`;
     }
 
-    if (queryArg.top) {
+    if (queryArg.top !== undefined) {
       queryString += `&$top=${queryArg.top}`;
     }
 
-    if (queryArg.skip) {
+    if (queryArg.skip !== undefined) {
       queryString += `&$skip=${queryArg.skip}`;
     }
 
-    if (queryArg.status) {
+    if (queryArg.status !== undefined) {
       queryString += `&status=${queryArg.status}`;
     }
 
-    if (queryArg.type) {
+    if (queryArg.type !== undefined) {
       queryString += `&type=${queryArg.type}`;
     }
 
@@ -166,27 +166,27 @@ export class BaseClient {
   protected getQueryStringArg(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
     let queryString = this.getQueryStringArgBase(queryArg, subClass);
 
-    if(!queryArg) {
+    if(queryArg === undefined) {
       return queryString;
     }
 
-    if (queryArg.search) {
+    if (queryArg.search !== undefined) {
       queryString += `&includeInactive=${queryArg.search}`;
     }
 
-    if (queryArg.displayName) {
+    if (queryArg.displayName !== undefined) {
       queryString += `&$top=${queryArg.displayName}`;
     }
 
-    if (queryArg.number) {
+    if (queryArg.number !== undefined) {
       queryString += `&$skip=${queryArg.number}`;
     }
 
-    if (queryArg.parentId) {
+    if (queryArg.parentId !== undefined) {
       queryString += `&status=${queryArg.parentId}`;
     }
 
-    if (queryArg.iTwinAccountId) {
+    if (queryArg.iTwinAccountId !== undefined) {
       queryString += `&type=${queryArg.iTwinAccountId}`;
     }
 
@@ -204,11 +204,11 @@ export class BaseClient {
   protected getRepositoryQueryString(queryArg: RepositoriesQueryArg): string {
     let queryString = "";
 
-    if (queryArg.class) {
-      queryString += `?class=${queryArg.class}`;
+    if (queryArg.class !== undefined) {
+      queryString += `class=${queryArg.class}`;
     }
 
-    if (queryArg.subClass) {
+    if (queryArg.subClass !== undefined) {
       queryString += `&subClass=${queryArg.subClass}`;
     }
 

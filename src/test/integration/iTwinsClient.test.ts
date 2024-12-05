@@ -399,8 +399,8 @@ describe("iTwinsClient", () => {
     chai.expect(iTwins).to.not.be.empty;
     iTwins.forEach((actualiTwin) => {
       chai.expect(actualiTwin.displayName).to.be.eq(iTwinName);
-      chai.expect(actualiTwin.class).to.be.eq(ITwinClass.Endeavor);
-      chai.expect(actualiTwin.subClass).to.be.eq(ITwinSubClass.Project);
+      chai.expect(actualiTwin.class).to.be.eq("Endeavor");
+      chai.expect(actualiTwin.subClass).to.be.eq("Project");
     });
   });
 

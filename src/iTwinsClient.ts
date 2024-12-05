@@ -136,8 +136,14 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     arg?: RepositoriesQueryArg
   ): Promise<ITwinsAPIResponse<Repository[]>> {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
-    if (arg)
-      url += this.getRepositoryQueryString(arg);
+
+    if (arg) {
+      const query = this.getRepositoryQueryString(arg);
+      if(query !== "") {
+        url += `?${query}`;
+      }
+    }
+
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "repositories");
   }
 
