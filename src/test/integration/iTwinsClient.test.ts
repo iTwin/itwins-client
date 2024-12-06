@@ -871,6 +871,80 @@ describe("iTwinsClient", () => {
     });
   });
 
+  it("should add iTwin as favorite", async () => {
+    // Arrange
+    const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
+
+    // Act
+    const addFavoriteResponse: ITwinsAPIResponse<any> =
+      await iTwinsAccessClient.addFavoriteAsync(accessToken, iTwinId!);
+
+    // Assert
+    chai.expect(addFavoriteResponse.status).to.be.eq(204);
+    chai.expect(addFavoriteResponse.data).to.be.undefined;
+  });
+
+  it("should remove iTwin as favorite", async () => {
+    // Arrange
+    const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
+
+    // Act
+    const deleteFavoriteResponse: ITwinsAPIResponse<any> =
+      await iTwinsAccessClient.removeFavoriteAsync(accessToken, iTwinId!);
+
+    // Assert
+    chai.expect(deleteFavoriteResponse.status).to.be.eq(204);
+    chai.expect(deleteFavoriteResponse.data).to.be.undefined;
+  });
+
+  it("should create new iTwin and add it as favorite then delete it", async () => {
+    /* CREATE THE ITWIN */
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      // eslint-disable-next-line id-blacklist
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: ITwinSubClass.Asset,
+      class: ITwinClass.Thing,
+      dataCenterLocation: "East US",
+      ianaTimeZone: "America/New_York",
+      status: "Trial",
+    };
+
+    // Act
+    const createResponse: ITwinsAPIResponse<ITwin> =
+      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
+    // eslint-disable-next-line no-console
+    const iTwinId = createResponse.data!.id!;
+
+    // Assert
+    chai.expect(createResponse.status).to.be.eq(201);
+    chai
+      .expect(createResponse.data!.displayName)
+      .to.be.eq(newiTwin.displayName);
+    chai.expect(createResponse.data!.class).to.be.eq(newiTwin.class);
+    chai.expect(createResponse.data!.subClass).to.be.eq(newiTwin.subClass);
+
+    /* ADD ITWIN AS FAVORITE */
+    // Act
+    const addFavoriteResponse: ITwinsAPIResponse<any> =
+      await iTwinsAccessClient.addFavoriteAsync(accessToken, iTwinId);
+
+    // Assert
+    chai.expect(addFavoriteResponse.status).to.be.eq(204);
+    chai.expect(addFavoriteResponse.data).to.be.undefined;
+
+    /* REMOVE ITWIN AS FAVORITE */
+    // Act
+    const deleteFavoriteResponse: ITwinsAPIResponse<any> =
+      await iTwinsAccessClient.removeFavoriteAsync(accessToken, iTwinId);
+
+    // Assert
+    chai.expect(deleteFavoriteResponse.status).to.be.eq(204);
+    chai.expect(deleteFavoriteResponse.data).to.be.undefined;
+  });
+
   it("should get the primary account iTwin", async () => {
     // Act
     const iTwinsResponse: ITwinsAPIResponse<ITwin> =
