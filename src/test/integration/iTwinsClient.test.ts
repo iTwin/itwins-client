@@ -548,6 +548,19 @@ describe("iTwinsClient", () => {
     });
   });
 
+  it("should add iTwin as favorite", async () => {
+    // Arrange
+    const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
+
+    // Act
+    const addFavoriteResponse: ITwinsAPIResponse<any> =
+      await iTwinsAccessClient.addFavoriteAsync(accessToken, iTwinId!);
+
+    // Assert
+    chai.expect(addFavoriteResponse.status).to.be.eq(204);
+    chai.expect(addFavoriteResponse.data).to.be.undefined;
+  });
+
   it("should get a list of favorited project iTwins", async () => {
     // Act
     const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
@@ -869,19 +882,6 @@ describe("iTwinsClient", () => {
       chai.expect(actualiTwin.class).to.be.eq("Thing");
       chai.expect(actualiTwin.subClass).to.be.eq("Asset");
     });
-  });
-
-  it("should add iTwin as favorite", async () => {
-    // Arrange
-    const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
-
-    // Act
-    const addFavoriteResponse: ITwinsAPIResponse<any> =
-      await iTwinsAccessClient.addFavoriteAsync(accessToken, iTwinId!);
-
-    // Assert
-    chai.expect(addFavoriteResponse.status).to.be.eq(204);
-    chai.expect(addFavoriteResponse.data).to.be.undefined;
   });
 
   it("should remove iTwin as favorite", async () => {
