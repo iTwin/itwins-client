@@ -193,6 +193,32 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
   }
 
+  /** Add itwin accessible to user as favorite
+   * @param accessToken The client access token string
+   * @param iTwin The id of iTwin
+   * @returns No Content
+   */
+  public async addFavoriteAsync(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<ITwinsAPIResponse<ITwin>> {
+    const url = `${this._baseUrl}/favorites/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "POST", url);
+  }
+
+  /** Remove itwin accessible to user as favorite
+   * @param accessToken The client access token string
+   * @param iTwinId The id of iTwin
+   * @returns No Content
+   */
+  public async removeFavoriteAsync(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<ITwinsAPIResponse<undefined>> {
+    const url = `${this._baseUrl}/favorites/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "DELETE", url);
+  }
+
   /** Get itwins accessible to the user
    * @param accessToken The client access token string
    * @param subClass Optional parameter to search a specific iTwin subClass
