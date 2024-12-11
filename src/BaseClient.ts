@@ -122,9 +122,9 @@ export class BaseClient {
   protected getQueryStringArgBase(queryArg?: ITwinsQueryArgBase, subClass?: ITwinSubClass): string {
     let queryString = "";
 
-    if (subClass !== undefined ) {
+    if (subClass) {
       queryString += `subClass=${subClass}`;
-    } else if (queryArg !== undefined && queryArg.subClass !== undefined) {
+    } else if (queryArg && queryArg.subClass) {
       queryString += `subClass=${queryArg.subClass}`;
     }
 
@@ -132,23 +132,23 @@ export class BaseClient {
       return queryString;
     }
 
-    if (queryArg.includeInactive !== undefined) {
+    if (queryArg.includeInactive) {
       queryString += `&includeInactive=${queryArg.includeInactive}`;
     }
 
-    if (queryArg.top !== undefined) {
+    if (queryArg.top) {
       queryString += `&$top=${queryArg.top}`;
     }
 
-    if (queryArg.skip !== undefined) {
+    if (queryArg.skip) {
       queryString += `&$skip=${queryArg.skip}`;
     }
 
-    if (queryArg.status !== undefined) {
+    if (queryArg.status) {
       queryString += `&status=${queryArg.status}`;
     }
 
-    if (queryArg.type !== undefined) {
+    if (queryArg.type) {
       queryString += `&type=${queryArg.type}`;
     }
 
@@ -170,24 +170,24 @@ export class BaseClient {
       return queryString;
     }
 
-    if (queryArg.search !== undefined) {
-      queryString += `&includeInactive=${queryArg.search}`;
+    if (queryArg.search) {
+      queryString += `&search=${queryArg.search}`;
     }
 
-    if (queryArg.displayName !== undefined) {
-      queryString += `&$top=${queryArg.displayName}`;
+    if (queryArg.displayName) {
+      queryString += `&displayName=${queryArg.displayName}`;
     }
 
-    if (queryArg.number !== undefined) {
-      queryString += `&$skip=${queryArg.number}`;
+    if (queryArg.number) {
+      queryString += `&number=${queryArg.number}`;
     }
 
-    if (queryArg.parentId !== undefined) {
-      queryString += `&status=${queryArg.parentId}`;
+    if (queryArg.parentId) {
+      queryString += `&parentId=${queryArg.parentId}`;
     }
 
-    if (queryArg.iTwinAccountId !== undefined) {
-      queryString += `&type=${queryArg.iTwinAccountId}`;
+    if (queryArg.iTwinAccountId) {
+      queryString += `&iTwinAccountId=${queryArg.iTwinAccountId}`;
     }
 
     // trim & from start of string
