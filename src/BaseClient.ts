@@ -171,7 +171,7 @@ export class BaseClient {
     }
 
     if (queryArg.search) {
-      queryString += `&search=${queryArg.search}`;
+      queryString += `&$search=${queryArg.search}`;
     }
 
     if (queryArg.displayName) {
