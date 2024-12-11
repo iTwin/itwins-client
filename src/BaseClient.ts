@@ -122,10 +122,10 @@ export class BaseClient {
   protected getQueryStringArgBase(queryArg?: ITwinsQueryArgBase, subClass?: ITwinSubClass): string {
     let queryString = "";
 
-    if (subClass) {
-      queryString += `subClass=${subClass}`;
-    } else if (queryArg && queryArg.subClass) {
+    if (queryArg && queryArg.subClass) {
       queryString += `subClass=${queryArg.subClass}`;
+    } else if (subClass) {
+      queryString += `subClass=${subClass}`;
     }
 
     if(!queryArg) {
