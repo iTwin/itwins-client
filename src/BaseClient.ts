@@ -164,7 +164,7 @@ export class BaseClient {
    * @returns query string with AccessControlQueryArg applied, which should be appended to a url
    */
   protected getQueryStringArg(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
-    let queryString = this.getQueryStringArgBase(queryArg, subClass);
+    let queryString = this.getQueryStringArgBase({ ...queryArg }, subClass);
 
     if(!queryArg) {
       return queryString;
