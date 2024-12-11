@@ -185,6 +185,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
       resolvedSubClass = arg.subClass;
     if (resolvedSubClass)
       query += `subClass=${resolvedSubClass}`;
+
     if (arg)
       query += this.getQueryString(arg);
     if (query !== "")
