@@ -12,6 +12,8 @@ import axios from "axios";
 import type {
   ITwinsAPIResponse,
   ITwinsQueryArg,
+  ITwinsQueryArgBase,
+  ITwinSubClass,
   RepositoriesQueryArg,
 } from "./iTwinsAccessProps";
 
@@ -113,15 +115,25 @@ export class BaseClient {
   }
 
   /**
-   * Build a query to be appended to a URL
-   * @param queryArg Object container queryable properties
-   * @returns query string with AccessControlQueryArg applied, which should be appended to a url
-   */
-  protected getQueryString(queryArg: ITwinsQueryArg): string {
+    * Build a query to be appended to a URL
+    * @param queryArg Object container queryable properties
+    * @returns query string with AccessControlQueryArg applied, which should be appended to a url
+    */
+  protected getQueryStringArgBase(queryArg?: ITwinsQueryArgBase, subClass?: ITwinSubClass): string {
     let queryString = "";
 
-    if (queryArg.search) {
-      queryString += `&$search=${queryArg.search}`;
+    if (queryArg && queryArg.subClass) {
+      queryString += `subClass=${queryArg.subClass}`;
+    } else if (subClass) {
+      queryString += `subClass=${subClass}`;
+    }
+
+    if(!queryArg) {
+      return queryString;
+    }
+
+    if (queryArg.includeInactive) {
+      queryString += `&includeInactive=${queryArg.includeInactive}`;
     }
 
     if (queryArg.top) {
@@ -132,6 +144,36 @@ export class BaseClient {
       queryString += `&$skip=${queryArg.skip}`;
     }
 
+    if (queryArg.status) {
+      queryString += `&status=${queryArg.status}`;
+    }
+
+    if (queryArg.type) {
+      queryString += `&type=${queryArg.type}`;
+    }
+
+    // trim & from start of string
+    queryString.replace(/^&+/, "");
+
+    return queryString;
+  }
+
+  /**
+   * Build a query to be appended to a URL
+   * @param queryArg Object container queryable properties
+   * @returns query string with AccessControlQueryArg applied, which should be appended to a url
+   */
+  protected getQueryStringArg(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
+    let queryString = this.getQueryStringArgBase({ ...queryArg }, subClass);
+
+    if(!queryArg) {
+      return queryString;
+    }
+
+    if (queryArg.search) {
+      queryString += `&$search=${queryArg.search}`;
+    }
+
     if (queryArg.displayName) {
       queryString += `&displayName=${queryArg.displayName}`;
     }
@@ -140,8 +182,12 @@ export class BaseClient {
       queryString += `&number=${queryArg.number}`;
     }
 
-    if (queryArg.type) {
-      queryString += `&type=${queryArg.type}`;
+    if (queryArg.parentId) {
+      queryString += `&parentId=${queryArg.parentId}`;
+    }
+
+    if (queryArg.iTwinAccountId) {
+      queryString += `&iTwinAccountId=${queryArg.iTwinAccountId}`;
     }
 
     // trim & from start of string
@@ -159,7 +205,7 @@ export class BaseClient {
     let queryString = "";
 
     if (queryArg.class) {
-      queryString += `?class=${queryArg.class}`;
+      queryString += `class=${queryArg.class}`;
     }
 
     if (queryArg.subClass) {
