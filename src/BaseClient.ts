@@ -128,7 +128,7 @@ export class BaseClient {
       queryString += `subClass=${queryArg.subClass}`;
     }
 
-    if(queryArg === undefined) {
+    if(!queryArg) {
       return queryString;
     }
 
@@ -166,7 +166,7 @@ export class BaseClient {
   protected getQueryStringArg(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
     let queryString = this.getQueryStringArgBase(queryArg, subClass);
 
-    if(queryArg === undefined) {
+    if(!queryArg) {
       return queryString;
     }
 
@@ -204,11 +204,11 @@ export class BaseClient {
   protected getRepositoryQueryString(queryArg: RepositoriesQueryArg): string {
     let queryString = "";
 
-    if (queryArg.class !== undefined) {
+    if (queryArg.class) {
       queryString += `class=${queryArg.class}`;
     }
 
-    if (queryArg.subClass !== undefined) {
+    if (queryArg.subClass) {
       queryString += `&subClass=${queryArg.subClass}`;
     }
 
