@@ -206,7 +206,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let url = `${this._baseUrl}/recents`;
 
     // eslint-disable-next-line deprecation/deprecation
-    const query = arg ? this.getQueryStringArgBase(arg, subClass) : "";
+    const query = this.getQueryStringArgBase(arg, subClass);
     if (query !== "")
       url += `?${query}`;
 
