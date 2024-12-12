@@ -164,7 +164,7 @@ export class BaseClient {
    * @returns query string with AccessControlQueryArg applied, which should be appended to a url
    */
   protected getQueryStringArg(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
-    let queryString = this.getQueryStringArgBase({ ...queryArg }, subClass);
+    let queryString = this.getQueryStringArgBase(queryArg, subClass);
 
     if(!queryArg) {
       return queryString;
@@ -201,7 +201,10 @@ export class BaseClient {
    * @param queryArg Object container queryable properties
    * @returns query string with RepositoriesQueryArg applied, which should be appended to a url
    */
-  protected getRepositoryQueryString(queryArg: RepositoriesQueryArg): string {
+  protected getRepositoryQueryString(queryArg?: RepositoriesQueryArg): string {
+    if(!queryArg)
+      return "";
+
     let queryString = "";
 
     if (queryArg.class) {

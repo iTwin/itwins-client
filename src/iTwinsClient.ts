@@ -137,11 +137,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<Repository[]>> {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
 
-    if (arg) {
-      const query = this.getRepositoryQueryString(arg);
-      if(query !== "") {
-        url += `?${query}`;
-      }
+    const query = this.getRepositoryQueryString(arg);
+    if(query !== "") {
+      url += `?${query}`;
     }
 
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "repositories");
@@ -177,7 +175,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     subClass?: ITwinSubClass,
     arg?: ITwinsQueryArgBase
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
-    const headers = this.getHeadersFromBase(arg);
+    const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites`;
 
     // eslint-disable-next-line deprecation/deprecation
@@ -202,7 +200,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     subClass?: ITwinSubClass,
     arg?: ITwinsQueryArgBase
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
-    const headers = this.getHeadersFromBase(arg);
+    const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
 
     // eslint-disable-next-line deprecation/deprecation
@@ -244,19 +242,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    * @param arg (Optional) iTwin query arguments
    * @protected
    */
-  protected getHeadersFromBase(arg?: ITwinsQueryArgBase): Record<string, string> {
-    return {
-      ...this.getQueryScopeHeaders(arg && arg.queryScope),
-      ...this.getResultModeHeaders(arg && arg.resultMode),
-    };
-  }
-
-  /**
-   * Format headers from query arguments
-   * @param arg (Optional) iTwin query arguments
-   * @protected
-   */
-  protected getHeaders(arg?: ITwinsQueryArg): Record<string, string> {
+  protected getHeaders(arg?: ITwinsQueryArgBase): Record<string, string> {
     return {
       ...this.getQueryScopeHeaders(arg && arg.queryScope),
       ...this.getResultModeHeaders(arg && arg.resultMode),
