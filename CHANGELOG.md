@@ -1,5 +1,18 @@
 # Change Log - @itwin/itwins-client
 
+## 1.6.1
+
+- Added missing properties when accesing these methods:
+  - `queryAsync`
+  - `queryFavoritesAsync`
+  - `queryRecentsAsync`
+- Missing properties:
+  - `includeInactive`
+  - `status`
+  - `subClass`
+  - `parentId`
+  - `iTwinAccountId`
+
 ## 1.6.0
 
 - Updated methods so that `subClass` is no longer mandatory.
