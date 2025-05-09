@@ -16,7 +16,10 @@
     "test": "npm run -s webpackTests && npm run -s test:chrome",
     "test:chrome": "certa -r chrome",
     "test:electron": "certa -r electron",
-    "pack": "npm pack"
+    "change": "beachball change",
+    "check": "beachball check",
+    "version-bump": "beachball bump",
+    "publish-package": "beachball publish --yes"
   },
   "keywords": [
     "Bentley",
@@ -47,6 +50,7 @@
     "@types/chai": "^4.1.4",
     "@types/mocha": "^8.2.2",
     "@types/node": "14.14.31",
+    "beachball": "^2.51.0",
     "chai": "^4.4.1",
     "dotenv": "^10.0.0",
     "dotenv-expand": "^5.1.0",
