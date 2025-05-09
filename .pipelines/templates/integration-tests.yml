@@ -18,10 +18,11 @@ stages:
             displayName: "Setup pnpm"
 
           - bash: |
-              echo "##vso[task.setvariable variable=imjs_test_super_user_password;]$test_super_password"
+              echo "##vso[task.setvariable variable=imjs_itwin_test_user_password;]$test_itwin_password"
+              echo "##vso[task.setvariable variable=USER_WITH_ACCESS_PASSWORD;]$test_itwin_password"
             displayName: "Add config to environment"
             env:
-              test_super_password: $(imjs_super_user_password)
+              test_itwin_password: $(imjs_itwin_user_password)
 
           - script: pnpm install
             displayName: pnpm install --frozen-lockfile
