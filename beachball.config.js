@@ -8,7 +8,6 @@ module.exports = {
   bumpDeps: false,
   access: "public",
   tag: "latest",
-  registry: "https://pkgs.dev.azure.com/bentleycs/_packaging/Packages/npm/registry/",
   ignorePatterns: [
     ".nycrc",
     ".eslintrc.json",
