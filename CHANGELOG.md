@@ -1,5 +1,17 @@
 # Change Log - @itwin/itwins-client
 
+<!-- This log was last generated on Fri, 09 May 2025 15:00:48 GMT and should not be manually modified. -->
+
+<!-- Start content -->
+
+## 1.7.0
+
+Fri, 09 May 2025 15:00:48 GMT
+
+### Minor changes
+
+- test change ([commit](https://github.com/iTwin/itwins-client/commit/7bc969f5fc0a2a107d71c7a76996923a26aaca70))
+
 ## 1.6.1
 
 - Added missing properties when accesing these methods:

@@ -1,0 +1,20 @@
+{
+  "name": "@itwin/itwins-client",
+  "entries": [
+    {
+      "date": "Fri, 09 May 2025 15:00:48 GMT",
+      "version": "1.7.0",
+      "tag": "@itwin/itwins-client_v1.7.0",
+      "comments": {
+        "minor": [
+          {
+            "author": "Will.McRae@bentley.com",
+            "package": "@itwin/itwins-client",
+            "commit": "7bc969f5fc0a2a107d71c7a76996923a26aaca70",
+            "comment": "test change"
+          }
+        ]
+      }
+    }
+  ]
+}
