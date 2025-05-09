@@ -12,5 +12,3 @@ export * from "./iTwinsAccessProps";
  * @docs-group-description iTwinsClient
  * Classes for communicating with the iTwins service.
  */
-
-() => {}
