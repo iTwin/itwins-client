@@ -1,0 +1,7 @@
+{
+  "type": "minor",
+  "comment": "test change",
+  "packageName": "@itwin/itwins-client",
+  "email": "Will.McRae@bentley.com",
+  "dependentChangeType": "patch"
+}
