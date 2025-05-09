@@ -1,0 +1,52 @@
+trigger: none
+pr: none
+
+variables:
+  - group: iTwin.js non-secret config variables
+  - group: iTwin.js Integration Test Users
+  - group: iTwins Client Integration Test Users
+  - group: "Caleb - iTwin GitHub Token"
+  - group: "Caleb - npmjs publish token"
+  - name: REPO_URL
+    value: github.com/iTwin/itwins-client/
+
+stages:
+  - template: templates/build.yml
+  - template: templates/integration-tests.yml
+
+  - stage: Publish
+    displayName: Publish
+    jobs:
+      - job: build
+        pool:
+          vmImage: ubuntu-latest
+
+        steps:
+          - task: NodeTool@0
+            displayName: Use Node 22.x
+            inputs:
+              versionSpec: 22.x
+
+          - script: |
+              corepack enable
+              corepack prepare pnpm@9.12 --activate
+            displayName: "Setup pnpm"
+
+          - task: npmAuthenticate@0
+            inputs:
+              workingFile: .npmrc
+
+          - script: pnpm install
+            displayName: pnpm install --frozen-lockfile
+
+          - script: pnpm build
+            displayName: pnpm build
+
+          - script: |
+              git config --global user.email imodeljs-admin@users.noreply.github.com
+              git config --global user.name imodeljs-admin
+              git remote set-url origin "https://$(GITHUBTOKEN)@$(REPO_URL)"
+              pnpm publish-package --branch main --message "Version bump [skip ci]" --token $NPM_AUTH_TOKEN
+            displayName: "Publish packages"
+            env:
+              NPM_AUTH_TOKEN: $(npmToken)

@@ -1,7 +1,7 @@
-
 ## Integration Test Setup
 
-Make sure an `.env` file is created in the root folder.  The following are the keys without the values:
+Make sure an `.env` file is created in the root folder. The following are the keys without the values:
+
 ```
 IMJS_AUTH_AUTHORITY=""
 IMJS_URL_PREFIX=""
@@ -20,9 +20,9 @@ IMJS_TEST_IMODEL_ID=""
 Run the following npm commands from the root folder in order.
 
 ```
-npm i
-npm run build
-npm run test
+pnpm install
+pnpm build
+pnpm test
 ```
 
-`npm run test` runs a script defined in `package.json`.
+`pnpm test` runs a script defined in `package.json`.

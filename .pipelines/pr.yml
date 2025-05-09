@@ -1,0 +1,17 @@
+trigger: none
+
+pr:
+  autoCancel: true
+  drafts: false
+  branches:
+    include:
+      - main
+
+variables:
+  - group: iTwin.js non-secret config variables
+  - group: iTwin.js Integration Test Users
+  - group: iTwins Client Integration Test Users
+
+stages:
+  - template: templates/build.yml
+  - template: templates/integration-tests.yml

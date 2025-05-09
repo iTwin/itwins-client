@@ -1,0 +1,34 @@
+stages:
+  - stage: Test
+    displayName: Test
+    jobs:
+      - job: test
+        pool:
+          vmImage: ubuntu-latest
+
+        steps:
+          - task: NodeTool@0
+            displayName: Use Node 22.x
+            inputs:
+              versionSpec: 22.x
+
+          - script: |
+              corepack enable
+              corepack prepare pnpm@9.12 --activate
+            displayName: "Setup pnpm"
+
+          - bash: |
+              echo "##vso[task.setvariable variable=imjs_itwin_test_user_password;]$test_itwin_password"
+              echo "##vso[task.setvariable variable=USER_WITH_ACCESS_PASSWORD;]$test_itwin_password"
+            displayName: "Add config to environment"
+            env:
+              test_itwin_password: $(imjs_itwin_user_password)
+
+          - script: pnpm install
+            displayName: pnpm install --frozen-lockfile
+
+          - script: pnpm build
+            displayName: pnpm build
+
+          - script: pnpm test
+            displayName: pnpm test
