@@ -6,6 +6,7 @@ variables:
   - group: iTwin.js Integration Test Users
   - group: iTwins Client Integration Test Users
   - group: "Caleb - iTwin GitHub Token"
+  - group: "Caleb - npmjs publish token"
   - name: REPO_URL
     value: github.com/iTwin/itwins-client/
 
@@ -45,7 +46,7 @@ stages:
               git config --global user.email imodeljs-admin@users.noreply.github.com
               git config --global user.name imodeljs-admin
               git remote set-url origin "https://$(GITHUBTOKEN)@$(REPO_URL)"
-              NPM_TOKEN="$(grep -Po '(?<=authToken=).*' .npmrc)"
-              npm config list
-              pnpm publish-package --branch main --message "Version bump [skip ci]" --token $NPM_TOKEN
+              pnpm publish-package --branch main --message "Version bump [skip ci]" --token $NPM_AUTH_TOKEN
             displayName: "Publish packages"
+            env:
+              NPM_AUTH_TOKEN: $(npmToken)
