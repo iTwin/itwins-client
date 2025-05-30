@@ -71,6 +71,9 @@ export class BaseClient {
               ? response.data[property]
               : response.data,
         error: response.data.error,
+        links: response.data !== undefined && response.data.error === undefined &&
+          response.data !== "" && response.data['_links'] !== undefined
+          ? response.data['_links'] : undefined
       };
     } catch (err) {
       return {
@@ -128,7 +131,7 @@ export class BaseClient {
       queryString += `subClass=${subClass}`;
     }
 
-    if(!queryArg) {
+    if (!queryArg) {
       return queryString;
     }
 
@@ -166,7 +169,7 @@ export class BaseClient {
   protected getQueryStringArg(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
     let queryString = this.getQueryStringArgBase(queryArg, subClass);
 
-    if(!queryArg) {
+    if (!queryArg) {
       return queryString;
     }
 
@@ -202,7 +205,7 @@ export class BaseClient {
    * @returns query string with RepositoriesQueryArg applied, which should be appended to a url
    */
   protected getRepositoryQueryString(queryArg?: RepositoriesQueryArg): string {
-    if(!queryArg)
+    if (!queryArg)
       return "";
 
     let queryString = "";

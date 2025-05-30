@@ -18,6 +18,8 @@ import type {
   ITwinSubClass,
   RepositoriesQueryArg,
   Repository,
+  RepositoryResource,
+  ResourceCapabilityUri,
 } from "./iTwinsAccessProps";
 
 /** Client API to access the itwins service.
@@ -138,11 +140,25 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
 
     const query = this.getRepositoryQueryString(arg);
-    if(query !== "") {
+    if (query !== "") {
       url += `?${query}`;
     }
 
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "repositories");
+  }
+
+  public async queryRepositoryResourcesAsync(
+    accessToken: AccessToken,
+    uri: string
+  ): Promise<ITwinsAPIResponse<RepositoryResource[]>> {
+    return this.sendGenericAPIRequest(accessToken, "GET", uri, undefined, "resources");
+  }
+
+  public async queryRepositoryResourceGraphicsAsync(
+    accessToken: AccessToken,
+    uri: string
+  ): Promise<ITwinsAPIResponse<ResourceCapabilityUri[]>> {
+    return this.sendGenericAPIRequest(accessToken, "GET", uri, undefined, "graphics");
   }
 
   /** Get itwin accessible to the user
