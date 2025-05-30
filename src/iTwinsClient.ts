@@ -151,16 +151,14 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     accessToken: AccessToken,
     uri: string
   ): Promise<ITwinsAPIResponse<RepositoryResource[]>> {
-    const headers: Record<string, string> = { "Accept": "application/vnd.bentley.dcb-repo-api3+json" }; // Temporary
-    return this.sendGenericAPIRequest(accessToken, "GET", uri, undefined, "resources", headers);
+    return this.sendGenericAPIRequest(accessToken, "GET", uri, undefined, "resources");
   }
 
   public async queryRepositoryResourceGraphicsAsync(
     accessToken: AccessToken,
     uri: string
   ): Promise<ITwinsAPIResponse<ResourceCapabilityUri[]>> {
-    const headers: Record<string, string> = { "accept": "application/vnd.bentley.dcb-repo-api3+json" }; // Temporary
-    return this.sendGenericAPIRequest(accessToken, "GET", uri, undefined, "graphics", headers);
+    return this.sendGenericAPIRequest(accessToken, "GET", uri, undefined, "graphics");
   }
 
   /** Get itwin accessible to the user

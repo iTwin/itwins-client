@@ -75,6 +75,16 @@ export interface ITwinsAPIResponse<T> {
   data?: T;
   status: number;
   error?: Error;
+  links?: ITwinLinks;
+}
+
+export interface ITwinLinks {
+  self?: ITwinLink;
+  next?: ITwinLink;
+}
+
+export interface ITwinLink {
+  href: string;
 }
 
 /** The ITwin object. Contains extra properties with "representation" result mode.

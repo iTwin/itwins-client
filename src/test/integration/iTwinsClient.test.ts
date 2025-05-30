@@ -159,7 +159,7 @@ describe("iTwinsClient", () => {
 
   it("should get iModel resources from repository", async () => {
     // Arrange
-    const iTwinId = "fe7f2121-4715-4ff2-acb6-add99aacf8e4"; // TODO: Change back
+    const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
     const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsCustomClient.queryRepositoriesAsync(
       accessToken,
       iTwinId,
@@ -167,7 +167,6 @@ describe("iTwinsClient", () => {
         class: RepositoryClass.iModels,
       }
     );
-    console.log(iTwinsResponse);
     chai.expect(iTwinsResponse).to.not.be.undefined;
     chai.expect(iTwinsResponse.status).to.be.eq(200);
     chai.expect(iTwinsResponse.data).to.not.be.empty;
@@ -188,6 +187,7 @@ describe("iTwinsClient", () => {
     chai.expect(resources.status).to.be.eq(200);
     chai.expect(resources.data).to.not.be.empty;
     chai.expect(resources.data!.length).to.be.greaterThan(0);
+    chai.expect(resources.links?.self?.href).to.not.be.undefined;
     resources.data!.forEach((resource) => {
       chai.expect(resource.class).to.be.eq("iModels");
       chai.expect(resource.displayName).to.not.be.empty;
@@ -197,7 +197,7 @@ describe("iTwinsClient", () => {
 
   it("should get iModel graphics from repository", async () => {
     // Arrange
-    const iTwinId = "fe7f2121-4715-4ff2-acb6-add99aacf8e4"; // TODO: Change back
+    const iTwinId = "e01065ed-c52b-4ddf-a326-e7845442716d";
     const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
       accessToken,
       iTwinId,
