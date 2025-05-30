@@ -157,6 +157,86 @@ describe("iTwinsClient", () => {
     chai.expect(iTwinsResponse.error!.details![0].target).to.be.eq("class");
   });
 
+  it("should get iModel resources from repository", async () => {
+    // Arrange
+    const iTwinId = "fe7f2121-4715-4ff2-acb6-add99aacf8e4"; // TODO: Change back
+    const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsCustomClient.queryRepositoriesAsync(
+      accessToken,
+      iTwinId,
+      {
+        class: RepositoryClass.iModels,
+      }
+    );
+    console.log(iTwinsResponse);
+    chai.expect(iTwinsResponse).to.not.be.undefined;
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    iTwinsResponse.data!.forEach((actualRepository) => {
+      chai.expect(actualRepository.class).to.be.eq("iModels");
+    });
+    const iModelResource = iTwinsResponse.data!.find(x => x.class === "iModels");
+    chai.expect(iModelResource).to.not.be.undefined;
+    chai.expect(iModelResource!.capabilities?.resources.uri).to.not.be.undefined;
+
+    // Act
+    const resources = await iTwinsCustomClient.queryRepositoryResourcesAsync(
+      accessToken,
+      iModelResource!.capabilities!.resources.uri
+    );
+
+    // Assert
+    chai.expect(resources.status).to.be.eq(200);
+    chai.expect(resources.data).to.not.be.empty;
+    chai.expect(resources.data!.length).to.be.greaterThan(0);
+    resources.data!.forEach((resource) => {
+      chai.expect(resource.class).to.be.eq("iModels");
+      chai.expect(resource.displayName).to.not.be.empty;
+      chai.expect(resource.capabilities).to.not.be.empty;
+    });
+  });
+
+  it("should get iModel graphics from repository", async () => {
+    // Arrange
+    const iTwinId = "fe7f2121-4715-4ff2-acb6-add99aacf8e4"; // TODO: Change back
+    const iTwinsResponse: ITwinsAPIResponse<Repository[]> = await iTwinsAccessClient.queryRepositoriesAsync(
+      accessToken,
+      iTwinId,
+      {
+        class: RepositoryClass.iModels,
+      }
+    );
+    chai.expect(iTwinsResponse).to.not.be.undefined;
+    chai.expect(iTwinsResponse.status).to.be.eq(200);
+    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    iTwinsResponse.data!.forEach((actualRepository) => {
+      chai.expect(actualRepository.class).to.be.eq("iModels");
+    });
+    const iModelResource = iTwinsResponse.data!.find(x => x.class === "iModels");
+    chai.expect(iModelResource).to.not.be.undefined;
+    const resources = await iTwinsAccessClient.queryRepositoryResourcesAsync(
+      accessToken,
+      iModelResource!.capabilities!.resources.uri
+    );
+    chai.expect(resources.status).to.be.eq(200);
+    chai.expect(resources.data?.length).to.be.greaterThan(0);
+    const resource = resources.data![0];
+    chai.expect(resource.capabilities?.graphics?.uri).to.not.be.undefined;
+
+
+    // Act
+    const graphicsResponse = await iTwinsAccessClient.queryRepositoryResourceGraphicsAsync(
+      accessToken,
+      resource.capabilities!.graphics!.uri
+    );
+
+    // Assert
+    chai.expect(graphicsResponse.status).to.be.eq(200);
+    chai.expect(graphicsResponse.data).to.not.be.empty;
+    chai.expect(graphicsResponse.data!.length).to.be.greaterThan(0);
+    chai.expect(graphicsResponse.data![0].type).to.be.eq("3DTILES");
+    chai.expect(graphicsResponse.data![0].uri).to.not.be.empty;
+  });
+
   it("should get a 404 when trying to get an iTwin", async () => {
     // Arrange
     const notAniTwinId = "22acf21e-0575-4faf-849b-bcd538718269";
@@ -842,7 +922,7 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.queryRecentsAsync(
         accessToken,
         ITwinSubClass.Asset,
-        { queryScope: "all"}
+        { queryScope: "all" }
       );
 
     // Assert

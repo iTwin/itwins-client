@@ -25,6 +25,18 @@ export interface ITwinsAccess {
     iTwinId: string
   ): Promise<ITwinsAPIResponse<Repository[]>>;
 
+  /** Get the resources for a repository */
+  queryRepositoryResourcesAsync(
+    accessToken: AccessToken,
+    uri: string
+  ): Promise<ITwinsAPIResponse<RepositoryResource[]>>
+
+  /** Get the graphics for a repository resource */
+  queryRepositoryResourceGraphicsAsync(
+    accessToken: AccessToken,
+    uri: string
+  ): Promise<ITwinsAPIResponse<ResourceCapabilityUri[]>>
+
   /** Get an ITwin */
   getAsync(
     accessToken: AccessToken,
@@ -98,6 +110,31 @@ export interface Repository {
   class: RepositoryClass;
   subClass: RepositorySubClass;
   uri: string;
+  capabilities?: RepositoryCapabilities;
+}
+
+export interface RepositoryCapabilities {
+  resources: RepositoryCapabilityUri;
+}
+
+export interface RepositoryCapabilityUri {
+  uri: string;
+}
+
+// TODO: What about 'next' and 'self' links?
+export interface RepositoryResource {
+  id?: string;
+  class: RepositoryClass;
+  displayName?: string;
+  capabilities?: ResourceCapabilities;
+}
+
+export interface ResourceCapabilities {
+  graphics?: ResourceCapabilityUri;
+}
+
+export interface ResourceCapabilityUri extends RepositoryCapabilityUri {
+  type: string; // 3DTiles, GEOJSON, etc
 }
 
 export enum ITwinSubClass {

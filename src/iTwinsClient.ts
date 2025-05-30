@@ -18,6 +18,8 @@ import type {
   ITwinSubClass,
   RepositoriesQueryArg,
   Repository,
+  RepositoryResource,
+  ResourceCapabilityUri,
 } from "./iTwinsAccessProps";
 
 /** Client API to access the itwins service.
@@ -138,11 +140,27 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
 
     const query = this.getRepositoryQueryString(arg);
-    if(query !== "") {
+    if (query !== "") {
       url += `?${query}`;
     }
 
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "repositories");
+  }
+
+  public async queryRepositoryResourcesAsync(
+    accessToken: AccessToken,
+    uri: string
+  ): Promise<ITwinsAPIResponse<RepositoryResource[]>> {
+    const headers: Record<string, string> = { "Accept": "application/vnd.bentley.dcb-repo-api3+json" }; // Temporary
+    return this.sendGenericAPIRequest(accessToken, "GET", uri, undefined, "resources", headers);
+  }
+
+  public async queryRepositoryResourceGraphicsAsync(
+    accessToken: AccessToken,
+    uri: string
+  ): Promise<ITwinsAPIResponse<ResourceCapabilityUri[]>> {
+    const headers: Record<string, string> = { "accept": "application/vnd.bentley.dcb-repo-api3+json" }; // Temporary
+    return this.sendGenericAPIRequest(accessToken, "GET", uri, undefined, "graphics", headers);
   }
 
   /** Get itwin accessible to the user
