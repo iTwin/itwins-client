@@ -1,15 +1,20 @@
 {
   "extends": "./node_modules/@itwin/build-tools/tsconfig-base.json",
   "compilerOptions": {
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "lib": ["dom", "dom.iterable", "es2020"],
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "./",
+    "moduleResolution": "bundler",
     "target": "es2020",
-    "module": "commonjs",
-    "outDir": "./lib"
+    "skipLibCheck": true,
+    "noEmit": true,
+    "module": "es2020"
   },
-  "include": [
-    "./src/**/*.ts"
-  ],
-  "exclude": [
-    "lib",
-    "node_modules"
-  ]
+  "include": ["src/**/*", "vitest.config.ts"],
+  "exclude": ["node_modules", "lib"]
 }

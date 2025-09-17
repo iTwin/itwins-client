@@ -2,15 +2,13 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import * as chai from "chai";
+import { beforeAll, describe, expect, it } from "vitest";
 import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
 import type { ITwin, ITwinsAPIResponse, Repository } from "../../iTwinsAccessProps";
 import { ITwinClass } from "../../iTwinsAccessProps";
 import { ITwinSubClass, RepositoryClass, RepositorySubClass } from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
-
-chai.should();
 describe("iTwinsClient", () => {
   let baseUrl: string = "https://api.bentley.com/itwins";
   const urlPrefix = process.env.IMJS_URL_PREFIX;
@@ -23,10 +21,9 @@ describe("iTwinsClient", () => {
   const iTwinsCustomClient: ITwinsAccessClient = new ITwinsAccessClient(baseUrl);
   let accessToken: AccessToken;
 
-  before(async function () {
-    this.timeout(0);
+  beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
-  });
+  }, 60000);
 
   it("should get a list of project iTwins with custom url", async () => {
     // Act
@@ -34,8 +31,9 @@ describe("iTwinsClient", () => {
       await iTwinsCustomClient.queryAsync(accessToken, ITwinSubClass.Project);
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).toBeDefined();
+    expect(iTwinsResponse.data).not.toHaveLength(0);
   });
 
   it("should get a list of project iTwins without provided subClass", async () => {
@@ -44,8 +42,9 @@ describe("iTwinsClient", () => {
       await iTwinsCustomClient.queryAsync(accessToken);
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).toBeDefined();
+    expect(iTwinsResponse.data).not.toHaveLength(0);
   });
 
   it("should get a list of project iTwins with provided subClass inside arg", async () => {
@@ -56,8 +55,9 @@ describe("iTwinsClient", () => {
       });
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).toBeDefined();
+    expect(iTwinsResponse.data).not.toHaveLength(0);
   });
 
   it("should get iTwin repositories by id", async () => {
@@ -71,8 +71,9 @@ describe("iTwinsClient", () => {
     );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).toBeDefined();
+    expect(iTwinsResponse.data).not.toHaveLength(0);
   });
 
   it("should get iTwin repositories by id and class", async () => {
@@ -89,10 +90,11 @@ describe("iTwinsClient", () => {
     );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).toBeDefined();
+    expect(iTwinsResponse.data).not.toHaveLength(0);
     iTwinsResponse.data!.forEach((actualRepository) => {
-      chai.expect(actualRepository.class).to.be.eq("iModels");
+      expect(actualRepository.class).toBe("iModels");
     });
   });
 
@@ -106,16 +108,17 @@ describe("iTwinsClient", () => {
       iTwinId,
       {
         class: RepositoryClass.GeographicInformationSystem,
-        subClass: RepositorySubClass.MapServer,
+        subClass: RepositorySubClass.ArcGIS,
       }
     );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).toBeDefined();
+    expect(iTwinsResponse.data).not.toHaveLength(0);
     iTwinsResponse.data!.forEach((actualRepository) => {
-      chai.expect(actualRepository.class).to.be.eq("GeographicInformationSystem");
-      chai.expect(actualRepository.subClass).to.be.eq("MapServer");
+      expect(actualRepository.class).toBe("GeographicInformationSystem");
+      expect(actualRepository.subClass).toBe("ArcGIS");
     });
   });
 
@@ -130,9 +133,9 @@ describe("iTwinsClient", () => {
     );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(404);
-    chai.expect(iTwinsResponse.data).to.be.undefined;
-    chai.expect(iTwinsResponse.error!.code).to.be.eq("iTwinNotFound");
+    expect(iTwinsResponse.status).toBe(404);
+    expect(iTwinsResponse.data).toBeUndefined();
+    expect(iTwinsResponse.error!.code).toBe("iTwinNotFound");
   });
 
   it("should get a 422 when querying iTwin Repositories with unsupported class", async () => {
@@ -149,12 +152,12 @@ describe("iTwinsClient", () => {
     );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(422);
-    chai.expect(iTwinsResponse.data).to.be.undefined;
-    chai.expect(iTwinsResponse.error).to.not.be.undefined;
-    chai.expect(iTwinsResponse.error!.code).to.be.eq("InvalidiTwinsRequest");
-    chai.expect(iTwinsResponse.error!.details![0].code).to.be.eq("InvalidValue");
-    chai.expect(iTwinsResponse.error!.details![0].target).to.be.eq("class");
+    expect(iTwinsResponse.status).toBe(422);
+    expect(iTwinsResponse.data).toBeUndefined();
+    expect(iTwinsResponse.error).not.toBeUndefined();
+    expect(iTwinsResponse.error!.code).toBe("InvalidiTwinsRequest");
+    expect(iTwinsResponse.error!.details![0].code).toBe("InvalidValue");
+    expect(iTwinsResponse.error!.details![0].target).toBe("class");
   });
 
   it("should get a 404 when trying to get an iTwin", async () => {
@@ -166,9 +169,9 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.getAsync(accessToken, notAniTwinId);
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(404);
-    chai.expect(iTwinsResponse.data).to.be.undefined;
-    chai.expect(iTwinsResponse.error!.code).to.be.eq("iTwinNotFound");
+    expect(iTwinsResponse.status).toBe(404);
+    expect(iTwinsResponse.data).toBeUndefined();
+    expect(iTwinsResponse.error!.code).toBe("iTwinNotFound");
   });
 
   it("should get a 422 when querying with an unsupported subClass", async () => {
@@ -180,14 +183,12 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(422);
-    chai.expect(iTwinsResponse.data).to.be.undefined;
-    chai.expect(iTwinsResponse.error).to.not.be.undefined;
-    chai.expect(iTwinsResponse.error!.code).to.be.eq("InvalidiTwinsRequest");
-    chai
-      .expect(iTwinsResponse.error!.details![0].code)
-      .to.be.eq("InvalidValue");
-    chai.expect(iTwinsResponse.error!.details![0].target).to.be.eq("subClass");
+    expect(iTwinsResponse.status).toBe(422);
+    expect(iTwinsResponse.data).toBeUndefined();
+    expect(iTwinsResponse.error).not.toBeUndefined();
+    expect(iTwinsResponse.error!.code).toBe("InvalidiTwinsRequest");
+    expect(iTwinsResponse.error!.details![0].code).toBe("InvalidValue");
+    expect(iTwinsResponse.error!.details![0].target).toBe("subClass");
   });
 
   it("should get a list of project iTwins", async () => {
@@ -196,8 +197,8 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.queryAsync(accessToken, ITwinSubClass.Project);
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
   });
 
   it("should get a list of project iTwins without providing subClass", async () => {
@@ -206,8 +207,8 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.queryAsync(accessToken);
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
   });
 
   it("should get a project iTwin", async () => {
@@ -219,12 +220,12 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.getAsync(accessToken, iTwinId!);
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.be.empty;
     const actualiTwin = iTwinsResponse.data!;
-    chai.expect(actualiTwin.id).to.be.eq(iTwinId);
-    chai.expect(actualiTwin.class).to.be.eq("Endeavor");
-    chai.expect(actualiTwin.subClass).to.be.eq("Project");
+    expect(actualiTwin.id).toBe(iTwinId);
+    expect(actualiTwin.class).toBe("Endeavor");
+    expect(actualiTwin.subClass).toBe("Project");
   });
 
   it("should get more project iTwin properties in representation result mode", async () => {
@@ -237,12 +238,12 @@ describe("iTwinsClient", () => {
 
     // Assert
     const actualiTwin = iTwinsResponse.data!;
-    chai.expect(actualiTwin.parentId).to.be.a("string");
-    chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
-    chai.expect(actualiTwin.imageName).to.be.null;
-    chai.expect(actualiTwin.image).to.be.null;
-    chai.expect(actualiTwin.createdDateTime).to.be.a("string");
-    chai.expect(actualiTwin.createdBy).to.be.a("string");
+    expect(actualiTwin.parentId).toBeTypeOf("string");
+    expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
+    expect(actualiTwin.imageName).toBeNull();
+    expect(actualiTwin.image).toBeNull();
+    expect(actualiTwin.createdDateTime).toBeTypeOf("string");
+    expect(actualiTwin.createdBy).toBeTypeOf("string");
   });
 
   it("should get an account", async () => {
@@ -254,12 +255,12 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.getAccountAsync(accessToken, iTwinId!);
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.be.empty;
     const actualiTwin = iTwinsResponse.data!;
-    chai.expect(actualiTwin.id).to.not.be.eq(iTwinId); // should be a different entity
-    chai.expect(actualiTwin.class).to.be.eq("Account");
-    chai.expect(actualiTwin.subClass).to.be.eq("Account");
+    expect(actualiTwin.id).not.toBe(iTwinId); // should be a different entity
+    expect(actualiTwin.class).toBe("Account");
+    expect(actualiTwin.subClass).toBe("Account");
   });
 
   it("should get more details for an account in represenatation result mode", async () => {
@@ -271,14 +272,14 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.getAccountAsync(accessToken, iTwinId!, "representation");
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.be.empty;
     const actualiTwin = iTwinsResponse.data!;
-    chai.expect(actualiTwin.id).to.not.be.eq(iTwinId); // should be a different entity
-    chai.expect(actualiTwin.class).to.be.eq("Account");
-    chai.expect(actualiTwin.subClass).to.be.eq("Account");
-    chai.expect(actualiTwin.createdDateTime).to.be.a("string");
-    chai.expect(actualiTwin.createdBy).to.be.a("string");
+    expect(actualiTwin.id).not.toBe(iTwinId); // should be a different entity
+    expect(actualiTwin.class).toBe("Account");
+    expect(actualiTwin.subClass).toBe("Account");
+    expect(actualiTwin.createdDateTime).toBeTypeOf("string");
+    expect(actualiTwin.createdBy).toBeTypeOf("string");
   });
 
   it("should get the account specified by the iTwinAccountId", async () => {
@@ -292,21 +293,21 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.getAsync(accessToken, iTwinId!, "representation");
 
     // Assert
-    chai.expect(accountResponse.status).to.be.eq(200);
-    chai.expect(accountResponse.data).to.not.be.empty;
+    expect(accountResponse.status).toBe(200);
+    expect(accountResponse.data).not.be.empty;
     const actualAccount = accountResponse.data!;
-    chai.expect(actualAccount.id).to.not.be.eq(iTwinId); // should be a different entity
-    chai.expect(actualAccount.class).to.be.eq("Account");
-    chai.expect(actualAccount.subClass).to.be.eq("Account");
+    expect(actualAccount.id).not.toBe(iTwinId); // should be a different entity
+    expect(actualAccount.class).toBe("Account");
+    expect(actualAccount.subClass).toBe("Account");
 
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.be.empty;
     const actualiTwin = iTwinsResponse.data!;
-    chai.expect(actualiTwin.id).to.be.eq(iTwinId);
-    chai.expect(actualiTwin.class).to.be.eq("Endeavor");
-    chai.expect(actualiTwin.subClass).to.be.eq("Project");
+    expect(actualiTwin.id).toBe(iTwinId);
+    expect(actualiTwin.class).toBe("Endeavor");
+    expect(actualiTwin.subClass).toBe("Project");
 
-    chai.expect(actualiTwin.iTwinAccountId).to.be.eq(actualAccount.id);
+    expect(actualiTwin.iTwinAccountId).toBe(actualAccount.id);
   });
 
   it("should get a paged list of project iTwins using top", async () => {
@@ -323,11 +324,11 @@ describe("iTwinsClient", () => {
     );
 
     // Assert
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
-    chai.expect(iTwinsResponse.data!.length).to.be.eq(3);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data!.length).toBe(3);
     iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.class).to.be.eq("Endeavor");
-      chai.expect(actualiTwin.subClass).to.be.eq("Project");
+      expect(actualiTwin.class).toBe("Endeavor");
+      expect(actualiTwin.subClass).toBe("Project");
     });
   });
 
@@ -347,11 +348,11 @@ describe("iTwinsClient", () => {
     );
 
     // Assert
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
-    chai.expect(iTwinsResponse.data!.length).to.be.eq(3);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data!.length).toBe(3);
     iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.class).to.be.eq("Endeavor");
-      chai.expect(actualiTwin.subClass).to.be.eq("Project");
+      expect(actualiTwin.class).toBe("Endeavor");
+      expect(actualiTwin.subClass).toBe("Project");
     });
   });
 
@@ -372,11 +373,11 @@ describe("iTwinsClient", () => {
       );
 
       // Assert
-      chai.expect(iTwinsResponse.data).to.not.be.empty;
-      chai.expect(iTwinsResponse.data!.length).to.be.eq(pageSize);
+      expect(iTwinsResponse.data).not.toHaveLength(0);
+      expect(iTwinsResponse.data!.length).toBe(pageSize);
       iTwinsResponse.data!.forEach((actualiTwin) => {
-        chai.expect(actualiTwin.class).to.be.eq("Endeavor");
-        chai.expect(actualiTwin.subClass).to.be.eq("Project");
+        expect(actualiTwin.class).toBe("Endeavor");
+        expect(actualiTwin.subClass).toBe("Project");
       });
     }
   });
@@ -396,11 +397,11 @@ describe("iTwinsClient", () => {
     const iTwins = iTwinsResponse.data!;
 
     // Assert
-    chai.expect(iTwins).to.not.be.empty;
+    expect(iTwins).not.toHaveLength(0);
     iTwins.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.displayName).to.be.eq(iTwinName);
-      chai.expect(actualiTwin.class).to.be.eq("Endeavor");
-      chai.expect(actualiTwin.subClass).to.be.eq("Project");
+      expect(actualiTwin.displayName).toBe(iTwinName);
+      expect(actualiTwin.class).toBe("Endeavor");
+      expect(actualiTwin.subClass).toBe("Project");
     });
   });
 
@@ -420,12 +421,12 @@ describe("iTwinsClient", () => {
     const iTwins = iTwinsResponse.data!;
 
     // Assert
-    chai.expect(iTwins).to.not.be.empty;
+    expect(iTwins).not.toHaveLength(0);
     // All items match the name
     iTwins.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.number).to.be.eq(iTwinNumber);
-      chai.expect(actualiTwin.class).to.be.eq("Endeavor");
-      chai.expect(actualiTwin.subClass).to.be.eq("Project");
+      expect(actualiTwin.number).toBe(iTwinNumber);
+      expect(actualiTwin.class).toBe("Endeavor");
+      expect(actualiTwin.subClass).toBe("Project");
     });
   });
 
@@ -444,12 +445,12 @@ describe("iTwinsClient", () => {
     const iTwins = iTwinsResponse.data!;
 
     // Assert
-    chai.expect(iTwins).to.not.be.empty;
+    expect(iTwins).not.toHaveLength(0);
     // All items match the name
     iTwins.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.displayName).to.be.contain(iTwinSearchString);
-      chai.expect(actualiTwin.class).to.be.eq("Endeavor");
-      chai.expect(actualiTwin.subClass).to.be.eq("Project");
+      expect(actualiTwin.displayName).toContain(iTwinSearchString);
+      expect(actualiTwin.class).toBe("Endeavor");
+      expect(actualiTwin.subClass).toBe("Project");
     });
   });
 
@@ -470,13 +471,13 @@ describe("iTwinsClient", () => {
     const iTwins = iTwinsResponse.data!;
 
     // Assert
-    chai.expect(iTwins).to.not.be.empty;
+    expect(iTwins).not.toHaveLength(0);
 
     iTwins.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.parentId).to.be.a("string");
-      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
-      chai.expect(actualiTwin.createdDateTime).to.be.a("string");
-      chai.expect(actualiTwin.createdBy).to.be.a("string");
+      expect(actualiTwin.parentId).toBeTypeOf('string');
+      expect(actualiTwin.iTwinAccountId).toBeTypeOf('string');
+      expect(actualiTwin.createdDateTime).toBeTypeOf('string');
+      expect(actualiTwin.createdBy).toBeTypeOf('string');
     });
   });
 
@@ -497,7 +498,7 @@ describe("iTwinsClient", () => {
     const iTwins = iTwinsResponse.data!;
 
     // Assert
-    chai.expect(iTwins).to.not.be.empty;
+    expect(iTwins).not.toHaveLength(0);
   });
 
   it("should get a list of recent project iTwins", async () => {
@@ -509,8 +510,8 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
   });
 
   it("should get a list of recent project iTwins without subClass query", async () => {
@@ -521,8 +522,8 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
   });
 
   it("should get more properties of recent project iTwins in representation result mode", async () => {
@@ -537,14 +538,14 @@ describe("iTwinsClient", () => {
     const iTwins = iTwinsResponse.data!;
 
     // Assert
-    chai.expect(iTwins).to.not.be.empty;
+    expect(iTwins).not.toHaveLength(0);
 
     // All items have the field "createdDateTime"
     iTwins.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.parentId).to.be.a("string");
-      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
-      chai.expect(actualiTwin.createdDateTime).to.be.a("string");
-      chai.expect(actualiTwin.createdBy).to.be.a("string");
+      expect(actualiTwin.parentId).toBeTypeOf('string');
+      expect(actualiTwin.iTwinAccountId).toBeTypeOf('string');
+      expect(actualiTwin.createdDateTime).toBeTypeOf('string');
+      expect(actualiTwin.createdBy).toBeTypeOf('string');
     });
   });
 
@@ -557,11 +558,11 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
     iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.class).to.be.eq("Endeavor");
-      chai.expect(actualiTwin.subClass).to.be.eq("Project");
+      expect(actualiTwin.class).toBe("Endeavor");
+      expect(actualiTwin.subClass).toBe("Project");
     });
   });
 
@@ -573,8 +574,8 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
   });
 
   it("should get more properties of favorited project iTwins in representation result mode", async () => {
@@ -587,13 +588,13 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.data).not.toHaveLength(0);
 
     iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.parentId).to.be.a("string");
-      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
-      chai.expect(actualiTwin.createdDateTime).to.be.a("string");
-      chai.expect(actualiTwin.createdBy).to.be.a("string");
+      expect(actualiTwin.parentId).toBeTypeOf('string');
+      expect(actualiTwin.iTwinAccountId).toBeTypeOf('string');
+      expect(actualiTwin.createdDateTime).toBeTypeOf('string');
+      expect(actualiTwin.createdBy).toBeTypeOf('string');
     });
   });
 
@@ -607,11 +608,11 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
     iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.class).to.be.eq("Endeavor");
-      chai.expect(actualiTwin.subClass).to.be.eq("Project");
+      expect(actualiTwin.class).toBe("Endeavor");
+      expect(actualiTwin.subClass).toBe("Project");
     });
   });
 
@@ -621,8 +622,8 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.queryAsync(accessToken, ITwinSubClass.Asset);
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
   });
 
   it("should get more properties of asset iTwins in representation result mode", async () => {
@@ -631,13 +632,13 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.queryAsync(accessToken, ITwinSubClass.Asset, { resultMode: "representation" });
 
     // Assert
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.data).not.toHaveLength(0);
 
     iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.parentId).to.be.a("string");
-      chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
-      chai.expect(actualiTwin.createdDateTime).to.be.a("string");
-      chai.expect(actualiTwin.createdBy).to.be.a("string");
+      expect(actualiTwin.parentId).toBeTypeOf('string');
+      expect(actualiTwin.iTwinAccountId).toBeTypeOf('string');
+      expect(actualiTwin.createdDateTime).toBeTypeOf('string');
+      expect(actualiTwin.createdBy).toBeTypeOf('string');
     });
   });
 
@@ -650,10 +651,10 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.getAsync(accessToken, iTwinId!);
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.be.empty;
     const actualiTwin = iTwinsResponse.data!;
-    chai.expect(iTwinId).to.be.eq(actualiTwin.id);
+    expect(iTwinId).toBe(actualiTwin.id);
   });
 
   it("should get more asset iTwin properties in representation result mode", async () => {
@@ -666,12 +667,12 @@ describe("iTwinsClient", () => {
 
     // Assert
     const actualiTwin = iTwinsResponse.data!;
-    chai.expect(actualiTwin.parentId).to.be.a("string");
-    chai.expect(actualiTwin.iTwinAccountId).to.be.a("string");
-    chai.expect(actualiTwin.imageName).to.be.null;
-    chai.expect(actualiTwin.image).to.be.null;
-    chai.expect(actualiTwin.createdDateTime).to.be.a("string");
-    chai.expect(actualiTwin.createdBy).to.be.a("string");
+    expect(actualiTwin.parentId).toBeTypeOf('string');
+    expect(actualiTwin.iTwinAccountId).toBeTypeOf('string');
+    expect(actualiTwin.imageName).toBeNull();
+    expect(actualiTwin.image).toBeNull();
+    expect(actualiTwin.createdDateTime).toBeTypeOf('string');
+    expect(actualiTwin.createdBy).toBeTypeOf('string');
   });
 
   it("should get a paged list of asset iTwins using top", async () => {
@@ -688,11 +689,11 @@ describe("iTwinsClient", () => {
     );
 
     // Assert
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
-    chai.expect(iTwinsResponse.data!.length).to.be.eq(3);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data!.length).toBe(3);
     iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.class).to.be.eq("Thing");
-      chai.expect(actualiTwin.subClass).to.be.eq("Asset");
+      expect(actualiTwin.class).toBe("Thing");
+      expect(actualiTwin.subClass).toBe("Asset");
     });
   });
 
@@ -712,11 +713,11 @@ describe("iTwinsClient", () => {
     );
 
     // Assert
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
-    chai.expect(iTwinsResponse.data!.length).to.be.eq(3);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data!.length).toBe(3);
     iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.class).to.be.eq("Thing");
-      chai.expect(actualiTwin.subClass).to.be.eq("Asset");
+      expect(actualiTwin.class).toBe("Thing");
+      expect(actualiTwin.subClass).toBe("Asset");
     });
   });
 
@@ -737,11 +738,11 @@ describe("iTwinsClient", () => {
       );
 
       // Assert
-      chai.expect(iTwinsResponse.data).to.not.be.empty;
-      chai.expect(iTwinsResponse.data!.length).to.be.eq(pageSize);
+      expect(iTwinsResponse.data).not.toHaveLength(0);
+      expect(iTwinsResponse.data!.length).toBe(pageSize);
       iTwinsResponse.data!.forEach((actualiTwin) => {
-        chai.expect(actualiTwin.class).to.be.eq("Thing");
-        chai.expect(actualiTwin.subClass).to.be.eq("Asset");
+        expect(actualiTwin.class).toBe("Thing");
+        expect(actualiTwin.subClass).toBe("Asset");
       });
     }
   });
@@ -761,12 +762,12 @@ describe("iTwinsClient", () => {
     const iTwins = iTwinsResponse.data!;
 
     // Assert
-    chai.expect(iTwins).to.not.be.empty;
+    expect(iTwins).not.toHaveLength(0);
     // All items match the name
     iTwins.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.displayName).to.be.eq(iTwinName);
-      chai.expect(actualiTwin.class).to.be.eq("Thing");
-      chai.expect(actualiTwin.subClass).to.be.eq("Asset");
+      expect(actualiTwin.displayName).toBe(iTwinName);
+      expect(actualiTwin.class).toBe("Thing");
+      expect(actualiTwin.subClass).toBe("Asset");
     });
   });
 
@@ -786,12 +787,12 @@ describe("iTwinsClient", () => {
     const iTwins = iTwinsResponse.data!;
 
     // Assert
-    chai.expect(iTwins).to.not.be.empty;
+    expect(iTwins).not.toHaveLength(0);
     // All items match the name
     iTwins.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.number).to.be.eq(iTwinNumber);
-      chai.expect(actualiTwin.class).to.be.eq("Thing");
-      chai.expect(actualiTwin.subClass).to.be.eq("Asset");
+      expect(actualiTwin.number).toBe(iTwinNumber);
+      expect(actualiTwin.class).toBe("Thing");
+      expect(actualiTwin.subClass).toBe("Asset");
     });
   });
 
@@ -810,12 +811,12 @@ describe("iTwinsClient", () => {
     const iTwins = iTwinsResponse.data!;
 
     // Assert
-    chai.expect(iTwins).to.not.be.empty;
+    expect(iTwins).not.toHaveLength(0);
     // All items match the name
     iTwins.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.displayName).to.be.contain(iTwinSearchString);
-      chai.expect(actualiTwin.class).to.be.eq("Thing");
-      chai.expect(actualiTwin.subClass).to.be.eq("Asset");
+      expect(actualiTwin.displayName).toContain(iTwinSearchString);
+      expect(actualiTwin.class).toBe("Thing");
+      expect(actualiTwin.subClass).toBe("Asset");
     });
   });
 
@@ -828,11 +829,11 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
     iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.class).to.be.eq("Thing");
-      chai.expect(actualiTwin.subClass).to.be.eq("Asset");
+      expect(actualiTwin.class).toBe("Thing");
+      expect(actualiTwin.subClass).toBe("Asset");
     });
   });
 
@@ -846,11 +847,11 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
     iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.class).to.be.eq("Thing");
-      chai.expect(actualiTwin.subClass).to.be.eq("Asset");
+      expect(actualiTwin.class).toBe("Thing");
+      expect(actualiTwin.subClass).toBe("Asset");
     });
   });
 
@@ -863,11 +864,11 @@ describe("iTwinsClient", () => {
       );
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.toHaveLength(0);
     iTwinsResponse.data!.forEach((actualiTwin) => {
-      chai.expect(actualiTwin.class).to.be.eq("Thing");
-      chai.expect(actualiTwin.subClass).to.be.eq("Asset");
+      expect(actualiTwin.class).toBe("Thing");
+      expect(actualiTwin.subClass).toBe("Asset");
     });
   });
 
@@ -877,10 +878,10 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.getPrimaryAccountAsync(accessToken);
 
     // Assert
-    chai.expect(iTwinsResponse.status).to.be.eq(200);
-    chai.expect(iTwinsResponse.data).to.not.be.empty;
+    expect(iTwinsResponse.status).toBe(200);
+    expect(iTwinsResponse.data).not.be.empty;
     const actualiTwin = iTwinsResponse.data!;
-    chai.expect(actualiTwin.id).to.not.be.empty;
+    expect(actualiTwin.id).not.toHaveLength(0);
   });
 
   it("should create, update, and delete an iTwin", async () => {
@@ -905,10 +906,10 @@ describe("iTwinsClient", () => {
     const iTwinId = createResponse.data!.id!;
 
     // Assert
-    chai.expect(createResponse.status).to.be.eq(201);
-    chai.expect(createResponse.data!.displayName).to.be.eq(newiTwin.displayName);
-    chai.expect(createResponse.data!.class).to.be.eq(newiTwin.class);
-    chai.expect(createResponse.data!.subClass).to.be.eq(newiTwin.subClass);
+    expect(createResponse.status).toBe(201);
+    expect(createResponse.data!.displayName).toBe(newiTwin.displayName);
+    expect(createResponse.data!.class).toBe(newiTwin.class);
+    expect(createResponse.data!.subClass).toBe(newiTwin.subClass);
 
     /* UPDATE ITWIN */
     // Arrange
@@ -921,8 +922,8 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.updateiTwin(accessToken, iTwinId, updatediTwin);
 
     // Assert
-    chai.expect(updateResponse.status).to.be.eq(200);
-    chai.expect(updateResponse.data!.displayName).to.be.eq(updatediTwin.displayName);
+    expect(updateResponse.status).toBe(200);
+    expect(updateResponse.data!.displayName).toBe(updatediTwin.displayName);
 
     /* DELETE ITWIN */
     // Act
@@ -930,8 +931,8 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
 
     // Assert
-    chai.expect(deleteResponse.status).to.be.eq(204);
-    chai.expect(deleteResponse.data).to.be.undefined;
+    expect(deleteResponse.status).toBe(204);
+    expect(deleteResponse.data).toBeUndefined();
   });
 
   it("should create and delete an iTwin Repository", async () => {
@@ -965,10 +966,10 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.createRepository(accessToken, iTwinId, newRepository);
 
     // Assert
-    chai.expect(createResponse.status).to.be.eq(201);
-    chai.expect(createResponse.data!.class).to.be.eq(newRepository.class);
-    chai.expect(createResponse.data!.subClass).to.be.eq(newRepository.subClass);
-    chai.expect(createResponse.data!.uri).to.be.eq(newRepository.uri);
+    expect(createResponse.status).toBe(201);
+    expect(createResponse.data!.class).toBe(newRepository.class);
+    expect(createResponse.data!.subClass).toBe(newRepository.subClass);
+    expect(createResponse.data!.uri).toBe(newRepository.uri);
 
     /* DELETE ITWIN REPOSITORY */
     // Act
@@ -979,10 +980,10 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
 
     // Assert
-    chai.expect(repositoryDeleteResponse.status).to.be.eq(204);
-    chai.expect(repositoryDeleteResponse.data).to.be.undefined;
-    chai.expect(iTwinDeleteResponse.status).to.be.eq(204);
-    chai.expect(iTwinDeleteResponse.data).to.be.undefined;
+    expect(repositoryDeleteResponse.status).toBe(204);
+    expect(repositoryDeleteResponse.data).toBeUndefined();
+    expect(iTwinDeleteResponse.status).toBe(204);
+    expect(iTwinDeleteResponse.data).toBeUndefined();
   });
 
   it("should get a 409 conflict when trying to create a duplicate", async () => {
@@ -1007,15 +1008,15 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.deleteiTwin(accessToken, iTwinResponse.data!.id!);
 
     // Assert
-    chai.expect(iTwinResponse.status).to.be.eq(201);
-    chai.expect(iTwinResponse2.status).to.be.eq(409);
-    chai.expect(iTwinResponse2.data).to.be.undefined;
-    chai.expect(iTwinResponse2.error).to.not.be.undefined;
-    chai.expect(iTwinResponse2.error!.code).to.be.eq("iTwinExists");
-    chai.expect(iTwinResponse2.error!.details![0].code).to.be.eq("InvalidValue");
-    chai.expect(iTwinResponse2.error!.details![0].target).to.be.eq("number");
-    chai.expect(deleteResponse.status).to.be.eq(204);
-    chai.expect(deleteResponse.data).to.be.undefined;
+    expect(iTwinResponse.status).toBe(201);
+    expect(iTwinResponse2.status).toBe(409);
+    expect(iTwinResponse2.data).toBeUndefined();
+    expect(iTwinResponse2.error).not.toBeUndefined();
+    expect(iTwinResponse2.error!.code).toBe("iTwinExists");
+    expect(iTwinResponse2.error!.details![0].code).toBe("InvalidValue");
+    expect(iTwinResponse2.error!.details![0].target).toBe("number");
+    expect(deleteResponse.status).toBe(204);
+    expect(deleteResponse.data).toBeUndefined();
   });
 
   it("should get a 422 unprocessable entity when trying to create an iTwin without a class specified", async () => {
@@ -1035,12 +1036,12 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
 
     // Assert
-    chai.expect(iTwinResponse.status).to.be.eq(422);
-    chai.expect(iTwinResponse.data).to.be.undefined;
-    chai.expect(iTwinResponse.error).to.not.be.undefined;
-    chai.expect(iTwinResponse.error!.code).to.be.eq("InvalidiTwinsRequest");
-    chai.expect(iTwinResponse.error!.details![0].code).to.be.eq("MissingRequiredProperty");
-    chai.expect(iTwinResponse.error!.details![0].target).to.be.eq("class");
+    expect(iTwinResponse.status).toBe(422);
+    expect(iTwinResponse.data).toBeUndefined();
+    expect(iTwinResponse.error).not.toBeUndefined();
+    expect(iTwinResponse.error!.code).toBe("InvalidiTwinsRequest");
+    expect(iTwinResponse.error!.details![0].code).toBe("MissingRequiredProperty");
+    expect(iTwinResponse.error!.details![0].target).toBe("class");
   });
 
   it("should get a 404 not found when trying to delete an iTwin that doesn't exist", async () => {
@@ -1052,10 +1053,10 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.deleteiTwin(accessToken, someRandomId);
 
     // Assert
-    chai.expect(deleteResponse.status).to.be.eq(404);
-    chai.expect(deleteResponse.data).to.be.undefined;
-    chai.expect(deleteResponse.error).to.not.be.undefined;
-    chai.expect(deleteResponse.error!.code).to.be.eq("iTwinNotFound");
+    expect(deleteResponse.status).toBe(404);
+    expect(deleteResponse.data).toBeUndefined();
+    expect(deleteResponse.error).not.toBeUndefined();
+    expect(deleteResponse.error!.code).toBe("iTwinNotFound");
   });
 
   it("should get a 404 not found when trying to create a repository with an iTwin that doesn't exist", async () => {
@@ -1072,10 +1073,10 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.createRepository(accessToken, someRandomId, newRepository);
 
     // Assert
-    chai.expect(createResponse.status).to.be.eq(404);
-    chai.expect(createResponse.data).to.be.undefined;
-    chai.expect(createResponse.error).to.not.be.undefined;
-    chai.expect(createResponse.error!.code).to.be.eq("iTwinNotFound");
+    expect(createResponse.status).toBe(404);
+    expect(createResponse.data).toBeUndefined();
+    expect(createResponse.error).not.toBeUndefined();
+    expect(createResponse.error!.code).toBe("iTwinNotFound");
   });
 
   it("should get a 409 conflict when trying to create a duplicate repository", async () => {
@@ -1110,16 +1111,16 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
 
     // Assert
-    chai.expect(createResponse.status).to.be.eq(201);
-    chai.expect(createResponse.data!.class).to.be.eq(newRepository.class);
-    chai.expect(createResponse.data!.subClass).to.be.eq(newRepository.subClass);
-    chai.expect(createResponse.data!.uri).to.be.eq(newRepository.uri);
-    chai.expect(createResponse2.status).to.be.eq(409);
-    chai.expect(createResponse2.data).to.be.undefined;
-    chai.expect(createResponse2.error).to.not.be.undefined;
-    chai.expect(createResponse2.error!.code).to.be.eq("iTwinRepositoryExists");
-    chai.expect(deleteResponse.status).to.be.eq(204);
-    chai.expect(deleteResponse.data).to.be.undefined;
+    expect(createResponse.status).toBe(201);
+    expect(createResponse.data!.class).toBe(newRepository.class);
+    expect(createResponse.data!.subClass).toBe(newRepository.subClass);
+    expect(createResponse.data!.uri).toBe(newRepository.uri);
+    expect(createResponse2.status).toBe(409);
+    expect(createResponse2.data).toBeUndefined();
+    expect(createResponse2.error).not.toBeUndefined();
+    expect(createResponse2.error!.code).toBe("iTwinRepositoryExists");
+    expect(deleteResponse.status).toBe(204);
+    expect(deleteResponse.data).toBeUndefined();
   });
 
   it("should get a 422 unprocessable entity when trying to create a repository without the uri property", async () => {
@@ -1152,14 +1153,14 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
 
     // Assert
-    chai.expect(createResponse.status).to.be.eq(422);
-    chai.expect(createResponse.data).to.be.undefined;
-    chai.expect(createResponse.error).to.not.be.undefined;
-    chai.expect(createResponse.error!.code).to.be.eq("InvalidiTwinsRequest");
-    chai.expect(createResponse.error!.details![0].code).to.be.eq("MissingRequiredProperty");
-    chai.expect(createResponse.error!.details![0].target).to.be.eq("uri");
-    chai.expect(deleteResponse.status).to.be.eq(204);
-    chai.expect(deleteResponse.data).to.be.undefined;
+    expect(createResponse.status).toBe(422);
+    expect(createResponse.data).toBeUndefined();
+    expect(createResponse.error).not.toBeUndefined();
+    expect(createResponse.error!.code).toBe("InvalidiTwinsRequest");
+    expect(createResponse.error!.details![0].code).toBe("MissingRequiredProperty");
+    expect(createResponse.error!.details![0].target).toBe("uri");
+    expect(deleteResponse.status).toBe(204);
+    expect(deleteResponse.data).toBeUndefined();
   });
 
   it("should get a 404 not found when trying to delete an repository that doesn't exist", async () => {
@@ -1187,11 +1188,12 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
 
     // Assert
-    chai.expect(deleteResponse.status).to.be.eq(404);
-    chai.expect(deleteResponse.data).to.be.undefined;
-    chai.expect(deleteResponse.error).to.not.be.undefined;
-    chai.expect(deleteResponse.error!.code).to.be.eq("iTwinRepositoryNotFound");
-    chai.expect(iTwinDeleteResponse.status).to.be.eq(204);
-    chai.expect(iTwinDeleteResponse.data).to.be.undefined;
+    expect(deleteResponse.status).toBe(404);
+    expect(deleteResponse.data).toBeUndefined();
+    expect(deleteResponse.error).not.toBeUndefined();
+    expect(deleteResponse.error!.code).toBe("iTwinRepositoryNotFound");
+    expect(iTwinDeleteResponse.status).toBe(204);
+    expect(iTwinDeleteResponse.data).toBeUndefined();
   });
 });
+

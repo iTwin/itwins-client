@@ -127,7 +127,8 @@ export enum RepositoryClass {
 export enum RepositorySubClass {
   WebMapService = "WebMapService",
   WebMapTileService = "WebMapTileService",
-  MapServer = "MapServer"
+  ArcGIS = "ArcGIS",
+  UrlTemplate = "UrlTemplate",
 }
 
 /**
