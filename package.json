@@ -3,9 +3,18 @@
   "version": "1.6.1",
   "description": "iTwins client for the iTwin platform",
   "type": "module",
-  "main": "lib/cjs/itwins-client.js",
-  "module": "lib/esm/itwins-client.js",
-  "typings": "lib/cjs/itwins-client",
+  "main": "./lib/cjs/itwins-client.js",
+  "module": "./lib/esm/itwins-client.js",
+  "types": "./lib/cjs/itwins-client.d.ts",
+  "files": [
+    "lib",
+    "README.md",
+    "LICENSE.md",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
   "exports": {
     ".": {
       "import": {
@@ -19,12 +28,12 @@
     }
   },
   "scripts": {
-    "build": "npm run -s build:cjs && npm run -s build:esm",
+    "build": "pnpm run clean && pnpm run -s build:cjs && pnpm run -s build:esm",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf lib",
     "lint": "eslint -f visualstudio \"./src/**/*.ts\" 1>&2",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "pnpm run lint -- --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
