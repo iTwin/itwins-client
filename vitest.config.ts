@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    environment: 'jsdom',
+    environment: 'node', // Use node for all tests (no CORS issues)
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/test/**/*.test.ts'],
