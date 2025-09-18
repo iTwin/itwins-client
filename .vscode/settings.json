@@ -112,8 +112,8 @@
   "eslint.format.enable": true,
   "eslint.lintTask.enable": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.markdownlint": "explicit",
-    "editor.action.fixAll": "explicit",
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.markdownlint": "always",
+    "editor.action.fixAll": "always",
+    "source.fixAll.eslint": "always"
   }
 }
