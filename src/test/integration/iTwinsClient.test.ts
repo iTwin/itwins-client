@@ -6,9 +6,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
 import type { ITwin, ITwinsAPIResponse, Repository } from "../../iTwinsAccessProps";
-import { ITwinClass } from "../../iTwinsAccessProps";
-import { ITwinSubClass, RepositoryClass, RepositorySubClass } from "../../iTwinsAccessProps";
+import { ITwinClass , ITwinSubClass, RepositoryClass, RepositorySubClass } from "../../iTwinsAccessProps";
 import { TestConfig } from "../TestConfig";
+
 describe("iTwinsClient", () => {
   let baseUrl: string = "https://api.bentley.com/itwins";
   const urlPrefix = process.env.IMJS_URL_PREFIX;
@@ -414,7 +414,6 @@ describe("iTwinsClient", () => {
       accessToken,
       ITwinSubClass.Project,
       {
-        // eslint-disable-next-line id-blacklist
         number: iTwinNumber,
       }
     );
@@ -780,7 +779,6 @@ describe("iTwinsClient", () => {
       accessToken,
       ITwinSubClass.Asset,
       {
-        // eslint-disable-next-line id-blacklist
         number: iTwinNumber,
       }
     );
@@ -889,7 +887,6 @@ describe("iTwinsClient", () => {
     // Arrange
     const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
-      // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
@@ -902,7 +899,6 @@ describe("iTwinsClient", () => {
     // Act
     const createResponse: ITwinsAPIResponse<ITwin> =
       await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    // eslint-disable-next-line no-console
     const iTwinId = createResponse.data!.id!;
 
     // Assert
@@ -940,7 +936,6 @@ describe("iTwinsClient", () => {
     // Arrange
     const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
-      // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
@@ -952,7 +947,6 @@ describe("iTwinsClient", () => {
     const iTwinResponse: ITwinsAPIResponse<ITwin> =
       await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
 
-    // eslint-disable-next-line no-console
     const iTwinId = iTwinResponse.data!.id!;
 
     const newRepository: Repository = {
@@ -990,7 +984,6 @@ describe("iTwinsClient", () => {
     // Arrange
     const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
-      // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
@@ -1023,7 +1016,6 @@ describe("iTwinsClient", () => {
     // Arrange
     const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
-      // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
@@ -1083,7 +1075,6 @@ describe("iTwinsClient", () => {
     // Arrange
     const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
-      // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
@@ -1127,7 +1118,6 @@ describe("iTwinsClient", () => {
     // Arrange
     const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
-      // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
@@ -1168,7 +1158,6 @@ describe("iTwinsClient", () => {
     const someRandomId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
     const newiTwin: ITwin = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
-      // eslint-disable-next-line id-blacklist
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
       subClass: ITwinSubClass.Asset,
