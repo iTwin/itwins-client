@@ -121,7 +121,6 @@ export enum ITwinSubClass {
 
 /**
  * iTwin main classification types
- * @beta
  */
 export enum ITwinClass {
   Account = "Account",
@@ -189,8 +188,8 @@ export interface ITwinsQueryArgBase {
   queryScope?: ITwinQueryScope;
 }
 
-/** Set of optional arguments used for querying Repositories API
- * @beta
+/**
+ * Set of optional arguments used for querying Repositories API
  */
 export interface RepositoriesQueryArg {
   class?: string;
