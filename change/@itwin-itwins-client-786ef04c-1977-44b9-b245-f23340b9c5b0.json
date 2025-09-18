@@ -1,7 +1,7 @@
 {
-  "type": "patch",
+  "type": "minor",
   "comment": "Created ts configs that only have one responsibility. Switched testing framework to vite. Fixed broken test. Upgraded package to use modern ts and eslint packages. Added the ability to debug tests. Added launch config and recommend plugins.",
   "packageName": "@itwin/itwins-client",
   "email": "caleb.german@bentley.com",
-  "dependentChangeType": "patch"
+  "dependentChangeType": "minor"
 }
