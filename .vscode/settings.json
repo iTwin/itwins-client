@@ -76,9 +76,7 @@
     }
   ],
   "eslint.options": {
-    "configFile": "./package.json",
-    "useEslintrc": false,
-    "resolvePluginsRelativeTo": "./node_modules/@itwin/eslint-plugin"
+    "configFile": "./eslint.config.js"
   },
   "importSorter.importStringConfiguration.quoteMark": "double",
   "importSorter.generalConfiguration.sortImportsInDirectory": false,

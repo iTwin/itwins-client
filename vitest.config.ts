@@ -18,5 +18,8 @@ export default defineConfig({
         singleFork: true
       }
     }
+  },
+  define: {
+    global: 'globalThis',
   }
 });
