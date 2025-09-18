@@ -64,11 +64,8 @@ export interface ITwinsAccess {
  * @template T The type of data returned in the response
  */
 export interface ITwinsAPIResponse<T> {
-  /** The response data, undefined if an error occurred */
   data?: T;
-  /** HTTP status code of the response */
   status: number;
-  /** Error information if the request failed */
   error?: Error;
 }
 
