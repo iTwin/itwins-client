@@ -109,7 +109,6 @@ export interface Repository {
 
 /**
  * iTwin sub-classification types
- * @beta
  */
 export enum ITwinSubClass {
   Account = "Account",
