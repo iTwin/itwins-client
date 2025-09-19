@@ -97,7 +97,6 @@ export class BaseClient {
    * @param property - Optional target property for response parsing (ex. iTwins, repositories, etc.)
    * @param headers - Optional additional request headers
    * @returns Promise that resolves to the parsed API response with type safety
-   * @throws Will throw an error if the request fails or response contains errors
    */
   protected async sendGenericAPIRequest<TResponse = unknown, TData = unknown>(
     accessToken: AccessToken,
