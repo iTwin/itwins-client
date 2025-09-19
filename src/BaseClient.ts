@@ -7,25 +7,28 @@
  */
 import type { AccessToken } from "@itwin/core-bentley";
 import type {
+  Error,
   ITwinsAPIResponse,
   ITwinsQueryArg,
   ITwinsQueryArgBase,
   ITwinSubClass,
   RepositoriesQueryArg,
-  Error,
 } from "./iTwinsAccessProps";
 
+/**
+ * Common HTTP methods used in API requests
+ */
 export type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 /**
  * Configuration object for HTTP requests
  */
-type RequestConfig = {
+interface RequestConfig {
   method: Method;
   url: string;
   body?: string;
   headers: Record<string, string>;
-};
+}
 
 /**
  * Type guard to validate if an object is a valid Error structure
@@ -58,7 +61,7 @@ function isErrorResponse(data: unknown): data is { error: Error } {
 /**
  * Type guard to check if an object has a specific property
  * @param obj - Object to check for property
- * @param key - Property key to check for
+ * @param prop - Property key to check for
  * @returns True if the object has the specified property
  */
 function hasProperty(
@@ -114,13 +117,16 @@ export class BaseClient {
         data,
         headers
       );
+
       const response = await fetch(requestOptions.url, {
         method: requestOptions.method,
         headers: requestOptions.headers,
         body: requestOptions.body,
       });
+      const responseData =
+        response.status !== 204 ? await response.json() : undefined;
+
       if (!response.ok) {
-        const responseData = await response.json();
         if (isErrorResponse(responseData)) {
           const errorData: Error = responseData.error;
           return {
@@ -130,9 +136,6 @@ export class BaseClient {
         }
         throw new Error("Unknown error occurred");
       }
-      const responseData =
-        response.status !== 204 ? await response.json() : undefined;
-
       return {
         status: response.status,
         data:
@@ -163,7 +166,7 @@ export class BaseClient {
    * @param headers - Optional additional request headers to include
    * @returns RequestConfig object with method, URL, body, and headers configured
    */
-  protected createRequestOptions<TData extends unknown>(
+  protected createRequestOptions<TData>(
     accessTokenString: string,
     method: Method,
     url: string,
