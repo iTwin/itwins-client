@@ -4,7 +4,7 @@
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
-    "lib": ["dom", "dom.iterable", "es2020"],
+    "lib": ["es2020"],
     "esModuleInterop": true,
     "sourceMap": true,
     "noFallthroughCasesInSwitch": true,
