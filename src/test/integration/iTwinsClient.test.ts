@@ -118,7 +118,7 @@ describe("iTwinsClient", () => {
     expect(iTwinsResponse.data).not.toHaveLength(0);
     iTwinsResponse.data!.forEach((actualRepository) => {
       expect(actualRepository.class).toBe("GeographicInformationSystem");
-      expect(actualRepository.subClass).toBe("ArcGIS");
+      expect(actualRepository.subClass).toBe(RepositorySubClass.ArcGIS);
     });
   });
 
