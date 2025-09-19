@@ -9,6 +9,6 @@
   },
   "include": ["src/**/*"],
   "exclude": [
-    "src/test/**/*",
+    "src/test/**/*"
   ]
 }
