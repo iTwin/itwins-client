@@ -3,7 +3,6 @@
   "version": "1.6.1",
   "description": "iTwins client for the iTwin platform",
   "type": "module",
-  "esmCompatibilityNotes": "This package is ESM-first due to 'type: module'. Consumers using CommonJS should use the CJS entry point ('require(\"@itwin/itwins-client\")'), while ESM consumers should use the ESM entry point ('import ... from \"@itwin/itwins-client\"'). See README.md for details.",
   "main": "./lib/cjs/itwins-client.js",
   "module": "./lib/esm/itwins-client.js",
   "types": "./lib/cjs/itwins-client.d.ts",
