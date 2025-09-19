@@ -59,6 +59,10 @@ export interface ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin>>;
 }
 
+/**
+ * Standard response structure for all iTwins API operations
+ * @template T The type of data returned in the response
+ */
 export interface ITwinsAPIResponse<T> {
   data?: T;
   status: number;
@@ -74,7 +78,7 @@ export interface ITwin {
   subClass?: ITwinSubClass;
   type?: string;
   displayName?: string;
-  // eslint-disable-next-line id-blacklist
+  // eslint-disable-next-line id-denylist
   number?: string;
   dataCenterLocation?: string;
   status?: string;
@@ -100,6 +104,9 @@ export interface Repository {
   uri: string;
 }
 
+/**
+ * iTwin sub-classification types
+ */
 export enum ITwinSubClass {
   Account = "Account",
   Asset = "Asset",
@@ -109,12 +116,19 @@ export enum ITwinSubClass {
   WorkPackage = "WorkPackage",
 }
 
+/**
+ * iTwin main classification types
+ */
 export enum ITwinClass {
   Account = "Account",
   Thing = "Thing",
   Endeavor = "Endeavor",
 }
 
+/**
+ * Repository classification types for different data sources
+ * @beta
+ */
 export enum RepositoryClass {
   iModels = "iModels",
   Storage = "Storage",
@@ -124,10 +138,15 @@ export enum RepositoryClass {
   GeographicInformationSystem = "GeographicInformationSystem"
 }
 
+/**
+ * Repository sub-classification types for specific data source implementations
+ * @beta
+ */
 export enum RepositorySubClass {
   WebMapService = "WebMapService",
   WebMapTileService = "WebMapTileService",
-  MapServer = "MapServer"
+  ArcGIS = "ArcGIS",
+  UrlTemplate = "UrlTemplate",
 }
 
 /**
@@ -146,12 +165,15 @@ export type ITwinQueryScope = "memberOfItwin" | "all";
 export interface ITwinsQueryArg extends ITwinsQueryArgBase {
   search?: string;
   displayName?: string;
-  // eslint-disable-next-line id-blacklist
+  // eslint-disable-next-line id-denylist
   number?: string;
   parentId?: string;
   iTwinAccountId?: string;
 }
 
+/**
+ * Base set of query arguments for iTwins API operations
+ */
 export interface ITwinsQueryArgBase {
   subClass?: ITwinSubClass;
   status?: string;
@@ -163,14 +185,17 @@ export interface ITwinsQueryArgBase {
   queryScope?: ITwinQueryScope;
 }
 
-/** Set of optional arguments used for querying Respositories API
- *
+/**
+ * Set of optional arguments used for querying Repositories API
  */
 export interface RepositoriesQueryArg {
   class?: string;
   subClass?: string;
 }
 
+/**
+ * Error response structure from iTwins API
+ */
 export interface Error {
   code: string;
   message: string;
@@ -178,6 +203,9 @@ export interface Error {
   target?: string;
 }
 
+/**
+ * Detailed error information from iTwins API responses
+ */
 export interface ErrorDetail {
   code: string;
   message: string;

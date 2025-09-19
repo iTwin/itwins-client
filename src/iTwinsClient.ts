@@ -45,7 +45,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     const headers = this.getHeaders(arg);
     let url = this._baseUrl;
 
-    // eslint-disable-next-line deprecation/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const query = this.getQueryStringArg(arg, subClass);
     if (query !== "")
       url += `?${query}`;
@@ -178,7 +178,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites`;
 
-    // eslint-disable-next-line deprecation/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const query = this.getQueryStringArgBase(arg, subClass);
     if (query !== "")
       url += `?${query}`;
@@ -203,7 +203,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
 
-    // eslint-disable-next-line deprecation/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const query = this.getQueryStringArgBase(arg, subClass);
     if (query !== "")
       url += `?${query}`;

@@ -17,6 +17,10 @@ import type {
   RepositoriesQueryArg,
 } from "./iTwinsAccessProps";
 
+/**
+ * Base client class providing common functionality for iTwins API requests.
+ * Handles authentication, request configuration, and query string building.
+ */
 export class BaseClient {
   protected _baseUrl: string = "https://api.bentley.com/itwins";
 
@@ -72,7 +76,7 @@ export class BaseClient {
               : response.data,
         error: response.data.error,
       };
-    } catch (err) {
+    } catch {
       return {
         status: 500,
         error: {

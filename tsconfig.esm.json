@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "module": "es2020",
+    "target": "es2020",
+    "outDir": "./lib/esm",
+    "moduleResolution": "bundler",
+    "incremental": false
+  }
+}
