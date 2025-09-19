@@ -132,9 +132,7 @@ export class BaseClient {
         throw new Error("Unknown error occurred");
       }
       const responseData =
-        response.status !== 204
-          ? (await response.json())
-          : undefined;
+        response.status !== 204 ? await response.json() : undefined;
 
       return {
         status: response.status,
@@ -244,34 +242,40 @@ export class BaseClient {
    * @param subClass - Optional iTwin subclass filter to apply
    * @returns Query string with all iTwins parameters applied, ready to append to a URL
    */
-protected getQueryStringArg(
-  queryArg?: ITwinsQueryArg,
-  subClass?: ITwinSubClass
-): string {
-  const baseParams = this.getQueryStringArgBase(queryArg, subClass);
-  const additionalParams: string[] = [];
+  protected getQueryStringArg(
+    queryArg?: ITwinsQueryArg,
+    subClass?: ITwinSubClass
+  ): string {
+    const baseParams = this.getQueryStringArgBase(queryArg, subClass);
+    const additionalParams: string[] = [];
 
-  if (queryArg) {
-    if (queryArg.search) {
-      additionalParams.push(`$search=${encodeURIComponent(queryArg.search)}`);
+    if (queryArg) {
+      if (queryArg.search) {
+        additionalParams.push(`$search=${encodeURIComponent(queryArg.search)}`);
+      }
+      if (queryArg.displayName) {
+        additionalParams.push(
+          `displayName=${encodeURIComponent(queryArg.displayName)}`
+        );
+      }
+      if (queryArg.number) {
+        additionalParams.push(`number=${encodeURIComponent(queryArg.number)}`);
+      }
+      if (queryArg.parentId) {
+        additionalParams.push(
+          `parentId=${encodeURIComponent(queryArg.parentId)}`
+        );
+      }
+      if (queryArg.iTwinAccountId) {
+        additionalParams.push(
+          `iTwinAccountId=${encodeURIComponent(queryArg.iTwinAccountId)}`
+        );
+      }
     }
-    if (queryArg.displayName) {
-      additionalParams.push(`displayName=${encodeURIComponent(queryArg.displayName)}`);
-    }
-    if (queryArg.number) {
-      additionalParams.push(`number=${encodeURIComponent(queryArg.number)}`);
-    }
-    if (queryArg.parentId) {
-      additionalParams.push(`parentId=${encodeURIComponent(queryArg.parentId)}`);
-    }
-    if (queryArg.iTwinAccountId) {
-      additionalParams.push(`iTwinAccountId=${encodeURIComponent(queryArg.iTwinAccountId)}`);
-    }
+
+    const allParams = [baseParams, ...additionalParams].filter(Boolean); // filter out falsy values
+    return allParams.join("&");
   }
-
-  const allParams = [baseParams, ...additionalParams].filter(Boolean); // filter out falsy values
-  return allParams.join('&');
-}
 
   /**
    * Builds a query string for repository-specific API requests
