@@ -879,7 +879,7 @@ describe("iTwinsClient", () => {
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).not.to.be.empty;
     const actualiTwin = iTwinsResponse.data!;
-    expect(actualiTwin.id).not.toHaveLength(0);
+    expect(actualiTwin.id).toBeTruthy();
   });
 
   it("should create, update, and delete an iTwin", async () => {
