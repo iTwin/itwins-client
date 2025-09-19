@@ -256,7 +256,7 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.be.empty;
+    expect(iTwinsResponse.data).not.to.be.empty;
     const actualiTwin = iTwinsResponse.data!;
     expect(actualiTwin.id).not.toBe(iTwinId); // should be a different entity
     expect(actualiTwin.class).toBe("Account");
@@ -273,7 +273,7 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.be.empty;
+    expect(iTwinsResponse.data).not.to.be.empty;
     const actualiTwin = iTwinsResponse.data!;
     expect(actualiTwin.id).not.toBe(iTwinId); // should be a different entity
     expect(actualiTwin.class).toBe("Account");
@@ -294,14 +294,14 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(accountResponse.status).toBe(200);
-    expect(accountResponse.data).not.be.empty;
+    expect(accountResponse.data).not.to.be.empty;
     const actualAccount = accountResponse.data!;
     expect(actualAccount.id).not.toBe(iTwinId); // should be a different entity
     expect(actualAccount.class).toBe("Account");
     expect(actualAccount.subClass).toBe("Account");
 
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.be.empty;
+    expect(iTwinsResponse.data).not.to.be.empty;
     const actualiTwin = iTwinsResponse.data!;
     expect(actualiTwin.id).toBe(iTwinId);
     expect(actualiTwin.class).toBe("Endeavor");
