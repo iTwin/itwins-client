@@ -877,7 +877,7 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.to.be.empty;
+    expect(iTwinsResponse.data).toBeDefined();
     const actualiTwin = iTwinsResponse.data!;
     expect(actualiTwin.id).toBeTruthy();
   });
