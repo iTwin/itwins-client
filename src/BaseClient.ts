@@ -80,18 +80,18 @@ export class BaseClient {
    */
   private static readonly QUERY_PARAM_MAPPING: ParameterMapping<ITwinsQueryArg> =
     {
-      top: "$top",
-      skip: "$skip",
-      search: "$search",
       subClass: "subClass",
-      includeInactive: "includeInactive",
-      status: "status",
       type: "type",
+      status: "status",
+      search: "$search",
       displayName: "displayName",
       // eslint-disable-next-line id-denylist
       number: "number",
+      top: "$top",
+      skip: "$skip",
       parentId: "parentId",
       iTwinAccountId: "iTwinAccountId",
+      includeInactive: "includeInactive",
       resultMode: "",
       queryScope: "",
     };
