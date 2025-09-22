@@ -10,10 +10,9 @@ import type {
   Error,
   ITwinsAPIResponse,
   ITwinsQueryArg,
-  ITwinsQueryArgBase,
-  ITwinSubClass,
   RepositoriesQueryArg,
 } from "./iTwinsAccessProps";
+import { hasProperty, ParameterMapping } from "./types/typeUtils";
 
 /**
  * Common HTTP methods used in API requests
@@ -59,25 +58,72 @@ function isErrorResponse(data: unknown): data is { error: Error } {
 }
 
 /**
- * Type guard to check if an object has a specific property
- * @param obj - Object to check for property
- * @param prop - Property key to check for
- * @returns True if the object has the specified property
- */
-function hasProperty(
-  obj: unknown,
-  prop: string
-): obj is Record<string, unknown> {
-  return typeof obj === "object" && obj !== null && prop in obj;
-}
-
-/**
  * Base client class providing common functionality for iTwins API requests.
  * Handles authentication, request configuration, and query string building.
  */
 export class BaseClient {
   protected _baseUrl: string = "https://api.bentley.com/itwins";
 
+
+  /**
+   * Maps the properties of {@link ITwinsQueryArg} to their corresponding query parameter names.
+   *
+   * @remarks
+   * This mapping is used to translate internal property names to the expected parameter names
+   * when constructing iTwins queries. Properties mapped to empty strings are excluded from
+   * the query string as they should be sent as headers instead.
+   *
+   * The mapping includes both OData query parameters (prefixed with $) and iTwins-specific
+   * parameters for filtering and pagination.
+   *
+   * @readonly
+   */
+  private static readonly QUERY_PARAM_MAPPING: ParameterMapping<ITwinsQueryArg> =
+    {
+      top: "$top",
+      skip: "$skip",
+      search: "$search",
+      subClass: "subClass",
+      includeInactive: "includeInactive",
+      status: "status",
+      type: "type",
+      displayName: "displayName",
+      // eslint-disable-next-line id-denylist
+      number: "number",
+      parentId: "parentId",
+      iTwinAccountId: "iTwinAccountId",
+      resultMode: "",
+      queryScope: "",
+    };
+
+  /**
+   * Maps the properties of {@link RepositoriesQueryArg} to their corresponding query parameter names.
+   *
+   * @remarks
+   * This mapping is used to translate internal property names to the expected parameter names
+   * when constructing repository queries.
+   *
+   * @readonly
+   */
+  private static readonly REPOSITORY_PARAM_MAPPING: ParameterMapping<RepositoriesQueryArg> =
+    {
+      class: "class",
+      subClass: "subClass",
+    } as const;
+
+  /**
+   * Creates a new BaseClient instance for iTwins API operations
+   * @param url - Optional custom base URL, defaults to production iTwins API URL
+   *
+   * @example
+   * ```typescript
+   * // Use default production URL
+   * const client = new BaseClient();
+   *
+   * // Use custom URL for development/testing
+   * const client = new BaseClient("https://dev-api.bentley.com/itwins");
+   * ```
+   */
   public constructor(url?: string) {
     if (url !== undefined) {
       this._baseUrl = url;
@@ -92,7 +138,10 @@ export class BaseClient {
   }
 
   /**
-   * Sends a generic API request with type safety and response validation
+   * Sends a generic API request with type safety and response validation.
+   * Handles authentication, error responses, and data extraction automatically.
+   * Error responses follow APIM standards for consistent error handling.
+   *
    * @param accessToken - The client access token for authentication
    * @param method - The HTTP method type (GET, POST, DELETE, etc.)
    * @param url - The complete URL of the request endpoint
@@ -100,6 +149,18 @@ export class BaseClient {
    * @param property - Optional target property for response parsing (ex. iTwins, repositories, etc.)
    * @param headers - Optional additional request headers
    * @returns Promise that resolves to the parsed API response with type safety
+   * @example
+   * ```typescript
+   * // Create new iTwin with POST request
+   * const newTwin = { displayName: "My Project", type: "Asset" };
+   * const response = await this.sendGenericAPIRequest<iTwin, CreateTwinRequest>(
+   *   accessToken,
+   *   "POST",
+   *   "/itwins",
+   *   newTwin,
+   *   "iTwin"
+   * );
+   * ```
    */
   protected async sendGenericAPIRequest<TResponse = unknown, TData = unknown>(
     accessToken: AccessToken,
@@ -134,7 +195,7 @@ export class BaseClient {
             error: errorData,
           };
         }
-        throw new Error("Unknown error occurred");
+        throw new Error("An error occurred while processing the request");
       }
       return {
         status: response.status,
@@ -146,6 +207,7 @@ export class BaseClient {
             : (responseData as TResponse),
       };
     } catch {
+      // Return generic error for security - don't expose internal exception details
       return {
         status: 500,
         error: {
@@ -158,13 +220,27 @@ export class BaseClient {
   }
 
   /**
-   * Creates request configuration options with authentication headers
+   * Creates request configuration options with authentication headers.
+   * Validates required parameters and sets up proper content type for JSON requests.
+   *
    * @param accessTokenString - The client access token string for authorization
    * @param method - The HTTP method type (GET, POST, DELETE, etc.)
    * @param url - The complete URL of the request endpoint
    * @param data - Optional payload data to be JSON stringified for the request body
    * @param headers - Optional additional request headers to include
    * @returns RequestConfig object with method, URL, body, and headers configured
+   * @throws Will throw an error if access token or URL are missing/invalid
+   *
+   * @example
+   * ```typescript
+   * const config = this.createRequestOptions(
+   *   "Bearer abc123...",
+   *   "POST",
+   *   "https://api.bentley.com/itwins",
+   *   { displayName: "My iTwin" },
+   *   { "Accept": "application/vnd.bentley.itwin-platform.v1+json" }
+   * );
+   * ```
    */
   protected createRequestOptions<TData>(
     accessTokenString: string,
@@ -196,107 +272,87 @@ export class BaseClient {
   /**
    * Builds a query string to be appended to a URL from query arguments
    * @param queryArg - Object containing queryable properties for filtering
-   * @param subClass - Optional iTwin subclass filter to apply
    * @returns Query string with parameters applied, ready to append to a URL
+   *
+   * @example
+   * ```typescript
+   * const queryString = this.getQueryStringArg({
+   *   search: "Building A",
+   *   top: 10,
+   *   subClass: "Asset"
+   * });
+   * // Returns: "$search=Building%20A&$top=10&subClass=Asset"
+   * ```
    */
-  protected getQueryStringArgBase(
-    queryArg?: ITwinsQueryArgBase,
-    subClass?: ITwinSubClass
-  ): string {
-    const params: string[] = [];
+  protected getQueryStringArg(queryArg?: ITwinsQueryArg): string {
+    if (!queryArg) return "";
 
-    if (queryArg && queryArg.subClass) {
-      params.push(`subClass=${encodeURIComponent(queryArg.subClass)}`);
-    } else if (subClass) {
-      params.push(`subClass=${encodeURIComponent(subClass)}`);
-    }
-
-    if (!queryArg) {
-      return params.join("&");
-    }
-
-    if (queryArg.includeInactive) {
-      params.push(`includeInactive=${queryArg.includeInactive}`);
-    }
-
-    if (queryArg.top) {
-      params.push(`$top=${queryArg.top}`);
-    }
-
-    if (queryArg.skip) {
-      params.push(`$skip=${queryArg.skip}`);
-    }
-
-    if (queryArg.status) {
-      params.push(`status=${queryArg.status}`);
-    }
-
-    if (queryArg.type) {
-      params.push(`type=${queryArg.type}`);
-    }
-
+    const params = this.buildQueryParams(
+      queryArg,
+      BaseClient.QUERY_PARAM_MAPPING
+    );
     return params.join("&");
-  }
-
-  /**
-   * Builds a comprehensive query string with iTwins-specific parameters
-   * @param queryArg - Object containing queryable properties including search, display name, etc.
-   * @param subClass - Optional iTwin subclass filter to apply
-   * @returns Query string with all iTwins parameters applied, ready to append to a URL
-   */
-  protected getQueryStringArg(
-    queryArg?: ITwinsQueryArg,
-    subClass?: ITwinSubClass
-  ): string {
-    const baseParams = this.getQueryStringArgBase(queryArg, subClass);
-    const additionalParams: string[] = [];
-
-    if (queryArg) {
-      if (queryArg.search) {
-        additionalParams.push(`$search=${encodeURIComponent(queryArg.search)}`);
-      }
-      if (queryArg.displayName) {
-        additionalParams.push(
-          `displayName=${encodeURIComponent(queryArg.displayName)}`
-        );
-      }
-      if (queryArg.number) {
-        additionalParams.push(`number=${encodeURIComponent(queryArg.number)}`);
-      }
-      if (queryArg.parentId) {
-        additionalParams.push(
-          `parentId=${encodeURIComponent(queryArg.parentId)}`
-        );
-      }
-      if (queryArg.iTwinAccountId) {
-        additionalParams.push(
-          `iTwinAccountId=${encodeURIComponent(queryArg.iTwinAccountId)}`
-        );
-      }
-    }
-
-    const allParams = [baseParams, ...additionalParams].filter(Boolean); // filter out falsy values
-    return allParams.join("&");
   }
 
   /**
    * Builds a query string for repository-specific API requests
    * @param queryArg - Object containing repository queryable properties like class and subClass
    * @returns Query string with repository parameters applied, ready to append to a URL
+   *
+   * @example
+   * ```typescript
+   * const queryString = this.getRepositoryQueryString({
+   *   class: "iModel",
+   *   subClass: "Design"
+   * });
+   * // Returns: "class=iModel&subClass=Design"
+   * ```
    */
   protected getRepositoryQueryString(queryArg?: RepositoriesQueryArg): string {
     if (!queryArg) return "";
 
-    const params: string[] = [];
-
-    if (queryArg.class) {
-      params.push(`class=${encodeURIComponent(queryArg.class)}`);
-    }
-
-    if (queryArg.subClass) {
-      params.push(`subClass=${encodeURIComponent(queryArg.subClass)}`);
-    }
-
+    const params = this.buildQueryParams(
+      queryArg,
+      BaseClient.REPOSITORY_PARAM_MAPPING
+    );
     return params.join("&");
+  }
+
+  /**
+   * Helper method to build query parameter array from mapping.
+   * Uses exhaustive parameter mapping to ensure type safety and prevent missing parameters.
+   * Automatically handles URL encoding and filters out excluded parameters.
+   *
+   * @param queryArg - Object containing queryable properties
+   * @param mapping - Parameter mapping configuration that maps object properties to query parameter names
+   * @returns Array of formatted query parameter strings ready for URL construction
+   *
+   * @example
+   * ```typescript
+   * const params = this.buildQueryParams(
+   *   { search: "Building A", top: 10 },
+   *   { search: "$search", top: "$top" }
+   * );
+   * // Returns: ["$search=Building%20A", "$top=10"]
+   * ```
+   */
+  private buildQueryParams<T>(
+    queryArg: T,
+    mapping: ParameterMapping<T>
+  ): string[] {
+    const params: string[] = [];
+    // Type assertion constrains paramKey to actual property names and mappedValue to the specific strings from the mapping
+    // Narrows from set of all strings to only valid keys/values
+    for (const [paramKey, mappedValue] of Object.entries(mapping) as [keyof T, ParameterMapping<T>[keyof T]][]) {
+      if (mappedValue === "") continue;
+      const queryArgValue = queryArg[paramKey];
+      if (queryArgValue !== undefined && queryArgValue !== null) {
+        const stringValue = String(queryArgValue);
+        params.push(
+          `${mappedValue}=${encodeURIComponent(stringValue)}`
+        );
+      }
+    }
+    return params;
   }
 }
