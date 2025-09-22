@@ -1,6 +1,6 @@
 {
   "type": "patch",
-  "comment": "feat: replace axios with fetch and refactor query parameter handling with type-safe mappings",
+  "comment": "feat: replace axios with fetch and refactor base client",
   "packageName": "@itwin/itwins-client",
   "email": "caleb.german@bentley.com",
   "dependentChangeType": "patch"
