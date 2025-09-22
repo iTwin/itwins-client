@@ -6,16 +6,56 @@
  * @module iTwinsClient
  */
 import type { AccessToken } from "@itwin/core-bentley";
-import type { Method } from "axios";
-import type { AxiosRequestConfig } from "axios";
-import axios from "axios";
 import type {
+  Error,
   ITwinsAPIResponse,
   ITwinsQueryArg,
-  ITwinsQueryArgBase,
-  ITwinSubClass,
   RepositoriesQueryArg,
 } from "./iTwinsAccessProps";
+import { hasProperty, ParameterMapping } from "./types/typeUtils";
+
+/**
+ * Common HTTP methods used in API requests
+ */
+export type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+
+/**
+ * Configuration object for HTTP requests
+ */
+interface RequestConfig {
+  method: Method;
+  url: string;
+  body?: string;
+  headers: Record<string, string>;
+}
+
+/**
+ * Type guard to validate if an object is a valid Error structure
+ * @param error - Unknown object to validate
+ * @returns True if the object is a valid Error type
+ */
+function isValidError(error: unknown): error is Error {
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
+
+  const obj = error as Record<string, unknown>;
+  return typeof obj.code === "string" && typeof obj.message === "string";
+}
+
+/**
+ * Type guard to validate if response data contains an error
+ * @param data - Unknown response data to validate
+ * @returns True if the data contains a valid Error object
+ */
+function isErrorResponse(data: unknown): data is { error: Error } {
+  if (typeof data !== "object" || data === null) {
+    return false;
+  }
+
+  const obj = data as Record<string, unknown>;
+  return "error" in obj && isValidError(obj.error);
+}
 
 /**
  * Base client class providing common functionality for iTwins API requests.
@@ -24,6 +64,66 @@ import type {
 export class BaseClient {
   protected _baseUrl: string = "https://api.bentley.com/itwins";
 
+
+  /**
+   * Maps the properties of {@link ITwinsQueryArg} to their corresponding query parameter names.
+   *
+   * @remarks
+   * This mapping is used to translate internal property names to the expected parameter names
+   * when constructing iTwins queries. Properties mapped to empty strings are excluded from
+   * the query string as they should be sent as headers instead.
+   *
+   * The mapping includes both OData query parameters (prefixed with $) and iTwins-specific
+   * parameters for filtering and pagination.
+   *
+   * @readonly
+   */
+  private static readonly QUERY_PARAM_MAPPING: ParameterMapping<ITwinsQueryArg> =
+    {
+      subClass: "subClass",
+      type: "type",
+      status: "status",
+      search: "$search",
+      displayName: "displayName",
+      // eslint-disable-next-line id-denylist
+      number: "number",
+      top: "$top",
+      skip: "$skip",
+      parentId: "parentId",
+      iTwinAccountId: "iTwinAccountId",
+      includeInactive: "includeInactive",
+      resultMode: "",
+      queryScope: "",
+    };
+
+  /**
+   * Maps the properties of {@link RepositoriesQueryArg} to their corresponding query parameter names.
+   *
+   * @remarks
+   * This mapping is used to translate internal property names to the expected parameter names
+   * when constructing repository queries.
+   *
+   * @readonly
+   */
+  private static readonly REPOSITORY_PARAM_MAPPING: ParameterMapping<RepositoriesQueryArg> =
+    {
+      class: "class",
+      subClass: "subClass",
+    } as const;
+
+  /**
+   * Creates a new BaseClient instance for iTwins API operations
+   * @param url - Optional custom base URL, defaults to production iTwins API URL
+   *
+   * @example
+   * ```typescript
+   * // Use default production URL
+   * const client = new BaseClient();
+   *
+   * // Use custom URL for development/testing
+   * const client = new BaseClient("https://dev-api.bentley.com/itwins");
+   * ```
+   */
   public constructor(url?: string) {
     if (url !== undefined) {
       this._baseUrl = url;
@@ -31,52 +131,83 @@ export class BaseClient {
       const urlPrefix = process.env.IMJS_URL_PREFIX;
       if (urlPrefix) {
         const baseUrl = new URL(this._baseUrl);
-        baseUrl.hostname = urlPrefix + baseUrl.hostname;
+        baseUrl.hostname = `${urlPrefix}${baseUrl.hostname}`;
         this._baseUrl = baseUrl.href;
       }
     }
   }
 
   /**
-   * Sends a basic API request
-   * @param accessToken The client access token string
-   * @param method The method type of the request (ex. GET, POST, DELETE, etc.)
-   * @param url The url of the request
-   * @param data (Optional) The payload of the request
-   * @param property (Optional) The target property (ex. iTwins, repositories, etc.)
-   * @param headers (Optional) Extra request headers.
+   * Sends a generic API request with type safety and response validation.
+   * Handles authentication, error responses, and data extraction automatically.
+   * Error responses follow APIM standards for consistent error handling.
+   *
+   * @param accessToken - The client access token for authentication
+   * @param method - The HTTP method type (GET, POST, DELETE, etc.)
+   * @param url - The complete URL of the request endpoint
+   * @param data - Optional payload data for the request body
+   * @param property - Optional target property for response parsing (ex. iTwins, repositories, etc.)
+   * @param headers - Optional additional request headers
+   * @returns Promise that resolves to the parsed API response with type safety
+   * @example
+   * ```typescript
+   * // Create new iTwin with POST request
+   * const newTwin = { displayName: "My Project", type: "Asset" };
+   * const response = await this.sendGenericAPIRequest<iTwin, CreateTwinRequest>(
+   *   accessToken,
+   *   "POST",
+   *   "/itwins",
+   *   newTwin,
+   *   "iTwin"
+   * );
+   * ```
    */
-  protected async sendGenericAPIRequest(
+  protected async sendGenericAPIRequest<TResponse = unknown, TData = unknown>(
     accessToken: AccessToken,
     method: Method,
     url: string,
-    data?: any,
+    data?: TData,
     property?: string,
-    headers?: Record<string, string | number | boolean>
-  ): Promise<ITwinsAPIResponse<any>> {
-    // TODO: Change any response
-    const requestOptions = this.getRequestOptions(
-      accessToken,
-      method,
-      url,
-      data,
-      headers
-    );
-
+    headers?: Record<string, string>
+  ): Promise<ITwinsAPIResponse<TResponse>> {
     try {
-      const response = await axios(requestOptions);
+      const requestOptions = this.createRequestOptions(
+        accessToken,
+        method,
+        url,
+        data,
+        headers
+      );
 
+      const response = await fetch(requestOptions.url, {
+        method: requestOptions.method,
+        headers: requestOptions.headers,
+        body: requestOptions.body,
+      });
+      const responseData =
+        response.status !== 204 ? await response.json() : undefined;
+
+      if (!response.ok) {
+        if (isErrorResponse(responseData)) {
+          const errorData: Error = responseData.error;
+          return {
+            status: response.status,
+            error: errorData,
+          };
+        }
+        throw new Error("An error occurred while processing the request");
+      }
       return {
         status: response.status,
         data:
-          response.data.error || response.data === ""
+          responseData === undefined || responseData === ""
             ? undefined
-            : property
-              ? response.data[property]
-              : response.data,
-        error: response.data.error,
+            : property && hasProperty(responseData, property)
+            ? (responseData[property] as TResponse)
+            : (responseData as TResponse),
       };
     } catch {
+      // Return generic error for security - don't expose internal exception details
       return {
         status: 500,
         error: {
@@ -89,139 +220,139 @@ export class BaseClient {
   }
 
   /**
-   * Build the request methods, headers, and other options
-   * @param accessTokenString The client access token string
-   * @param method The method type of the request (ex. GET, POST, DELETE, etc.)
-   * @param url The url of the request
-   * @param data (Optional) The payload of the request
-   * @param headers (Optional) Extra request headers.
+   * Creates request configuration options with authentication headers.
+   * Validates required parameters and sets up proper content type for JSON requests.
+   *
+   * @param accessTokenString - The client access token string for authorization
+   * @param method - The HTTP method type (GET, POST, DELETE, etc.)
+   * @param url - The complete URL of the request endpoint
+   * @param data - Optional payload data to be JSON stringified for the request body
+   * @param headers - Optional additional request headers to include
+   * @returns RequestConfig object with method, URL, body, and headers configured
+   * @throws Will throw an error if access token or URL are missing/invalid
+   *
+   * @example
+   * ```typescript
+   * const config = this.createRequestOptions(
+   *   "Bearer abc123...",
+   *   "POST",
+   *   "https://api.bentley.com/itwins",
+   *   { displayName: "My iTwin" },
+   *   { "Accept": "application/vnd.bentley.itwin-platform.v1+json" }
+   * );
+   * ```
    */
-  protected getRequestOptions(
+  protected createRequestOptions<TData>(
     accessTokenString: string,
     method: Method,
     url: string,
-    data?: any,
-    headers: Record<string, string | number | boolean> = {}
-  ): AxiosRequestConfig {
+    data?: TData,
+    headers: Record<string, string> = {}
+  ): RequestConfig {
+    if (!accessTokenString) {
+      throw new Error("Access token is required");
+    }
+
+    if (!url) {
+      throw new Error("URL is required");
+    }
+
     return {
       method,
       url,
-      data,
+      body: data ? JSON.stringify(data) : undefined,
       headers: {
         ...headers,
-        "authorization": accessTokenString,
+        authorization: accessTokenString,
         "content-type": "application/json",
-      },
-      validateStatus(status: number) {
-        return status < 500; // Resolve only if the status code is less than 500
       },
     };
   }
 
   /**
-    * Build a query to be appended to a URL
-    * @param queryArg Object container queryable properties
-    * @returns query string with AccessControlQueryArg applied, which should be appended to a url
-    */
-  protected getQueryStringArgBase(queryArg?: ITwinsQueryArgBase, subClass?: ITwinSubClass): string {
-    let queryString = "";
-
-    if (queryArg && queryArg.subClass) {
-      queryString += `subClass=${queryArg.subClass}`;
-    } else if (subClass) {
-      queryString += `subClass=${subClass}`;
-    }
-
-    if(!queryArg) {
-      return queryString;
-    }
-
-    if (queryArg.includeInactive) {
-      queryString += `&includeInactive=${queryArg.includeInactive}`;
-    }
-
-    if (queryArg.top) {
-      queryString += `&$top=${queryArg.top}`;
-    }
-
-    if (queryArg.skip) {
-      queryString += `&$skip=${queryArg.skip}`;
-    }
-
-    if (queryArg.status) {
-      queryString += `&status=${queryArg.status}`;
-    }
-
-    if (queryArg.type) {
-      queryString += `&type=${queryArg.type}`;
-    }
-
-    // trim & from start of string
-    queryString.replace(/^&+/, "");
-
-    return queryString;
-  }
-
-  /**
-   * Build a query to be appended to a URL
-   * @param queryArg Object container queryable properties
-   * @returns query string with AccessControlQueryArg applied, which should be appended to a url
+   * Builds a query string to be appended to a URL from query arguments
+   * @param queryArg - Object containing queryable properties for filtering
+   * @returns Query string with parameters applied, ready to append to a URL
+   *
+   * @example
+   * ```typescript
+   * const queryString = this.getQueryStringArg({
+   *   search: "Building A",
+   *   top: 10,
+   *   subClass: "Asset"
+   * });
+   * // Returns: "$search=Building%20A&$top=10&subClass=Asset"
+   * ```
    */
-  protected getQueryStringArg(queryArg?: ITwinsQueryArg, subClass?: ITwinSubClass): string {
-    let queryString = this.getQueryStringArgBase(queryArg, subClass);
+  protected getQueryStringArg(queryArg?: ITwinsQueryArg): string {
+    if (!queryArg) return "";
 
-    if(!queryArg) {
-      return queryString;
-    }
-
-    if (queryArg.search) {
-      queryString += `&$search=${queryArg.search}`;
-    }
-
-    if (queryArg.displayName) {
-      queryString += `&displayName=${queryArg.displayName}`;
-    }
-
-    if (queryArg.number) {
-      queryString += `&number=${queryArg.number}`;
-    }
-
-    if (queryArg.parentId) {
-      queryString += `&parentId=${queryArg.parentId}`;
-    }
-
-    if (queryArg.iTwinAccountId) {
-      queryString += `&iTwinAccountId=${queryArg.iTwinAccountId}`;
-    }
-
-    // trim & from start of string
-    queryString.replace(/^&+/, "");
-
-    return queryString;
+    const params = this.buildQueryParams(
+      queryArg,
+      BaseClient.QUERY_PARAM_MAPPING
+    );
+    return params.join("&");
   }
 
   /**
-   * Build a query to be appended to the URL for iTwin Repositories
-   * @param queryArg Object container queryable properties
-   * @returns query string with RepositoriesQueryArg applied, which should be appended to a url
+   * Builds a query string for repository-specific API requests
+   * @param queryArg - Object containing repository queryable properties like class and subClass
+   * @returns Query string with repository parameters applied, ready to append to a URL
+   *
+   * @example
+   * ```typescript
+   * const queryString = this.getRepositoryQueryString({
+   *   class: "iModel",
+   *   subClass: "Design"
+   * });
+   * // Returns: "class=iModel&subClass=Design"
+   * ```
    */
   protected getRepositoryQueryString(queryArg?: RepositoriesQueryArg): string {
-    if(!queryArg)
-      return "";
+    if (!queryArg) return "";
 
-    let queryString = "";
+    const params = this.buildQueryParams(
+      queryArg,
+      BaseClient.REPOSITORY_PARAM_MAPPING
+    );
+    return params.join("&");
+  }
 
-    if (queryArg.class) {
-      queryString += `class=${queryArg.class}`;
+  /**
+   * Helper method to build query parameter array from mapping.
+   * Uses exhaustive parameter mapping to ensure type safety and prevent missing parameters.
+   * Automatically handles URL encoding and filters out excluded parameters.
+   *
+   * @param queryArg - Object containing queryable properties
+   * @param mapping - Parameter mapping configuration that maps object properties to query parameter names
+   * @returns Array of formatted query parameter strings ready for URL construction
+   *
+   * @example
+   * ```typescript
+   * const params = this.buildQueryParams(
+   *   { search: "Building A", top: 10 },
+   *   { search: "$search", top: "$top" }
+   * );
+   * // Returns: ["$search=Building%20A", "$top=10"]
+   * ```
+   */
+  private buildQueryParams<T>(
+    queryArg: T,
+    mapping: ParameterMapping<T>
+  ): string[] {
+    const params: string[] = [];
+    // Type assertion constrains paramKey to actual property names and mappedValue to the specific strings from the mapping
+    // Narrows from set of all strings to only valid keys/values
+    for (const [paramKey, mappedValue] of Object.entries(mapping) as [keyof T, ParameterMapping<T>[keyof T]][]) {
+      if (mappedValue === "") continue;
+      const queryArgValue = queryArg[paramKey];
+      if (queryArgValue !== undefined && queryArgValue !== null) {
+        const stringValue = String(queryArgValue);
+        params.push(
+          `${mappedValue}=${encodeURIComponent(stringValue)}`
+        );
+      }
     }
-
-    if (queryArg.subClass) {
-      queryString += `&subClass=${queryArg.subClass}`;
-    }
-
-    // trim & from start of string
-    queryString.replace(/^&+/, "");
-
-    return queryString;
+    return params;
   }
 }

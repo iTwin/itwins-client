@@ -2,6 +2,7 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
+/* eslint-disable @typescript-eslint/no-deprecated */
 /** @packageDocumentation
  * @module iTwinsClient
  */
@@ -44,9 +45,10 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = this._baseUrl;
+    const mergedQueryArgs = arg ?? {};
+    subClass ? mergedQueryArgs.subClass = subClass : undefined;
 
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const query = this.getQueryStringArg(arg, subClass);
+    const query = this.getQueryStringArg(mergedQueryArgs);
     if (query !== "")
       url += `?${query}`;
 
@@ -177,9 +179,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites`;
-
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const query = this.getQueryStringArgBase(arg, subClass);
+    const mergedQueryArgs = arg ?? {};
+    subClass ? mergedQueryArgs.subClass = subClass : undefined;
+    const query = this.getQueryStringArg(mergedQueryArgs);
     if (query !== "")
       url += `?${query}`;
 
@@ -202,9 +204,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<ITwinsAPIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
-
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const query = this.getQueryStringArgBase(arg, subClass);
+    const mergedQueryArgs = arg ?? {};
+    subClass ? mergedQueryArgs.subClass = subClass : undefined;
+    const query = this.getQueryStringArg(mergedQueryArgs);
     if (query !== "")
       url += `?${query}`;
 
