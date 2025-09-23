@@ -2,24 +2,24 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-/* eslint-disable @typescript-eslint/no-deprecated */
 /** @packageDocumentation
  * @module iTwinsClient
  */
 import type { AccessToken } from "@itwin/core-bentley";
 import { BaseClient } from "./BaseClient";
 import type {
-  ITwin,
+  ITwinExport,
+  ITwinExportMultiResponse,
+  ITwinExportQueryArgs,
+  ITwinExportSingleResponse,
   ITwinQueryScope,
-  ITwinResultMode,
   ITwinsAccess,
-  ITwinsAPIResponse,
   ITwinsQueryArg,
-  ITwinsQueryArgBase,
-  ITwinSubClass,
   RepositoriesQueryArg,
-  Repository,
 } from "./iTwinsAccessProps";
+import { APIResponse, ResultMode } from "./types/CommonApiTypes.ts";
+import { ITwin } from "./types/ITwin";
+import { Repository } from "./types/Repository";
 
 /** Client API to access the itwins service.
  * @beta
@@ -29,30 +29,61 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     super(url);
   }
 
+  getExports(accessToken: AccessToken): Promise<APIResponse<ITwinExportMultiResponse>> {
+    const url = `${this._baseUrl}/exports`;
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
+  }
+
+  getExport(
+    accessToken: AccessToken,
+    id: string
+  ): Promise<APIResponse<ITwinExportSingleResponse>> {
+    const url = `${this._baseUrl}/exports/${id}`;
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
+  }
+
+  /**
+   * Create a new iTwin export
+   * @param accessToken The client access token string
+   * @param args Export query arguments including scope, filters, and output format
+   * @returns Export response with operation details
+   */
+  public async createExport(
+    accessToken: AccessToken,
+    args: ITwinExportQueryArgs
+  ): Promise<APIResponse<ITwinExportSingleResponse>> {
+    const url = `${this._baseUrl}/exports`;
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "POST",
+      url,
+      args,
+      undefined
+    );
+  }
+
   /** Get itwins accessible to the user
    * @param accessToken The client access token string
-   * @param subClass Optional parameter to search a specific iTwin subClass
    * @param arg Optional query arguments, for paging, searching, and filtering
    * @returns Array of projects, may be empty
    */
   public async queryAsync(
     accessToken: AccessToken,
-    /**
-     * @deprecated in 2.0 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
-     */
-    subClass?: ITwinSubClass,
     arg?: ITwinsQueryArg
-  ): Promise<ITwinsAPIResponse<ITwin[]>> {
+  ): Promise<APIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = this._baseUrl;
-    const mergedQueryArgs = arg ?? {};
-    subClass ? mergedQueryArgs.subClass = subClass : undefined;
+    const query = this.getQueryStringArg(arg);
+    if (query !== "") url += `?${query}`;
 
-    const query = this.getQueryStringArg(mergedQueryArgs);
-    if (query !== "")
-      url += `?${query}`;
-
-    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      "iTwins",
+      headers
+    );
   }
 
   /** Create a new iTwin
@@ -63,7 +94,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async createiTwin(
     accessToken: AccessToken,
     iTwin: ITwin
-  ): Promise<ITwinsAPIResponse<ITwin>> {
+  ): Promise<APIResponse<ITwin>> {
     const url = `${this._baseUrl}/`;
     return this.sendGenericAPIRequest(accessToken, "POST", url, iTwin, "iTwin");
   }
@@ -78,9 +109,15 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     accessToken: AccessToken,
     iTwinId: string,
     iTwin: ITwin
-  ): Promise<ITwinsAPIResponse<ITwin>> {
+  ): Promise<APIResponse<ITwin>> {
     const url = `${this._baseUrl}/${iTwinId}`;
-    return this.sendGenericAPIRequest(accessToken, "PATCH", url, iTwin, "iTwin");
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "PATCH",
+      url,
+      iTwin,
+      "iTwin"
+    );
   }
 
   /** Delete the specified iTwin
@@ -91,7 +128,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async deleteiTwin(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<ITwinsAPIResponse<undefined>> {
+  ): Promise<APIResponse<undefined>> {
     const url = `${this._baseUrl}/${iTwinId}`;
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
@@ -106,9 +143,15 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     accessToken: AccessToken,
     iTwinId: string,
     repository: Repository
-  ): Promise<ITwinsAPIResponse<Repository>> {
+  ): Promise<APIResponse<Repository>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories`;
-    return this.sendGenericAPIRequest(accessToken, "POST", url, repository, "repository");
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "POST",
+      url,
+      repository,
+      "repository"
+    );
   }
 
   /** Delete the specified iTwin Repository
@@ -121,7 +164,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     accessToken: AccessToken,
     iTwinId: string,
     repositoryId: string
-  ): Promise<ITwinsAPIResponse<undefined>> {
+  ): Promise<APIResponse<undefined>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}`;
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
@@ -136,15 +179,21 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     accessToken: AccessToken,
     iTwinId: string,
     arg?: RepositoriesQueryArg
-  ): Promise<ITwinsAPIResponse<Repository[]>> {
+  ): Promise<APIResponse<Repository[]>> {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
 
     const query = this.getRepositoryQueryString(arg);
-    if(query !== "") {
+    if (query !== "") {
       url += `?${query}`;
     }
 
-    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "repositories");
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      "repositories"
+    );
   }
 
   /** Get itwin accessible to the user
@@ -156,61 +205,68 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async getAsync(
     accessToken: AccessToken,
     iTwinId: string,
-    resultMode?: ITwinResultMode
-  ): Promise<ITwinsAPIResponse<ITwin>> {
+    resultMode?: ResultMode
+  ): Promise<APIResponse<ITwin>> {
     const headers = this.getResultModeHeaders(resultMode);
     const url = `${this._baseUrl}/${iTwinId}`;
-    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwin", headers);
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      "iTwin",
+      headers
+    );
   }
 
   /** Get itwins accessible to the user
    * @param accessToken The client access token string
-   * @param subClass Optional parameter to search a specific iTwin subClass
    * @param arg Optional query arguments, for paging, searching, and filtering
    * @returns Array of projects, may be empty
    */
   public async queryFavoritesAsync(
     accessToken: AccessToken,
-    /**
-     * @deprecated in 2.0 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
-     */
-    subClass?: ITwinSubClass,
-    arg?: ITwinsQueryArgBase
-  ): Promise<ITwinsAPIResponse<ITwin[]>> {
+    arg?: ITwinsQueryArg
+  ): Promise<APIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites`;
     const mergedQueryArgs = arg ?? {};
-    subClass ? mergedQueryArgs.subClass = subClass : undefined;
     const query = this.getQueryStringArg(mergedQueryArgs);
-    if (query !== "")
-      url += `?${query}`;
+    if (query !== "") url += `?${query}`;
 
-    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      "iTwins",
+      headers
+    );
   }
 
   /** Get itwins accessible to the user
    * @param accessToken The client access token string
-   * @param subClass Optional parameter to search a specific iTwin subClass
    * @param arg Optional query arguments, for paging, searching, and filtering
    * @returns Array of projects, may be empty
    */
   public async queryRecentsAsync(
     accessToken: AccessToken,
-    /**
-     * @deprecated in 2.0 This property is deprecated, and will be removed in the next major release. Please use `arg` to provide subClass instead.
-     */
-    subClass?: ITwinSubClass,
-    arg?: ITwinsQueryArgBase
-  ): Promise<ITwinsAPIResponse<ITwin[]>> {
+    arg?: ITwinsQueryArg
+  ): Promise<APIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
     const mergedQueryArgs = arg ?? {};
-    subClass ? mergedQueryArgs.subClass = subClass : undefined;
     const query = this.getQueryStringArg(mergedQueryArgs);
-    if (query !== "")
-      url += `?${query}`;
+    if (query !== "") url += `?${query}`;
 
-    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwins", headers);
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      "iTwins",
+      headers
+    );
   }
 
   /** Get primary account accessible to the user
@@ -218,9 +274,15 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    */
   public async getPrimaryAccountAsync(
     accessToken: AccessToken
-  ): Promise<ITwinsAPIResponse<ITwin>> {
+  ): Promise<APIResponse<ITwin>> {
     const url = `${this._baseUrl}/myprimaryaccount`;
-    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwin");
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      "iTwin"
+    );
   }
 
   /**
@@ -232,11 +294,18 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   public async getAccountAsync(
     accessToken: AccessToken,
     iTwinId: string,
-    resultMode?: ITwinResultMode
-  ): Promise<ITwinsAPIResponse<ITwin>> {
+    resultMode?: ResultMode
+  ): Promise<APIResponse<ITwin>> {
     const headers = this.getResultModeHeaders(resultMode);
     const url = `${this._baseUrl}/${iTwinId}/account`;
-    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined, "iTwin", headers);
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      "iTwin",
+      headers
+    );
   }
 
   /**
@@ -244,7 +313,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    * @param arg (Optional) iTwin query arguments
    * @protected
    */
-  protected getHeaders(arg?: ITwinsQueryArgBase): Record<string, string> {
+  protected getHeaders(arg?: ITwinsQueryArg): Record<string, string> {
     return {
       ...this.getQueryScopeHeaders(arg && arg.queryScope),
       ...this.getResultModeHeaders(arg && arg.resultMode),
@@ -256,7 +325,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    * @param resultMode (Optional) iTwin result mode
    * @protected
    */
-  protected getResultModeHeaders(resultMode: ITwinResultMode = "minimal"): Record<string, string> {
+  protected getResultModeHeaders(
+    resultMode: ResultMode = "minimal"
+  ): Record<string, string> {
     return {
       prefer: `return=${resultMode}`,
     };
@@ -267,7 +338,9 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    * @param queryScope (Optional) iTwin query scope
    * @protected
    */
-  protected getQueryScopeHeaders(queryScope: ITwinQueryScope = "memberOfItwin"): Record<string, string> {
+  protected getQueryScopeHeaders(
+    queryScope: ITwinQueryScope = "memberOfItwin"
+  ): Record<string, string> {
     return {
       "x-itwin-query-scope": queryScope,
     };

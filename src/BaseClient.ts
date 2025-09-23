@@ -7,12 +7,11 @@
  */
 import type { AccessToken } from "@itwin/core-bentley";
 import type {
-  Error,
-  ITwinsAPIResponse,
   ITwinsQueryArg,
   RepositoriesQueryArg,
 } from "./iTwinsAccessProps";
 import { hasProperty, ParameterMapping } from "./types/typeUtils";
+import { ApimError, APIResponse } from "./types/CommonApiTypes.ts";
 
 /**
  * Common HTTP methods used in API requests
@@ -34,7 +33,7 @@ interface RequestConfig {
  * @param error - Unknown object to validate
  * @returns True if the object is a valid Error type
  */
-function isValidError(error: unknown): error is Error {
+function isValidError(error: unknown): error is ApimError {
   if (typeof error !== "object" || error === null) {
     return false;
   }
@@ -48,7 +47,7 @@ function isValidError(error: unknown): error is Error {
  * @param data - Unknown response data to validate
  * @returns True if the data contains a valid Error object
  */
-function isErrorResponse(data: unknown): data is { error: Error } {
+function isErrorResponse(data: unknown): data is { error: ApimError} {
   if (typeof data !== "object" || data === null) {
     return false;
   }
@@ -169,7 +168,7 @@ export class BaseClient {
     data?: TData,
     property?: string,
     headers?: Record<string, string>
-  ): Promise<ITwinsAPIResponse<TResponse>> {
+  ): Promise<APIResponse<TResponse>> {
     try {
       const requestOptions = this.createRequestOptions(
         accessToken,
@@ -189,10 +188,9 @@ export class BaseClient {
 
       if (!response.ok) {
         if (isErrorResponse(responseData)) {
-          const errorData: Error = responseData.error;
           return {
             status: response.status,
-            error: errorData,
+            error: responseData.error,
           };
         }
         throw new Error("An error occurred while processing the request");

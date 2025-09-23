@@ -7,182 +7,128 @@
  */
 
 import type { AccessToken } from "@itwin/core-bentley";
-
-/** Methods for accessing itwins
- * @beta
- */
-export interface ITwinsAccess {
-  /** Get iTwins */
-  queryAsync(
-    accessToken: AccessToken,
-    subClass?: ITwinSubClass,
-    arg?: ITwinsQueryArg
-  ): Promise<ITwinsAPIResponse<ITwin[]>>;
-
-  /** Get iTwins */
-  queryRepositoriesAsync(
-    accessToken: AccessToken,
-    iTwinId: string
-  ): Promise<ITwinsAPIResponse<Repository[]>>;
-
-  /** Get an ITwin */
-  getAsync(
-    accessToken: AccessToken,
-    iTwinId: string,
-    resultMode?: ITwinResultMode
-  ): Promise<ITwinsAPIResponse<ITwin>>;
-
-  /** Get favorited iTwins */
-  queryFavoritesAsync(
-    accessToken: AccessToken,
-    subClass?: ITwinSubClass,
-    arg?: ITwinsQueryArgBase
-  ): Promise<ITwinsAPIResponse<ITwin[]>>;
-
-  /** Get recent iTwins */
-  queryRecentsAsync(
-    accessToken: AccessToken,
-    subClass?: ITwinSubClass,
-    arg?: ITwinsQueryArgBase
-  ): Promise<ITwinsAPIResponse<ITwin[]>>;
-
-  /** Get the primary account ITwin */
-  getPrimaryAccountAsync(
-    accessToken: AccessToken
-  ): Promise<ITwinsAPIResponse<ITwin>>;
-
-  /* Get the account for an iTwin */
-  getAccountAsync(
-    accessToken: AccessToken,
-    iTwinId: string,
-    resultMode?: ITwinResultMode
-  ): Promise<ITwinsAPIResponse<ITwin>>;
-}
-
-/**
- * Standard response structure for all iTwins API operations
- * @template T The type of data returned in the response
- */
-export interface ITwinsAPIResponse<T> {
-  data?: T;
-  status: number;
-  error?: Error;
-}
-
-/** The ITwin object. Contains extra properties with "representation" result mode.
- * @beta
- */
-export interface ITwin {
-  id?: string;
-  class?: ITwinClass;
-  subClass?: ITwinSubClass;
-  type?: string;
-  displayName?: string;
-  // eslint-disable-next-line id-denylist
-  number?: string;
-  dataCenterLocation?: string;
-  status?: string;
-
-  // extra properties available with "representation" result mode:
-  parentId?: string;
-  iTwinAccountId?: string;
-  ianaTimeZone?: string | null;
-  imageName?: string | null;
-  image?: string | null;
-  createdDateTime?: string;
-  createdBy?: string;
-  geographicLocation?: string;
-}
-
-/** The simplified Repository object
- * @beta
- */
-export interface Repository {
-  id?: string;
-  class: RepositoryClass;
-  subClass: RepositorySubClass;
-  uri: string;
-}
-
-/**
- * iTwin sub-classification types
- */
-export enum ITwinSubClass {
-  Account = "Account",
-  Asset = "Asset",
-  Project = "Project",
-  Portfolio = "Portfolio",
-  Program = "Program",
-  WorkPackage = "WorkPackage",
-}
-
-/**
- * iTwin main classification types
- */
-export enum ITwinClass {
-  Account = "Account",
-  Thing = "Thing",
-  Endeavor = "Endeavor",
-}
-
-/**
- * Repository classification types for different data sources
- * @beta
- */
-export enum RepositoryClass {
-  iModels = "iModels",
-  Storage = "Storage",
-  Forms = "Forms",
-  Issues = "Issues",
-  RealityData = "RealityData",
-  GeographicInformationSystem = "GeographicInformationSystem"
-}
-
-/**
- * Repository sub-classification types for specific data source implementations
- * @beta
- */
-export enum RepositorySubClass {
-  WebMapService = "WebMapService",
-  WebMapTileService = "WebMapTileService",
-  ArcGIS = "ArcGIS",
-  UrlTemplate = "UrlTemplate",
-}
-
-/**
- * Optional result mode. Minimal is the default, representation returns extra properties
- */
-export type ITwinResultMode = "minimal" | "representation";
+import { ITwin, ITwinSubClass } from "./types/ITwin";
+import { APIResponse, ResultMode } from "./types/CommonApiTypes.ts";
+import { Repository } from "./types/Repository";
 
 /**
  * Optional query scope. MemberOfITwin is the default. This is used to expand the scope of the query to all iTwins you have access to, not just ones that you are a member of, which only applies to organization administrators.
  */
-export type ITwinQueryScope = "memberOfItwin" | "all";
+export type ITwinQueryScope = "memberOfItwin" | "all" | "OrganizationAdmin";
 
-/** Set of optional arguments used for querying the iTwins API
- * @beta
+/**
+ * Query scope options for iTwin export operations
  */
-export interface ITwinsQueryArg extends ITwinsQueryArgBase {
-  search?: string;
-  displayName?: string;
-  // eslint-disable-next-line id-denylist
-  number?: string;
-  parentId?: string;
-  iTwinAccountId?: string;
+export type ExportQueryScope = "MemberOfiTwin" | "OrganizationAdmin";
+
+/**
+ * Available output formats for iTwin exports
+ */
+export type ExportOutputFormat =
+  | "JsonGZip"
+  | "JsonZipArchive"
+  | "CsvGZip"
+  | "Csv";
+
+/**
+ * Status of an iTwin export operation
+ */
+export type ExportStatus = "Queued" | "InProgress" | "Completed" | "Failed";
+
+/**
+ * Response interface for iTwin export operations
+ */
+export interface ITwinExportSingleResponse {
+  export: ITwinExport;
+}
+
+export interface ITwinExportMultiResponse {
+  exports: ITwinExport[];
+}
+
+export interface ITwinExport {
+  /** Unique identifier for the export operation */
+  id: string;
+  /** Original request parameters used to create the export */
+  request: ITwinExportQueryArgs;
+  /** Current status of the export operation */
+  status: ExportStatus;
+  /** URL to download the completed export file (null until completed) */
+  outputUrl: string | null;
+  /** Identifier of the user who created this export */
+  createdBy: string;
+  /** ISO 8601 timestamp when the export was created */
+  createdDateTime: string;
+  /** ISO 8601 timestamp when the export processing started (null if not started) */
+  startedDateTime: string | null;
+  /** ISO 8601 timestamp when the export was completed (null if not completed) */
+  completedDateTime: string | null;
+}
+
+/**
+ * Arguments for creating an iTwin export
+ */
+export interface ITwinExportQueryArgs {
+  /** Export scope - MemberOfiTwin (default) or OrganizationAdmin */
+  queryScope?: ExportQueryScope;
+  /** Comma-delimited list of iTwin subClasses to include (e.g., 'Asset,Project') */
+  subClass?: string;
+  /**
+   * Comma-delimited list of iTwin properties to include in export.
+   * Keep the list as small as possible to increase speed and limit file size.
+   * If not specified, exports minimal representation: id,class,subClass,type,number,displayName
+   */
+  select?: string;
+  /**
+   * OData filter to limit exported iTwins. Use subClass property for basic filtering,
+   * then use filter for additional criteria. All text values are case insensitive.
+   *
+   * Examples:
+   * - status+in+['Active','Inactive']
+   * - status+eq+'Active'+and+contains('test',number)+and+CreatedDateTime+ge+2023-01-01T00:00:00Z
+   * - parentId+eq+'78202ffd-272b-4207-a7ad-7d2b1af5dafc'+and+(startswith('ABC',number)+or+startswith('ABC',displayName))
+   */
+  filter?: string;
+  /** Include inactive iTwins in the export */
+  includeInactive?: boolean;
+  /** Required output format for the export file */
+  outputFormat: ExportOutputFormat;
 }
 
 /**
  * Base set of query arguments for iTwins API operations
  */
-export interface ITwinsQueryArgBase {
+export interface ITwinsQueryArg extends ITwinsQueryArgsApi {
   subClass?: ITwinSubClass;
   status?: string;
   type?: string;
-  top?: number;
-  skip?: number;
   includeInactive?: boolean;
-  resultMode?: ITwinResultMode;
+  displayName?: string;
+  // eslint-disable-next-line id-denylist
+  number?: string;
+  parentId?: string;
+  iTwinAccountId?: string;
+}
+
+/**
+ * API-level query arguments for iTwins operations.
+ *
+ * These parameters control result formatting, paging, and search for API requests.
+ * They are typically sent as query parameters or headers depending on the parameter type.
+ *
+ * @public
+ */
+export interface ITwinsQueryArgsApi {
+  /** Controls the level of detail in the response (minimal or representation) */
+  resultMode?: ResultMode;
+  /** Limits the scope of the query (memberOfItwin, all, OrganizationAdmin) */
   queryScope?: ITwinQueryScope;
+  /** Maximum number of results to return (for pagination) */
+  top?: number;
+  /** Number of results to skip (for pagination) */
+  skip?: number;
+  /** Search string to filter results by keyword */
+  search?: string;
 }
 
 /**
@@ -193,21 +139,65 @@ export interface RepositoriesQueryArg {
   subClass?: string;
 }
 
-/**
- * Error response structure from iTwins API
+/** Methods for accessing itwins
+ * @beta
  */
-export interface Error {
-  code: string;
-  message: string;
-  details?: ErrorDetail[];
-  target?: string;
-}
+export interface ITwinsAccess {
+  /** Create a new iTwin export */
+  createExport(
+    accessToken: AccessToken,
+    args: ITwinExportQueryArgs
+  ): Promise<APIResponse<ITwinExportSingleResponse>>;
 
-/**
- * Detailed error information from iTwins API responses
- */
-export interface ErrorDetail {
-  code: string;
-  message: string;
-  target?: string;
+  /** Create a new iTwin export */
+  getExport(
+    accessToken: AccessToken,
+    id: string
+  ): Promise<APIResponse<ITwinExportSingleResponse>>;
+
+  /** Get a list of iTwin exports for user */
+  getExports(
+    accessToken: AccessToken,
+  ): Promise<APIResponse<ITwinExportMultiResponse>>;
+
+  /** Get iTwins */
+  queryAsync(
+    accessToken: AccessToken,
+    arg?: ITwinsQueryArg
+  ): Promise<APIResponse<ITwin[]>>;
+
+  /** Get iTwins */
+  queryRepositoriesAsync(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<APIResponse<Repository[]>>;
+
+  /** Get an ITwin */
+  getAsync(
+    accessToken: AccessToken,
+    iTwinId: string,
+    resultMode?: ResultMode
+  ): Promise<APIResponse<ITwin>>;
+
+  /** Get favorited iTwins */
+  queryFavoritesAsync(
+    accessToken: AccessToken,
+    arg?: ITwinsQueryArg
+  ): Promise<APIResponse<ITwin[]>>;
+
+  /** Get recent iTwins */
+  queryRecentsAsync(
+    accessToken: AccessToken,
+    arg?: ITwinsQueryArg
+  ): Promise<APIResponse<ITwin[]>>;
+
+  /** Get the primary account ITwin */
+  getPrimaryAccountAsync(accessToken: AccessToken): Promise<APIResponse<ITwin>>;
+
+  /* Get the account for an iTwin */
+  getAccountAsync(
+    accessToken: AccessToken,
+    iTwinId: string,
+    resultMode?: ResultMode
+  ): Promise<APIResponse<ITwin>>;
 }
