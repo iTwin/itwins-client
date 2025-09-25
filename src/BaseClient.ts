@@ -24,7 +24,7 @@ export type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 interface RequestConfig {
   method: Method;
   url: string;
-  body?: string;
+  body?: string | Blob;
   headers: Record<string, string>;
 }
 
@@ -254,15 +254,20 @@ export class BaseClient {
     if (!url) {
       throw new Error("URL is required");
     }
-
+    let body: string | Blob | undefined;
+    if(!(data instanceof Blob)){
+      body = JSON.stringify(data);
+    }else{
+      body = data;
+    }
     return {
       method,
       url,
-      body: data ? JSON.stringify(data) : undefined,
+      body,
       headers: {
         ...headers,
         authorization: accessTokenString,
-        "content-type": "application/json",
+        "content-type": headers.contentType || headers["content-type"] ? headers.contentType || headers["content-type"] : "application/json",
       },
     };
   }

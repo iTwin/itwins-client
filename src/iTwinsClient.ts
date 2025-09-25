@@ -10,6 +10,7 @@ import { BaseClient } from "./BaseClient";
 import type {
   ITwinExportMultiResponse,
   ITwinExportSingleResponse,
+  ITwinImageResponse,
   ITwinQueryScope,
   ITwinsAccess,
   ITwinsQueryArg,
@@ -28,6 +29,10 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     super(url);
   }
 
+  /** Get a list of iTwin exports for the current user
+   * @param accessToken The client access token string
+   * @returns Promise that resolves with an array of export operations
+   */
   public async getExports(
     accessToken: AccessToken
   ): Promise<APIResponse<ITwinExportMultiResponse>> {
@@ -35,6 +40,11 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
   }
 
+  /** Get details of a specific iTwin export operation
+   * @param accessToken The client access token string
+   * @param id The id of the export operation to retrieve
+   * @returns Promise that resolves with the export operation details
+   */
   public async getExport(
     accessToken: AccessToken,
     id: string
@@ -110,6 +120,56 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     iTwinId?: string
   ): Promise<APIResponse<undefined>> {
     const url = `${this._baseUrl}/favorites/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "DELETE", url);
+  }
+
+  /** Upload an image to the specified iTwin
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin to upload the image to
+   * @param imageBlob The image file as a Blob (must be PNG or JPEG)
+   * @param contentType The content type of the image ("image/png" | "image/jpeg")
+   * @returns Promise that resolves with the uploaded image details including URLs for small and large versions
+   */
+  public async uploadITwinImage(
+    accessToken: AccessToken,
+    iTwinId: string,
+    imageBlob: Blob,
+    contentType: "image/png" | "image/jpeg"
+  ): Promise<APIResponse<ITwinImageResponse>> {
+    const url = `${this._baseUrl}/${iTwinId}/image`;
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "PUT",
+      url,
+      imageBlob,
+      undefined,
+      { contentType }
+    );
+  }
+
+  /** Get the image associated with the specified iTwin
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin to retrieve the image from
+   * @returns Promise that resolves with the image details including URLs for small and large versions
+   */
+  public async getITwinImage(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<APIResponse<ITwinImageResponse>> {
+    const url = `${this._baseUrl}/${iTwinId}/image`;
+    return this.sendGenericAPIRequest(accessToken, "GET", url);
+  }
+
+  /** Delete the image associated with the specified iTwin
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin to delete the image from
+   * @returns Promise that resolves when the image is successfully deleted
+   */
+  public async deleteITwinImage(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<APIResponse<undefined>> {
+    const url = `${this._baseUrl}/${iTwinId}/image`;
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
 

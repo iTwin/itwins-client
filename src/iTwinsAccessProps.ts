@@ -11,6 +11,7 @@ import { ITwin, ITwinSubClass } from "./types/ITwin";
 import { APIResponse, ResultMode } from "./types/CommonApiTypes.ts";
 import { Repository } from "./types/Repository";
 import { ITwinExport, ITwinExportRequestInfo } from "./types/ITwinExport";
+import { ITwinImage } from "./types/ITwinImage";
 
 /**
  * Optional query scope. MemberOfITwin is the default. This is used to expand the scope of the query to all iTwins you have access to, not just ones that you are a member of, which only applies to organization administrators.
@@ -29,6 +30,13 @@ export interface ITwinExportSingleResponse {
  */
 export interface ITwinExportMultiResponse {
   exports: ITwinExport[];
+}
+
+/**
+ * Response interface for iTwin image operations
+ */
+export interface ITwinImageResponse {
+  image: ITwinImage;
 }
 
 /**
@@ -93,26 +101,46 @@ export interface ITwinsAccess {
 
   /** Get a list of iTwin exports for user */
   getExports(
-    accessToken: AccessToken,
+    accessToken: AccessToken
   ): Promise<APIResponse<ITwinExportMultiResponse>>;
 
   /** Get favorites iTwins accessible to the user */
-   getFavoritesITwins(
+  getFavoritesITwins(
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
-  ): Promise<APIResponse<ITwin[]>>
+  ): Promise<APIResponse<ITwin[]>>;
 
   /** Add iTwin to favorites */
-   addITwinToFavorites(
+  addITwinToFavorites(
     accessToken: AccessToken,
     iTwinId?: string
-  ): Promise<APIResponse<undefined>>
+  ): Promise<APIResponse<undefined>>;
 
   /** Remove iTwin from favorites */
-   removeITwinFromFavorites(
+  removeITwinFromFavorites(
     accessToken: AccessToken,
     iTwinId?: string
-  ): Promise<APIResponse<undefined>>
+  ): Promise<APIResponse<undefined>>;
+
+  /** Adds image to iTwin  */
+  uploadITwinImage(
+    accessToken: AccessToken,
+    iTwinId: string,
+    imageBlob: Blob,
+    contentType: "image/png" | "image/jpeg"
+  ): Promise<APIResponse<ITwinImageResponse>>;
+
+  /** Adds image for iTwin  */
+  getITwinImage(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<APIResponse<ITwinImageResponse>>;
+
+  /** Deletes image from iTwin  */
+  deleteITwinImage(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<APIResponse<undefined>>;
 
   /** Get iTwins */
   queryAsync(

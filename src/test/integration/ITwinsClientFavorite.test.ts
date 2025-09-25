@@ -229,60 +229,62 @@ describe("iTwinsClient Favorites Functionality", () => {
       await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
     const iTwinId = createResponse.data!.id!;
 
-    // Assert
-    expect(createResponse.status).toBe(201);
-    expect(createResponse.data!.displayName).toBe(newiTwin.displayName);
-    expect(createResponse.data!.class).toBe(newiTwin.class);
-    expect(createResponse.data!.subClass).toBe(newiTwin.subClass);
+    try {
+      // Assert
+      expect(createResponse.status).toBe(201);
+      expect(createResponse.data!.displayName).toBe(newiTwin.displayName);
+      expect(createResponse.data!.class).toBe(newiTwin.class);
+      expect(createResponse.data!.subClass).toBe(newiTwin.subClass);
 
-    /* ADD ITWIN TO FAVORITES */
+      /* ADD ITWIN TO FAVORITES */
 
-    // Act add to favorites
-    const addFavoriteResponse: APIResponse<undefined> =
-      await iTwinsAccessClient.addITwinToFavorites(accessToken, iTwinId);
+      // Act add to favorites
+      const addFavoriteResponse: APIResponse<undefined> =
+        await iTwinsAccessClient.addITwinToFavorites(accessToken, iTwinId);
 
-    // Assert
-    expect(addFavoriteResponse.status).toBe(204);
-    expect(addFavoriteResponse.data).toBeUndefined();
+      // Assert
+      expect(addFavoriteResponse.status).toBe(204);
+      expect(addFavoriteResponse.data).toBeUndefined();
 
-    /* VERIFY ITWIN IS IN FAVORITES */
-    // Act
-    let getFavoritesResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.getFavoritesITwins(accessToken, {
-        displayName: newiTwin.displayName,
-      });
-    // Assert
-    expect(getFavoritesResponse.status).toBe(200);
-    expect(getFavoritesResponse.data).toHaveLength(1);
-    expect(getFavoritesResponse.data![0].id).toBe(iTwinId);
+      /* VERIFY ITWIN IS IN FAVORITES */
+      // Act
+      let getFavoritesResponse: APIResponse<ITwin[]> =
+        await iTwinsAccessClient.getFavoritesITwins(accessToken, {
+          displayName: newiTwin.displayName,
+        });
+      // Assert
+      expect(getFavoritesResponse.status).toBe(200);
+      expect(getFavoritesResponse.data).toHaveLength(1);
+      expect(getFavoritesResponse.data![0].id).toBe(iTwinId);
 
-    /* DELETE ITWIN FROM FAVORITES */
-    const removeFavoriteResponse: APIResponse<undefined> =
-      await iTwinsAccessClient.removeITwinFromFavorites(accessToken, iTwinId);
+      /* DELETE ITWIN FROM FAVORITES */
+      const removeFavoriteResponse: APIResponse<undefined> =
+        await iTwinsAccessClient.removeITwinFromFavorites(accessToken, iTwinId);
 
-    // Assert
-    expect(removeFavoriteResponse.status).toBe(204);
-    expect(removeFavoriteResponse.data).toBeUndefined();
+      // Assert
+      expect(removeFavoriteResponse.status).toBe(204);
+      expect(removeFavoriteResponse.data).toBeUndefined();
 
-    /* VERIFY ITWIN IS NOT IN FAVORITES */
-    // Act
-    getFavoritesResponse = await iTwinsAccessClient.getFavoritesITwins(
-      accessToken,
-      {
-        displayName: newiTwin.displayName,
-      }
-    );
+      /* VERIFY ITWIN IS NOT IN FAVORITES */
+      // Act
+      getFavoritesResponse = await iTwinsAccessClient.getFavoritesITwins(
+        accessToken,
+        {
+          displayName: newiTwin.displayName,
+        }
+      );
 
-    // Assert
-    expect(getFavoritesResponse.status).toBe(200);
-    expect(getFavoritesResponse.data).toHaveLength(0);
+      // Assert
+      expect(getFavoritesResponse.status).toBe(200);
+      expect(getFavoritesResponse.data).toHaveLength(0);
+    } finally {
+      // Clean up - Delete the test iTwin
+      const deleteResponse: APIResponse<undefined> =
+        await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
 
-    // Act
-    const deleteResponse: APIResponse<undefined> =
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
-
-    // Assert
-    expect(deleteResponse.status).toBe(204);
-    expect(deleteResponse.data).toBeUndefined();
+      // Assert cleanup was successful
+      expect(deleteResponse.status).toBe(204);
+      expect(deleteResponse.data).toBeUndefined();
+    }
   });
 });
