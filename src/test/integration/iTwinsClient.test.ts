@@ -527,68 +527,6 @@ describe("iTwinsClient", () => {
     });
   });
 
-  it("should get a list of favorited project iTwins", async () => {
-    // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryFavoritesAsync(accessToken, {
-        subClass: "Project",
-      });
-
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
-      expect(actualiTwin.class).toBe("Endeavor");
-      expect(actualiTwin.subClass).toBe("Project");
-    });
-  });
-
-  it("should get a list of favorited project iTwins without subClass query", async () => {
-    // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryFavoritesAsync(accessToken);
-
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-  });
-
-  it("should get more properties of favorited project iTwins in representation result mode", async () => {
-    // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryFavoritesAsync(accessToken, {
-        subClass: "Project",
-        resultMode: "representation",
-      });
-
-    // Assert
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
-      expect(actualiTwin.parentId).toBeTypeOf("string");
-      expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
-      expect(actualiTwin.createdDateTime).toBeTypeOf("string");
-      expect(actualiTwin.createdBy).toBeTypeOf("string");
-    });
-  });
-
-  it("should get a list of favorited project iTwins using all query scope", async () => {
-    // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryFavoritesAsync(accessToken, {
-        queryScope: "all",
-        subClass: "Project",
-      });
-
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
-      expect(actualiTwin.class).toBe("Endeavor");
-      expect(actualiTwin.subClass).toBe("Project");
-    });
-  });
-
   it("should get a list of asset iTwins", async () => {
     // Act
     const iTwinsResponse: APIResponse<ITwin[]> =
@@ -806,22 +744,6 @@ describe("iTwinsClient", () => {
           queryScope:"all"
          },
       );
-
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
-      expect(actualiTwin.class).toBe("Thing");
-      expect(actualiTwin.subClass).toBe("Asset");
-    });
-  });
-
-  it("should get a list of favorited asset iTwins", async () => {
-    // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryFavoritesAsync(accessToken, {
-        subClass: "Asset",
-      });
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);

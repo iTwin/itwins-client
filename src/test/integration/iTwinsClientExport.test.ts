@@ -2,12 +2,10 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import type { AccessToken } from "@itwin/core-bentley";
 import { ITwinsAccessClient } from "../../iTwinsClient";
 import { TestConfig } from "../TestConfig";
-import { ITwin } from "src/types/ITwin";
-import { APIResponse } from "src/types/CommonApiTypes.ts";
 import { ITwinExportSingleResponse } from "src/iTwinsAccessProps";
 
 describe("iTwinsClient Export Functionality", () => {

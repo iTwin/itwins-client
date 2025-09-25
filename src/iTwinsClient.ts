@@ -8,9 +8,7 @@
 import type { AccessToken } from "@itwin/core-bentley";
 import { BaseClient } from "./BaseClient";
 import type {
-  ITwinExport,
   ITwinExportMultiResponse,
-  ITwinExportQueryArgs,
   ITwinExportSingleResponse,
   ITwinQueryScope,
   ITwinsAccess,
@@ -19,6 +17,7 @@ import type {
 } from "./iTwinsAccessProps";
 import { APIResponse, ResultMode } from "./types/CommonApiTypes.ts";
 import { ITwin } from "./types/ITwin";
+import { ITwinExportRequestInfo } from "./types/ITwinExport";
 import { Repository } from "./types/Repository";
 
 /** Client API to access the itwins service.
@@ -29,12 +28,14 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     super(url);
   }
 
-  getExports(accessToken: AccessToken): Promise<APIResponse<ITwinExportMultiResponse>> {
+  public async getExports(
+    accessToken: AccessToken
+  ): Promise<APIResponse<ITwinExportMultiResponse>> {
     const url = `${this._baseUrl}/exports`;
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
   }
 
-  getExport(
+  public async getExport(
     accessToken: AccessToken,
     id: string
   ): Promise<APIResponse<ITwinExportSingleResponse>> {
@@ -50,7 +51,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    */
   public async createExport(
     accessToken: AccessToken,
-    args: ITwinExportQueryArgs
+    args: ITwinExportRequestInfo
   ): Promise<APIResponse<ITwinExportSingleResponse>> {
     const url = `${this._baseUrl}/exports`;
     return this.sendGenericAPIRequest(
@@ -60,6 +61,56 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
       args,
       undefined
     );
+  }
+
+  /** Get favorites iTwins accessible to the user
+   * @param accessToken The client access token string
+   * @param arg Optional query arguments, for paging, searching, and filtering
+   * @returns Array of iTwins, may be empty, if no favorites
+   */
+  public async getFavoritesITwins(
+    accessToken: AccessToken,
+    arg?: ITwinsQueryArg
+  ): Promise<APIResponse<ITwin[]>> {
+    const headers = this.getHeaders(arg);
+    let url = `${this._baseUrl}/favorites`;
+    const query = this.getQueryStringArg(arg);
+    if (query !== "") url += `?${query}`;
+
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      "iTwins",
+      headers
+    );
+  }
+
+  /** Add the specified iTwin to the user's favorites list
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin to add to favorites
+   * @returns Promise that resolves when the iTwin is successfully added to favorites
+   */
+  public async addITwinToFavorites(
+    accessToken: AccessToken,
+    iTwinId?: string
+  ): Promise<APIResponse<undefined>> {
+    const url = `${this._baseUrl}/favorites/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "POST", url);
+  }
+
+  /** Remove the specified iTwin from the user's favorites list
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin to remove from favorites
+   * @returns Promise that resolves when the iTwin is successfully removed from favorites
+   */
+  public async removeITwinFromFavorites(
+    accessToken: AccessToken,
+    iTwinId?: string
+  ): Promise<APIResponse<undefined>> {
+    const url = `${this._baseUrl}/favorites/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
 
   /** Get itwins accessible to the user
@@ -215,31 +266,6 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
       url,
       undefined,
       "iTwin",
-      headers
-    );
-  }
-
-  /** Get itwins accessible to the user
-   * @param accessToken The client access token string
-   * @param arg Optional query arguments, for paging, searching, and filtering
-   * @returns Array of projects, may be empty
-   */
-  public async queryFavoritesAsync(
-    accessToken: AccessToken,
-    arg?: ITwinsQueryArg
-  ): Promise<APIResponse<ITwin[]>> {
-    const headers = this.getHeaders(arg);
-    let url = `${this._baseUrl}/favorites`;
-    const mergedQueryArgs = arg ?? {};
-    const query = this.getQueryStringArg(mergedQueryArgs);
-    if (query !== "") url += `?${query}`;
-
-    return this.sendGenericAPIRequest(
-      accessToken,
-      "GET",
-      url,
-      undefined,
-      "iTwins",
       headers
     );
   }

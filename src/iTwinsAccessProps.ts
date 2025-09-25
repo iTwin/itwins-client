@@ -10,30 +10,12 @@ import type { AccessToken } from "@itwin/core-bentley";
 import { ITwin, ITwinSubClass } from "./types/ITwin";
 import { APIResponse, ResultMode } from "./types/CommonApiTypes.ts";
 import { Repository } from "./types/Repository";
+import { ITwinExport, ITwinExportRequestInfo } from "./types/ITwinExport";
 
 /**
  * Optional query scope. MemberOfITwin is the default. This is used to expand the scope of the query to all iTwins you have access to, not just ones that you are a member of, which only applies to organization administrators.
  */
 export type ITwinQueryScope = "memberOfItwin" | "all" | "OrganizationAdmin";
-
-/**
- * Query scope options for iTwin export operations
- */
-export type ExportQueryScope = "MemberOfiTwin" | "OrganizationAdmin";
-
-/**
- * Available output formats for iTwin exports
- */
-export type ExportOutputFormat =
-  | "JsonGZip"
-  | "JsonZipArchive"
-  | "CsvGZip"
-  | "Csv";
-
-/**
- * Status of an iTwin export operation
- */
-export type ExportStatus = "Queued" | "InProgress" | "Completed" | "Failed";
 
 /**
  * Response interface for iTwin export operations
@@ -42,57 +24,11 @@ export interface ITwinExportSingleResponse {
   export: ITwinExport;
 }
 
+/**
+ * Response interface for multiple iTwin export operations
+ */
 export interface ITwinExportMultiResponse {
   exports: ITwinExport[];
-}
-
-export interface ITwinExport {
-  /** Unique identifier for the export operation */
-  id: string;
-  /** Original request parameters used to create the export */
-  request: ITwinExportQueryArgs;
-  /** Current status of the export operation */
-  status: ExportStatus;
-  /** URL to download the completed export file (null until completed) */
-  outputUrl: string | null;
-  /** Identifier of the user who created this export */
-  createdBy: string;
-  /** ISO 8601 timestamp when the export was created */
-  createdDateTime: string;
-  /** ISO 8601 timestamp when the export processing started (null if not started) */
-  startedDateTime: string | null;
-  /** ISO 8601 timestamp when the export was completed (null if not completed) */
-  completedDateTime: string | null;
-}
-
-/**
- * Arguments for creating an iTwin export
- */
-export interface ITwinExportQueryArgs {
-  /** Export scope - MemberOfiTwin (default) or OrganizationAdmin */
-  queryScope?: ExportQueryScope;
-  /** Comma-delimited list of iTwin subClasses to include (e.g., 'Asset,Project') */
-  subClass?: string;
-  /**
-   * Comma-delimited list of iTwin properties to include in export.
-   * Keep the list as small as possible to increase speed and limit file size.
-   * If not specified, exports minimal representation: id,class,subClass,type,number,displayName
-   */
-  select?: string;
-  /**
-   * OData filter to limit exported iTwins. Use subClass property for basic filtering,
-   * then use filter for additional criteria. All text values are case insensitive.
-   *
-   * Examples:
-   * - status+in+['Active','Inactive']
-   * - status+eq+'Active'+and+contains('test',number)+and+CreatedDateTime+ge+2023-01-01T00:00:00Z
-   * - parentId+eq+'78202ffd-272b-4207-a7ad-7d2b1af5dafc'+and+(startswith('ABC',number)+or+startswith('ABC',displayName))
-   */
-  filter?: string;
-  /** Include inactive iTwins in the export */
-  includeInactive?: boolean;
-  /** Required output format for the export file */
-  outputFormat: ExportOutputFormat;
 }
 
 /**
@@ -146,7 +82,7 @@ export interface ITwinsAccess {
   /** Create a new iTwin export */
   createExport(
     accessToken: AccessToken,
-    args: ITwinExportQueryArgs
+    args: ITwinExportRequestInfo
   ): Promise<APIResponse<ITwinExportSingleResponse>>;
 
   /** Create a new iTwin export */
@@ -159,6 +95,24 @@ export interface ITwinsAccess {
   getExports(
     accessToken: AccessToken,
   ): Promise<APIResponse<ITwinExportMultiResponse>>;
+
+  /** Get favorites iTwins accessible to the user */
+   getFavoritesITwins(
+    accessToken: AccessToken,
+    arg?: ITwinsQueryArg
+  ): Promise<APIResponse<ITwin[]>>
+
+  /** Add iTwin to favorites */
+   addITwinToFavorites(
+    accessToken: AccessToken,
+    iTwinId?: string
+  ): Promise<APIResponse<undefined>>
+
+  /** Remove iTwin from favorites */
+   removeITwinFromFavorites(
+    accessToken: AccessToken,
+    iTwinId?: string
+  ): Promise<APIResponse<undefined>>
 
   /** Get iTwins */
   queryAsync(
@@ -178,12 +132,6 @@ export interface ITwinsAccess {
     iTwinId: string,
     resultMode?: ResultMode
   ): Promise<APIResponse<ITwin>>;
-
-  /** Get favorited iTwins */
-  queryFavoritesAsync(
-    accessToken: AccessToken,
-    arg?: ITwinsQueryArg
-  ): Promise<APIResponse<ITwin[]>>;
 
   /** Get recent iTwins */
   queryRecentsAsync(
