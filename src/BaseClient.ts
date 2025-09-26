@@ -6,12 +6,10 @@
  * @module iTwinsClient
  */
 import type { AccessToken } from "@itwin/core-bentley";
-import type {
-  ITwinsQueryArg,
-  RepositoriesQueryArg,
-} from "./iTwinsAccessProps";
+import type { ITwinsQueryArg } from "./iTwinsAccessProps";
 import { hasProperty, ParameterMapping } from "./types/typeUtils";
 import { ApimError, APIResponse } from "./types/CommonApiTypes.ts";
+import { Repository } from "./types/Repository";
 
 /**
  * Common HTTP methods used in API requests
@@ -47,7 +45,7 @@ function isValidError(error: unknown): error is ApimError {
  * @param data - Unknown response data to validate
  * @returns True if the data contains a valid Error object
  */
-function isErrorResponse(data: unknown): data is { error: ApimError} {
+function isErrorResponse(data: unknown): data is { error: ApimError } {
   if (typeof data !== "object" || data === null) {
     return false;
   }
@@ -62,7 +60,6 @@ function isErrorResponse(data: unknown): data is { error: ApimError} {
  */
 export class BaseClient {
   protected _baseUrl: string = "https://api.bentley.com/itwins";
-
 
   /**
    * Maps the properties of {@link ITwinsQueryArg} to their corresponding query parameter names.
@@ -96,7 +93,7 @@ export class BaseClient {
     };
 
   /**
-   * Maps the properties of {@link RepositoriesQueryArg} to their corresponding query parameter names.
+   * Maps the properties of class and subclass to their corresponding query parameter names.
    *
    * @remarks
    * This mapping is used to translate internal property names to the expected parameter names
@@ -104,11 +101,13 @@ export class BaseClient {
    *
    * @readonly
    */
-  private static readonly REPOSITORY_PARAM_MAPPING: ParameterMapping<RepositoriesQueryArg> =
-    {
-      class: "class",
-      subClass: "subClass",
-    } as const;
+  private static readonly REPOSITORY_PARAM_MAPPING: ParameterMapping<{
+    class: Repository["class"];
+    subClass: Repository["subClass"];
+  }> = {
+    class: "class",
+    subClass: "subClass",
+  } as const;
 
   /**
    * Creates a new BaseClient instance for iTwins API operations
@@ -255,9 +254,9 @@ export class BaseClient {
       throw new Error("URL is required");
     }
     let body: string | Blob | undefined;
-    if(!(data instanceof Blob)){
+    if (!(data instanceof Blob)) {
       body = JSON.stringify(data);
-    }else{
+    } else {
       body = data;
     }
     return {
@@ -267,7 +266,10 @@ export class BaseClient {
       headers: {
         ...headers,
         authorization: accessTokenString,
-        "content-type": headers.contentType || headers["content-type"] ? headers.contentType || headers["content-type"] : "application/json",
+        "content-type":
+          headers.contentType || headers["content-type"]
+            ? headers.contentType || headers["content-type"]
+            : "application/json",
       },
     };
   }
@@ -346,14 +348,15 @@ export class BaseClient {
     const params: string[] = [];
     // Type assertion constrains paramKey to actual property names and mappedValue to the specific strings from the mapping
     // Narrows from set of all strings to only valid keys/values
-    for (const [paramKey, mappedValue] of Object.entries(mapping) as [keyof T, ParameterMapping<T>[keyof T]][]) {
+    for (const [paramKey, mappedValue] of Object.entries(mapping) as [
+      keyof T,
+      ParameterMapping<T>[keyof T]
+    ][]) {
       if (mappedValue === "") continue;
       const queryArgValue = queryArg[paramKey];
       if (queryArgValue !== undefined && queryArgValue !== null) {
         const stringValue = String(queryArgValue);
-        params.push(
-          `${mappedValue}=${encodeURIComponent(stringValue)}`
-        );
+        params.push(`${mappedValue}=${encodeURIComponent(stringValue)}`);
       }
     }
     return params;

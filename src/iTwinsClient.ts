@@ -12,9 +12,11 @@ import type {
   ITwinExportSingleResponse,
   ITwinImageResponse,
   ITwinQueryScope,
+  ITwinRecentsResponse,
   ITwinsAccess,
   ITwinsQueryArg,
-  RepositoriesQueryArg,
+  MultiRepositoriesResponse,
+  SingleRepositoryResponse,
 } from "./iTwinsAccessProps";
 import { APIResponse, ResultMode } from "./types/CommonApiTypes.ts";
 import { ITwin } from "./types/ITwin";
@@ -173,6 +175,51 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
 
+  /** Add the specified iTwin to the user's recently used list
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin to add to the recently used list
+   * @returns Promise that resolves when the iTwin is successfully added to the recently used list
+   */
+  public async addITwinToMyRecents(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<APIResponse<undefined>> {
+    const url = `${this._baseUrl}/recents/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "POST", url);
+  }
+
+  /** Get recently used iTwins for the current user
+   *
+   * Retrieves a list of recently used iTwins for the calling user. A user can only have 25 recently used iTwins.
+   * They are returned in order with the most recently used iTwin first in the list.
+   *
+   * iTwins with status=Inactive are not returned by default. This improves query performance and reduces clutter
+   * in user interfaces by filtering out unused iTwins. You should still provide a way for users to see their
+   * Inactive iTwins if they request them. In the API, you can do this by setting the status parameter or by
+   * using the includeInactive parameter.
+   *
+   * @param accessToken The client access token string
+   * @param arg Optional query arguments, for paging, searching, and filtering (including status and includeInactive)
+   * @returns Promise that resolves with an array of recently used iTwins (maximum 25), ordered by most recent first
+   */
+  public async getMyRecentUsedITwins(
+    accessToken: AccessToken,
+    arg?: ITwinsQueryArg
+  ): Promise<APIResponse<ITwinRecentsResponse>> {
+    const headers = this.getHeaders(arg);
+    let url = `${this._baseUrl}/recents`;
+    const query = this.getQueryStringArg(arg);
+    if (query !== "") url += `?${query}`;
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      undefined,
+      headers
+    );
+  }
+
   /** Get itwins accessible to the user
    * @param accessToken The client access token string
    * @param arg Optional query arguments, for paging, searching, and filtering
@@ -248,21 +295,16 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
    * @param repository The Repository to be created
+   * @beta
    * @return Repository
    */
   public async createRepository(
     accessToken: AccessToken,
     iTwinId: string,
-    repository: Repository
-  ): Promise<APIResponse<Repository>> {
+    repository: Omit<Repository, "id">
+  ): Promise<APIResponse<SingleRepositoryResponse>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories`;
-    return this.sendGenericAPIRequest(
-      accessToken,
-      "POST",
-      url,
-      repository,
-      "repository"
-    );
+    return this.sendGenericAPIRequest(accessToken, "POST", url, repository);
   }
 
   /** Delete the specified iTwin Repository
@@ -283,14 +325,16 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   /** Get Repositories accessible to user
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
-   * @param arg Optional query arguments, for class and subclass
+   * @param arg Optional query arguments, for class and subclass. If subClass is specified, class is also required.
    * @returns Array of Repositories, may be empty
    */
-  public async queryRepositoriesAsync(
+  public async getRepositories(
     accessToken: AccessToken,
     iTwinId: string,
-    arg?: RepositoriesQueryArg
-  ): Promise<APIResponse<Repository[]>> {
+    arg?:
+      | { class: Repository["class"] }
+      | { class: Repository["class"]; subClass: Repository["subClass"] }
+  ): Promise<APIResponse<MultiRepositoriesResponse>> {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
 
     const query = this.getRepositoryQueryString(arg);
@@ -298,13 +342,41 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
       url += `?${query}`;
     }
 
-    return this.sendGenericAPIRequest(
-      accessToken,
-      "GET",
-      url,
-      undefined,
-      "repositories"
-    );
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
+  }
+
+  /** Get Repositories accessible to user
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @param repositoryId The id of the Repository
+   * @returns Repository
+   * @beta
+   */
+  public async getRepository(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string
+  ): Promise<APIResponse<SingleRepositoryResponse>> {
+    const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}`;
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
+  }
+
+  /** Get Repositories accessible to user
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @param repositoryId The id of the Repository
+   * @param repository updated repository
+   * @returns Updated repository
+   * @beta
+   */
+  public async updateRepository(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    repository: Omit<Repository, "id" | "class" | "subClass">
+  ): Promise<APIResponse<SingleRepositoryResponse>> {
+    const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}`;
+    return this.sendGenericAPIRequest(accessToken, "PATCH", url, repository);
   }
 
   /** Get itwin accessible to the user

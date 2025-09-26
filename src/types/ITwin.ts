@@ -1,8 +1,6 @@
 /**
  * Base iTwin interface containing core properties that are always available
  * in standard API responses.
- *
- * @public
  */
 export interface ITwin {
   /** Unique identifier for the iTwin */
@@ -27,17 +25,25 @@ export interface ITwin {
   /** Account identifier associated with this iTwin */
   iTwinAccountId?: string;
   /** IANA timezone identifier for the iTwin's geographic location */
-  ianaTimeZone?: string | null;
+  ianaTimeZone?: string;
   /** Name of the image file associated with this iTwin */
-  imageName?: string | null;
+  imageName?: string;
   /** Base64 encoded image data or URL for the iTwin's visual representation */
-  image?: string | null;
+  image?: string;
   /** ISO 8601 timestamp when the iTwin was created */
   createdDateTime?: string;
   /** Identifier of the user who created this iTwin */
   createdBy?: string;
   /** Geographic location description of the iTwin */
   geographicLocation?: string;
+  /** Latitude coordinate of the iTwin's geographic location */
+  latitude?: number;
+  /** Longitude coordinate of the iTwin's geographic location */
+  longitude?: number;
+  /** ISO 8601 timestamp when the iTwin was last modified */
+  lastModifiedDateTime?: string;
+  /** Identifier of the user who last modified this iTwin */
+  lastModifiedBy?: string;
 }
 
 /**
@@ -72,6 +78,5 @@ export type ITwinSubClass =
  * @public
  */
 export type ITwinClass =
-  | "Account"
   | "Thing"
   | "Endeavor";

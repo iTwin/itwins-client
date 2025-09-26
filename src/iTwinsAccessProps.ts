@@ -12,6 +12,7 @@ import { APIResponse, ResultMode } from "./types/CommonApiTypes.ts";
 import { Repository } from "./types/Repository";
 import { ITwinExport, ITwinExportRequestInfo } from "./types/ITwinExport";
 import { ITwinImage } from "./types/ITwinImage";
+import { Links } from "./types/links";
 
 /**
  * Optional query scope. MemberOfITwin is the default. This is used to expand the scope of the query to all iTwins you have access to, not just ones that you are a member of, which only applies to organization administrators.
@@ -37,6 +38,33 @@ export interface ITwinExportMultiResponse {
  */
 export interface ITwinImageResponse {
   image: ITwinImage;
+}
+
+/**
+ * Response interface for single repository operations (create, get, update)
+ */
+export interface SingleRepositoryResponse {
+  /** The repository object returned by the API */
+  repository: Repository;
+}
+
+/**
+ * Response interface for multiple repository operations get repositories
+ */
+export interface MultiRepositoriesResponse {
+  /** Array of repository objects returned by the API */
+  repositories: Repository[];
+}
+
+/**
+ * Response interface for recently used iTwins operations
+ */
+export interface ITwinRecentsResponse {
+  /** Array of recently used iTwin objects */
+  iTwins: ITwin[];
+  /** Navigation links for pagination and related resources */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _links: Links;
 }
 
 /**
@@ -73,14 +101,6 @@ export interface ITwinsQueryArgsApi {
   skip?: number;
   /** Search string to filter results by keyword */
   search?: string;
-}
-
-/**
- * Set of optional arguments used for querying Repositories API
- */
-export interface RepositoriesQueryArg {
-  class?: string;
-  subClass?: string;
 }
 
 /** Methods for accessing itwins
@@ -130,6 +150,56 @@ export interface ITwinsAccess {
     contentType: "image/png" | "image/jpeg"
   ): Promise<APIResponse<ITwinImageResponse>>;
 
+  /** Add the specified iTwin to the user's recently used list */
+  addITwinToMyRecents(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<APIResponse<undefined>>;
+
+  /** Get recently used iTwins for the current user, maximum 25 items ordered by most recent first */
+  getMyRecentUsedITwins(
+    accessToken: AccessToken,
+    arg?: ITwinsQueryArg
+  ): Promise<APIResponse<ITwinRecentsResponse>>;
+
+  /** Create a new repository for the specified iTwin */
+  createRepository(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repository: Omit<Repository, "id">
+  ): Promise<APIResponse<SingleRepositoryResponse>>;
+
+  /** Delete the specified repository from an iTwin */
+  deleteRepository(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string
+  ): Promise<APIResponse<undefined>>;
+
+  /** Get all repositories for an iTwin with optional filtering by class and subClass. If subClass is specified, class is also required. */
+  getRepositories(
+    accessToken: AccessToken,
+    iTwinId: string,
+    arg?:
+      | { class: Repository["class"] }
+      | { class: Repository["class"]; subClass: Repository["subClass"] }
+  ): Promise<APIResponse<MultiRepositoriesResponse>>;
+
+  /** Get a specific repository by ID from an iTwin */
+  getRepository(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string
+  ): Promise<APIResponse<SingleRepositoryResponse>>;
+
+  /** update a specific repository by ID from an iTwin */
+  updateRepository(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    repository: Omit<Repository, "id" | "class" | "subClass">
+  ): Promise<APIResponse<SingleRepositoryResponse>>;
+
   /** Adds image for iTwin  */
   getITwinImage(
     accessToken: AccessToken,
@@ -147,12 +217,6 @@ export interface ITwinsAccess {
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
   ): Promise<APIResponse<ITwin[]>>;
-
-  /** Get iTwins */
-  queryRepositoriesAsync(
-    accessToken: AccessToken,
-    iTwinId: string
-  ): Promise<APIResponse<Repository[]>>;
 
   /** Get an ITwin */
   getAsync(
