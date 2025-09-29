@@ -71,3 +71,20 @@ export type RepositorySubClass =
   | "ArcGIS"
   | "UrlTemplate"
   | "EvoWorkspace";
+
+/**
+ * Response interface for single repository operations (create, get, update)
+ */
+export interface SingleRepositoryResponse {
+  /** The repository object returned by the API */
+  repository: Repository;
+}
+
+
+/**
+ * Response interface for multiple repository operations get repositories
+ */
+export interface MultiRepositoriesResponse {
+  /** Array of repository objects returned by the API */
+  repositories: Repository[];
+}

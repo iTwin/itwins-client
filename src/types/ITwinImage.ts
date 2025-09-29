@@ -13,3 +13,10 @@ export interface ITwinImage {
   /** URL to access the large version of the image */
   largeImageUrl: string;
 }
+
+/**
+ * Response interface for iTwin image operations
+ */
+export interface ITwinImageResponse {
+  image: ITwinImage;
+}

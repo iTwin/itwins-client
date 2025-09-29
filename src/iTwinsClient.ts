@@ -5,29 +5,21 @@
 /** @packageDocumentation
  * @module iTwinsClient
  */
+
 import type { AccessToken } from "@itwin/core-bentley";
-import { BaseClient } from "./BaseClient";
-import type {
-  ITwinExportMultiResponse,
-  ITwinExportSingleResponse,
-  ITwinImageResponse,
-  ITwinQueryScope,
-  ITwinRecentsResponse,
-  ITwinsAccess,
-  ITwinsQueryArg,
-  MultiRepositoriesResponse,
-  SingleRepositoryResponse,
-} from "./iTwinsAccessProps";
-import { APIResponse, ResultMode } from "./types/CommonApiTypes.ts";
-import { ITwin } from "./types/ITwin";
-import { ITwinExportRequestInfo } from "./types/ITwinExport";
-import { Repository } from "./types/Repository";
+import { BaseITwinsApiClient } from "./BaseITwinsApiClient.js";
+import type { APIResponse, ResultMode } from "./types/CommonApiTypes";
+import type { ITwin, ITwinRecentsResponse } from "./types/ITwin";
+import type { ITwinExportMultiResponse, ITwinExportRequestInfo, ITwinExportSingleResponse } from "./types/ITwinExport";
+import type { ITwinImageResponse } from "./types/ITwinImage.js";
+import type { ITwinQueryScope, ITwinsQueryArg } from "./types/ITwinsQueryArgs.js";
+import type { MultiRepositoriesResponse, Repository, SingleRepositoryResponse } from "./types/Repository";
 
 /** Client API to access the itwins service.
  * @beta
  */
-export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
-  public constructor(url?: string) {
+export class ITwinsAccessClient extends BaseITwinsApiClient {
+  constructor(url?: string) {
     super(url);
   }
 
@@ -86,7 +78,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<APIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites`;
-    const query = this.getQueryStringArg(arg);
+    const query = this.getQueryStringArg(ITwinsAccessClient.iTwinsQueryParamMapping, arg);
     if (query !== "") url += `?${query}`;
 
     return this.sendGenericAPIRequest(
@@ -208,7 +200,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<APIResponse<ITwinRecentsResponse>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
-    const query = this.getQueryStringArg(arg);
+    const query = this.getQueryStringArg(ITwinsAccessClient.iTwinsQueryParamMapping,arg);
     if (query !== "") url += `?${query}`;
     return this.sendGenericAPIRequest(
       accessToken,
@@ -231,7 +223,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<APIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = this._baseUrl;
-    const query = this.getQueryStringArg(arg);
+    const query = this.getQueryStringArg(ITwinsAccessClient.iTwinsQueryParamMapping, arg);
     if (query !== "") url += `?${query}`;
 
     return this.sendGenericAPIRequest(
@@ -337,7 +329,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<APIResponse<MultiRepositoriesResponse>> {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
 
-    const query = this.getRepositoryQueryString(arg);
+    const query = this.getQueryStringArg(ITwinsAccessClient.repositoryParamMapping, arg);
     if (query !== "") {
       url += `?${query}`;
     }
@@ -413,8 +405,7 @@ export class ITwinsAccessClient extends BaseClient implements ITwinsAccess {
   ): Promise<APIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
-    const mergedQueryArgs = arg ?? {};
-    const query = this.getQueryStringArg(mergedQueryArgs);
+    const query = this.getQueryStringArg(ITwinsAccessClient.iTwinsQueryParamMapping, arg);
     if (query !== "") url += `?${query}`;
 
     return this.sendGenericAPIRequest(

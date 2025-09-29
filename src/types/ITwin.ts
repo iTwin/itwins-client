@@ -1,3 +1,5 @@
+import { Links } from "./links";
+
 /**
  * Base iTwin interface containing core properties that are always available
  * in standard API responses.
@@ -80,3 +82,15 @@ export type ITwinSubClass =
 export type ITwinClass =
   | "Thing"
   | "Endeavor";
+
+
+  /**
+   * Response interface for recently used iTwins operations
+   */
+  export interface ITwinRecentsResponse {
+    /** Array of recently used iTwin objects */
+    iTwins: ITwin[];
+    /** Navigation links for pagination and related resources */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    _links: Links;
+  }

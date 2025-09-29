@@ -3,12 +3,11 @@
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 import type { AccessToken } from "@itwin/core-bentley";
-import { APIResponse } from "src/types/CommonApiTypes.ts";
-import { ITwin } from "src/types/ITwin";
-import { ITwinRecentsResponse } from "src/iTwinsAccessProps";
+import type { ITwin, ITwinRecentsResponse } from "../../types/ITwin";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsAccessClient } from "../../iTwinsClient";
 import { TestConfig } from "../TestConfig";
+import { APIResponse } from "src/types/CommonApiTypes";
 
 describe("iTwinsClient Recently Used Functionality", () => {
   let baseUrl: string = "https://api.bentley.com/itwins";

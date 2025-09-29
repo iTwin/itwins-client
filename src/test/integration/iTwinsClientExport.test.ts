@@ -2,20 +2,14 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import { beforeAll, describe, expect, it } from "vitest";
 import type { AccessToken } from "@itwin/core-bentley";
+import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsAccessClient } from "../../iTwinsClient";
+import type { ITwinExportSingleResponse } from "../../types/ITwinExport";
 import { TestConfig } from "../TestConfig";
-import { ITwinExportSingleResponse } from "src/iTwinsAccessProps";
+
 
 describe("iTwinsClient Export Functionality", () => {
-  let baseUrl: string = "https://api.bentley.com/itwins";
-  const urlPrefix = process.env.IMJS_URL_PREFIX;
-  if (urlPrefix) {
-    const url = new URL(baseUrl);
-    url.hostname = urlPrefix + url.hostname;
-    baseUrl = url.href;
-  }
   const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
   let accessToken: AccessToken;
 

@@ -68,3 +68,17 @@ export interface ITwinExport {
   /** ISO 8601 timestamp when the export was completed (null if not completed) */
   completedDateTime: string | null;
 }
+
+/**
+ * Response interface for iTwin export operations
+ */
+export interface ITwinExportSingleResponse {
+  export: ITwinExport;
+}
+
+/**
+ * Response interface for multiple iTwin export operations
+ */
+export interface ITwinExportMultiResponse {
+  exports: ITwinExport[];
+}

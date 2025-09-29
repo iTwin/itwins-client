@@ -5,21 +5,14 @@
 import type { AccessToken } from "@itwin/core-bentley";
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import { APIResponse } from "src/types/CommonApiTypes.ts";
-import { ITwin } from "src/types/ITwin";
-import { ITwinImageResponse } from "src/iTwinsAccessProps";
+import type { APIResponse } from "../../types/CommonApiTypes";
+import type { ITwin } from "../../types/ITwin";
+import type { ITwinImageResponse } from "../../types/ITwinImage";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsAccessClient } from "../../iTwinsClient";
 import { TestConfig } from "../TestConfig";
 
 describe("iTwinsClient Image Functionality", () => {
-  let baseUrl: string = "https://api.bentley.com/itwins";
-  const urlPrefix = process.env.IMJS_URL_PREFIX;
-  if (urlPrefix) {
-    const url = new URL(baseUrl);
-    url.hostname = urlPrefix + url.hostname;
-    baseUrl = url.href;
-  }
   const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
   let accessToken: AccessToken;
 
