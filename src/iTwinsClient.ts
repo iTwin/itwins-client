@@ -25,14 +25,14 @@ import type {
   ITwinsQueryArg,
 } from "./types/ITwinsQueryArgs.js";
 import type {
+  GetMultiRepositoryResourceMinimalResponse,
+  GetMultiRepositoryResourceRepresentationResponse,
+  GetRepositoryResourceMinimalResponse,
+  GetRepositoryResourceRepresentationResponse,
   MultiRepositoriesResponse,
-  Repository,
   PostRepositoryResourceResponse,
+  Repository,
   SingleRepositoryResponse,
-  getRepositoryResourceRepresentationResponse,
-  getRepositoryResourceMinimalResponse,
-  getMultiRepositoryResourceMinimalResponse,
-  getMultiRepositoryResourceRepresentationResponse,
 } from "./types/Repository";
 
 /** Client API to access the itwins service.
@@ -446,8 +446,8 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
     resultMode?: ResultMode
   ): Promise<
     APIResponse<
-      | getRepositoryResourceRepresentationResponse
-      | getRepositoryResourceMinimalResponse
+      | GetRepositoryResourceRepresentationResponse
+      | GetRepositoryResourceMinimalResponse
     >
   > {
     const headers = this.getResultModeHeaders(resultMode);
@@ -467,6 +467,7 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
    * @param accessToken - The client access token string for authorization
    * @param iTwinId - The id of the iTwin that contains the repository
    * @param repositoryId - The id of the repository containing the resource
+   * @param args query params for get query
    * @param resultMode - Optional result mode controlling the level of detail returned (minimal or representation)
    * @returns Promise that resolves with the repository resource details in the requested format
    * @beta
@@ -479,12 +480,12 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
     resultMode?: ResultMode
   ): Promise<
     APIResponse<
-      | getMultiRepositoryResourceMinimalResponse
-      | getMultiRepositoryResourceRepresentationResponse
+      | GetMultiRepositoryResourceMinimalResponse
+      | GetMultiRepositoryResourceRepresentationResponse
     >
   > {
     const headers = this.getResultModeHeaders(resultMode);
-    let url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}/resources?${this.getQueryStringArg(
+    const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}/resources?${this.getQueryStringArg(
       ITwinsAccessClient.ODataParamMapping,
       args
     )}`;

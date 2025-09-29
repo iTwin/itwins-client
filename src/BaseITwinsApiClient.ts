@@ -22,14 +22,14 @@ import type {
 import type { ITwinImageResponse } from "./types/ITwinImage";
 import type { ITwinsQueryArg } from "./types/ITwinsQueryArgs";
 import type {
+  GetMultiRepositoryResourceMinimalResponse,
+  GetMultiRepositoryResourceRepresentationResponse,
+  GetRepositoryResourceMinimalResponse,
+  GetRepositoryResourceRepresentationResponse,
   MultiRepositoriesResponse,
-  Repository,
   PostRepositoryResourceResponse,
+  Repository,
   SingleRepositoryResponse,
-  getRepositoryResourceRepresentationResponse,
-  getRepositoryResourceMinimalResponse,
-  getMultiRepositoryResourceMinimalResponse,
-  getMultiRepositoryResourceRepresentationResponse,
 } from "./types/Repository";
 import type { ParameterMapping } from "./types/typeUtils";
 
@@ -50,9 +50,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
    *
    * @readonly
    */
-  protected static readonly iTwinsQueryParamMapping: ParameterMapping<
-    Omit<ITwinsQueryArg, "resultMode" | "queryScope">
-  > = {
+  protected static readonly iTwinsQueryParamMapping: ParameterMapping<ITwinsQueryArg> = {
     subClass: "subClass",
     type: "type",
     status: "status",
@@ -65,6 +63,8 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     parentId: "parentId",
     iTwinAccountId: "iTwinAccountId",
     includeInactive: "includeInactive",
+    resultMode:"",
+    queryScope:""
   } as const;
 
   /**
@@ -80,6 +80,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
    *
    * @readonly
    */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   protected static readonly ODataParamMapping: ParameterMapping<
     Pick<ODataQueryParams, "search" | "skip" | "top">
   > = {
@@ -252,8 +253,8 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     resultMode?: ResultMode
   ): Promise<
     APIResponse<
-      | getRepositoryResourceRepresentationResponse
-      | getRepositoryResourceMinimalResponse
+      | GetRepositoryResourceRepresentationResponse
+      | GetRepositoryResourceMinimalResponse
     >
   >;
 
@@ -266,8 +267,8 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     resultMode?: ResultMode
   ): Promise<
     APIResponse<
-      | getMultiRepositoryResourceMinimalResponse
-      | getMultiRepositoryResourceRepresentationResponse
+      | GetMultiRepositoryResourceMinimalResponse
+      | GetMultiRepositoryResourceRepresentationResponse
     >
   >;
 

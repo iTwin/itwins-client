@@ -2461,8 +2461,8 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(minimalResponse._links.self.href).toContain("skip=1");
 
       // Verify resources don't have properties (minimal mode characteristic)
-      const resources_response = getResourcesResponse.data!.resources;
-      resources_response.forEach(resource => {
+      const resourcesResponse = getResourcesResponse.data!.resources;
+      resourcesResponse.forEach(resource => {
         expect("properties" in resource).toBe(false);
       });
 

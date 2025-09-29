@@ -90,41 +90,82 @@ export interface MultiRepositoriesResponse {
   repositories: Repository[];
 }
 
+/**
+ * Response interface for creating a repository resource.
+ * Contains the created resource with minimal information including ID, subClass, displayName, and class.
+ * @beta
+ */
 export interface PostRepositoryResourceResponse {
+  /** The created repository resource with basic information */
   resource: Pick<Repository, "id" | "subClass" | "displayName"> & {
+    /** Repository class is always GeographicInformationSystem for resources */
     class: "GeographicInformationSystem";
   };
 }
 
-export interface getRepositoryResourceMinimalResponse {
+/**
+ * Response interface for getting a repository resource in minimal mode.
+ * Contains basic resource information without detailed properties.
+ * @beta
+ */
+export interface GetRepositoryResourceMinimalResponse {
+  /** The repository resource with minimal information */
   resource: Pick<Repository, "id" | "subClass" | "displayName"> & {
+    /** Optional type identifier for the resource */
     type?: string;
+    /** Repository class indicating the type of data source */
     class:
       | "GeographicInformationSystem"
       | "CesiumCuratedContent"
       | "GeospatialFeatures"
       | "RealityData"
       | "iModels";
+    /** Optional capabilities supported by the resource */
     capabilities?: {
+      /** Graphics-related capabilities */
       graphics: {
+        /** URI for graphics access */
         uri: string;
       };
     };
   };
 }
 
-export interface getRepositoryResourceRepresentationResponse extends getRepositoryResourceMinimalResponse {
+/**
+ * Response interface for getting a repository resource in representation mode.
+ * Extends the minimal response with additional detailed properties.
+ * @beta
+ */
+export interface GetRepositoryResourceRepresentationResponse extends GetRepositoryResourceMinimalResponse {
+  /** Additional properties providing detailed information about the resource */
   properties?: {
+    /** Dynamic properties specific to the resource type */
     [key: string]: unknown;
   };
 }
 
-export interface getMultiRepositoryResourceMinimalResponse {
-  resources: getRepositoryResourceMinimalResponse['resource'][];
+/**
+ * Response interface for getting multiple repository resources in minimal mode.
+ * Contains an array of resources with basic information and navigation links following HAL specification.
+ * @beta
+ */
+export interface GetMultiRepositoryResourceMinimalResponse {
+  /** Array of repository resources with minimal information */
+  resources: GetRepositoryResourceMinimalResponse['resource'][];
+  /** HAL specification links for navigation and pagination */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   _links: Links;
 }
 
-export interface getMultiRepositoryResourceRepresentationResponse {
-  resources: getRepositoryResourceRepresentationResponse['resource'][];
+/**
+ * Response interface for getting multiple repository resources in representation mode.
+ * Contains an array of resources with detailed information and navigation links following HAL specification.
+ * @beta
+ */
+export interface GetMultiRepositoryResourceRepresentationResponse {
+  /** Array of repository resources with detailed information */
+  resources: GetRepositoryResourceRepresentationResponse['resource'][];
+  /** HAL specification links for navigation and pagination */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   _links: Links;
 }

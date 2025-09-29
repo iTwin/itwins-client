@@ -6,23 +6,9 @@
  * @module iTwinsClient
  */
 import type { AccessToken } from "@itwin/core-bentley";
-import type { ApimError, APIResponse } from "./types/CommonApiTypes";
+import type { ApimError, APIResponse, Method, RequestConfig } from "./types/CommonApiTypes";
 import { hasProperty, ParameterMapping } from "./types/typeUtils";
 
-/**
- * Common HTTP methods used in API requests
- */
-export type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-
-/**
- * Configuration object for HTTP requests
- */
-interface RequestConfig {
-  method: Method;
-  url: string;
-  body?: string | Blob;
-  headers: Record<string, string>;
-}
 
 /**
  * Type guard to validate if an object is a valid Error structure

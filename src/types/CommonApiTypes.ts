@@ -1,5 +1,20 @@
 /**
- * Standard response structure for all iTwins API operations
+ * Common HTTP methods used in API requests
+ */
+export type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+
+/**
+ * Configuration object for HTTP requests
+ */
+export interface RequestConfig {
+  method: Method;
+  url: string;
+  body?: string | Blob;
+  headers: Record<string, string>;
+}
+
+/**
+ * Standard response structure for all Bentley public API operations
  * @template T The type of data returned in the response
  */
 export interface APIResponse<T> {
@@ -28,10 +43,17 @@ export interface ErrorDetail {
 }
 
 /**
- * prefer header result mode
+ * Result mode preference for API responses.
+ * - minimal: Returns only essential data fields
+ * - representation: Returns complete data with all available properties
  */
 export type ResultMode = "minimal" | "representation";
 
+/**
+ * OData query parameters interface for filtering, pagination, and data manipulation.
+ * Supports standard OData v4 query options for flexible API data retrieval.
+ * @see {@link https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html} OData URL Conventions
+ */
 export interface ODataQueryParams {
   /** Maximum number of results to return (for pagination) */
   top?: number;
