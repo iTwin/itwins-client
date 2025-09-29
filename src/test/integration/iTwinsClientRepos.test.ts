@@ -1271,4 +1271,1343 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(iTwinDeleteResponse.data).toBeUndefined();
     }
   });
+
+  it("should successfully create a repository resource with required properties", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Resources",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      const repositoryResource = {
+        id: "flood_zones",
+        displayName: "Flood Zones",
+      };
+
+      // Act - Create repository resource
+      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        repositoryResource
+      );
+
+      // Assert
+      expect(createResourceResponse.status).toBe(201);
+      expect(createResourceResponse.data?.resource).toBeDefined();
+
+      const createdResource = createResourceResponse.data!.resource;
+      expect(createdResource.id).toBe(repositoryResource.id);
+      expect(createdResource.displayName).toBe(repositoryResource.displayName);
+      expect(createdResource.class).toBe("GeographicInformationSystem");
+      expect(createdResource.subClass).toBe("WebMapService");
+
+      // Cleanup repository (this will also cleanup the resource)
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 422 unprocessable entity when trying to create a repository resource without required properties", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Resources",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      // Missing required 'id' property
+      const invalidRepositoryResource = {
+        displayName: "Flood Zones Without ID",
+      } as any;
+
+      // Act - Try to create repository resource with missing required property
+      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        invalidRepositoryResource
+      );
+
+      // Assert
+      expect(createResourceResponse.status).toBe(422);
+      expect(createResourceResponse.data).toBeUndefined();
+      expect(createResourceResponse.error).not.toBeUndefined();
+      expect(createResourceResponse.error!.code).toBe("InvalidiTwinsRequest");
+
+      // Cleanup repository
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 422 unprocessable entity when trying to create a repository resource with empty required properties", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Resources",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      // Empty required properties
+      const invalidRepositoryResource = {
+        id: "",
+        displayName: "",
+      };
+
+      // Act - Try to create repository resource with empty required properties
+      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        invalidRepositoryResource
+      );
+
+      // Assert
+      expect(createResourceResponse.status).toBe(422);
+      expect(createResourceResponse.data).toBeUndefined();
+      expect(createResourceResponse.error).not.toBeUndefined();
+      expect(createResourceResponse.error!.code).toBe("InvalidiTwinsRequest");
+
+      // Cleanup repository
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 409 conflict when trying to create a duplicate repository resource", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Resources",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      const repositoryResource = {
+        id: "water_bodies",
+        displayName: "Water Bodies",
+      };
+
+      // Act - Create repository resource first time
+      const createResourceResponse1 = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        repositoryResource
+      );
+
+      // Assert - First creation should succeed
+      expect(createResourceResponse1.status).toBe(201);
+      expect(createResourceResponse1.data?.resource).toBeDefined();
+      expect(createResourceResponse1.data!.resource.id).toBe(repositoryResource.id);
+
+      // Act - Try to create the same repository resource again
+      const createResourceResponse2 = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        repositoryResource
+      );
+
+      // Assert - Second creation should fail with conflict
+      expect(createResourceResponse2.status).toBe(409);
+      expect(createResourceResponse2.data).toBeUndefined();
+      expect(createResourceResponse2.error).not.toBeUndefined();
+      expect(createResourceResponse2.error!.code).toBe("iTwinRepositoryResourceExists");
+
+      // Cleanup repository (this will also cleanup the resource)
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to create a repository resource for a repository that doesn't exist", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+    const someRandomRepositoryId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+    const repositoryResource = {
+      id: "test_resource",
+      displayName: "Test Resource",
+    };
+
+    try {
+      // Act - Try to create repository resource for non-existent repository
+      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        someRandomRepositoryId,
+        repositoryResource
+      );
+
+      // Assert
+      expect(createResourceResponse.status).toBe(404);
+      expect(createResourceResponse.data).toBeUndefined();
+      expect(createResourceResponse.error).not.toBeUndefined();
+      expect(createResourceResponse.error!.code).toBe("iTwinRepositoryNotFound");
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to create a repository resource for an iTwin that doesn't exist", async () => {
+    // Arrange
+    const someRandomiTwinId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomRepositoryId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+    const repositoryResource = {
+      id: "test_resource",
+      displayName: "Test Resource",
+    };
+
+    // Act - Try to create repository resource for non-existent iTwin
+    const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
+      accessToken,
+      someRandomiTwinId,
+      someRandomRepositoryId,
+      repositoryResource
+    );
+
+    // Assert
+    expect(createResourceResponse.status).toBe(404);
+    expect(createResourceResponse.data).toBeUndefined();
+    expect(createResourceResponse.error).not.toBeUndefined();
+    expect(createResourceResponse.error!.code).toBe("iTwinRepositoryNotFound");
+  });
+
+  it("should successfully get a repository resource with minimal mode", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Resource Access",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      const repositoryResource = {
+        id: "water_features",
+        displayName: "Water Features",
+      };
+
+      // Create a repository resource
+      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        repositoryResource
+      );
+      expect(createResourceResponse.status).toBe(201);
+      const resourceId = createResourceResponse.data?.resource!.id!;
+
+      // Act - Get repository resource with minimal mode
+      const getResourceResponse = await iTwinsAccessClient.getRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        resourceId,
+        "minimal"
+      );
+
+      // Assert
+      expect(getResourceResponse.status).toBe(200);
+      expect(getResourceResponse.data?.resource).toBeDefined();
+
+      const retrievedResource = getResourceResponse.data!.resource;
+      expect(retrievedResource.id).toBe(resourceId);
+      expect(retrievedResource.displayName).toBe(repositoryResource.displayName);
+      expect(retrievedResource.class).toBeDefined();
+      expect(retrievedResource.class).toBe("GeographicInformationSystem");
+
+      // In minimal mode, properties should not be present
+      expect("properties" in retrievedResource).toBe(false);
+
+      // Cleanup repository (this will also cleanup the resource)
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should successfully get a repository resource with representation mode", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Resource Representation",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      const repositoryResource = {
+        id: "vegetation_areas",
+        displayName: "Vegetation Areas",
+      };
+
+      // Create a repository resource
+      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        repositoryResource
+      );
+      expect(createResourceResponse.status).toBe(201);
+      const resourceId = createResourceResponse.data?.resource!.id!;
+
+      // Act - Get repository resource with representation mode
+      const getResourceResponse = await iTwinsAccessClient.getRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        resourceId,
+        "representation"
+      );
+
+      // Assert
+      expect(getResourceResponse.status).toBe(200);
+      expect(getResourceResponse.data?.resource).toBeDefined();
+
+      const retrievedResource = getResourceResponse.data!.resource;
+      expect(retrievedResource.id).toBe(resourceId);
+      expect(retrievedResource.displayName).toBe(repositoryResource.displayName);
+      expect(retrievedResource.class).toBeDefined();
+      expect(retrievedResource.class).toBe("GeographicInformationSystem");
+
+      // Cleanup repository (this will also cleanup the resource)
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to get a repository resource that doesn't exist", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      const someRandomResourceId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+      // Act - Try to get a non-existent repository resource
+      const getResourceResponse = await iTwinsAccessClient.getRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        someRandomResourceId
+      );
+
+      // Assert
+      expect(getResourceResponse.status).toBe(404);
+      expect(getResourceResponse.data).toBeUndefined();
+      expect(getResourceResponse.error).not.toBeUndefined();
+      expect(getResourceResponse.error!.code).toBe("iTwinRepositoryResourceNotFound");
+
+      // Cleanup repository
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to get a repository resource from a repository that doesn't exist", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const someRandomRepositoryId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomResourceId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+    try {
+      // Act - Try to get a repository resource from a non-existent repository
+      const getResourceResponse = await iTwinsAccessClient.getRepositoryResource(
+        accessToken,
+        iTwinId,
+        someRandomRepositoryId,
+        someRandomResourceId
+      );
+
+      // Assert
+      expect(getResourceResponse.status).toBe(404);
+      expect(getResourceResponse.data).toBeUndefined();
+      expect(getResourceResponse.error).not.toBeUndefined();
+      expect(getResourceResponse.error!.code).toBe("iTwinRepositoryNotFound");
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to get a repository resource from an iTwin that doesn't exist", async () => {
+    // Arrange
+    const someRandomiTwinId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomRepositoryId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomResourceId = "bbf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+    // Act - Try to get a repository resource from a non-existent iTwin
+    const getResourceResponse = await iTwinsAccessClient.getRepositoryResource(
+      accessToken,
+      someRandomiTwinId,
+      someRandomRepositoryId,
+      someRandomResourceId
+    );
+
+    // Assert
+    expect(getResourceResponse.status).toBe(404);
+    expect(getResourceResponse.data).toBeUndefined();
+    expect(getResourceResponse.error).not.toBeUndefined();
+    expect(getResourceResponse.error!.code).toBe("iTwinNotFound");
+  });
+
+  it("should successfully get repository resources with minimal mode", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Multiple Resources",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      // Create multiple repository resources
+      const resource1 = {
+        id: "water_features",
+        displayName: "Water Features",
+      };
+      const resource2 = {
+        id: "vegetation_areas",
+        displayName: "Vegetation Areas",
+      };
+
+      const createResourceResponse1 = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        resource1
+      );
+      expect(createResourceResponse1.status).toBe(201);
+
+      const createResourceResponse2 = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        resource2
+      );
+      expect(createResourceResponse2.status).toBe(201);
+
+      // Act - Get repository resources with minimal mode
+      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        undefined,
+        "minimal"
+      );
+
+      // Assert
+      expect(getResourcesResponse.status).toBe(200);
+      expect(getResourcesResponse.data?.resources).toBeDefined();
+      expect(Array.isArray(getResourcesResponse.data!.resources)).toBe(true);
+      expect(getResourcesResponse.data!.resources.length).toBeGreaterThanOrEqual(2);
+
+      // Check that resources contain expected data
+      const resources = getResourcesResponse.data!.resources;
+      const waterFeature = resources.find(r => r.id === "water_features");
+      const vegetationArea = resources.find(r => r.id === "vegetation_areas");
+
+      expect(waterFeature).toBeDefined();
+      expect(waterFeature!.displayName).toBe("Water Features");
+      expect(waterFeature!.class).toBe("GeographicInformationSystem");
+
+      expect(vegetationArea).toBeDefined();
+      expect(vegetationArea!.displayName).toBe("Vegetation Areas");
+      expect(vegetationArea!.class).toBe("GeographicInformationSystem");
+
+      // In minimal mode, properties should not be present
+      resources.forEach(resource => {
+        expect("properties" in resource).toBe(false);
+      });
+
+      // In minimal mode, _links should also be present (updated requirement)
+      const minimalResponse = getResourcesResponse.data! as any;
+      expect(minimalResponse._links).toBeDefined();
+      expect(minimalResponse._links.self).toBeDefined();
+      expect(minimalResponse._links.self.href).toBeDefined();
+      expect(typeof minimalResponse._links.self.href).toBe("string");
+
+      // Cleanup repository (this will also cleanup the resources)
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should successfully get repository resources with representation mode", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Resource Representation",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      // Create repository resources
+      const resource1 = {
+        id: "roads_network",
+        displayName: "Roads Network",
+      };
+      const resource2 = {
+        id: "building_footprints",
+        displayName: "Building Footprints",
+      };
+
+      const createResourceResponse1 = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        resource1
+      );
+      expect(createResourceResponse1.status).toBe(201);
+
+      const createResourceResponse2 = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        resource2
+      );
+      expect(createResourceResponse2.status).toBe(201);
+
+      // Act - Get repository resources with representation mode
+      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        undefined,
+        "representation"
+      );
+
+      // Assert
+      expect(getResourcesResponse.status).toBe(200);
+      expect(getResourcesResponse.data?.resources).toBeDefined();
+      expect(Array.isArray(getResourcesResponse.data!.resources)).toBe(true);
+      expect(getResourcesResponse.data!.resources.length).toBeGreaterThanOrEqual(2);
+
+      // Check that resources contain expected data
+      const resources = getResourcesResponse.data!.resources;
+      const roadsNetwork = resources.find(r => r.id === "roads_network");
+      const buildingFootprints = resources.find(r => r.id === "building_footprints");
+
+      expect(roadsNetwork).toBeDefined();
+      expect(roadsNetwork!.displayName).toBe("Roads Network");
+      expect(roadsNetwork!.class).toBe("GeographicInformationSystem");
+
+      expect(buildingFootprints).toBeDefined();
+      expect(buildingFootprints!.displayName).toBe("Building Footprints");
+      expect(buildingFootprints!.class).toBe("GeographicInformationSystem");
+
+      // In representation mode, _links should be present
+      const representationResponse = getResourcesResponse.data! as any;
+      expect(representationResponse._links).toBeDefined();
+      expect(representationResponse._links.self).toBeDefined();
+      expect(representationResponse._links.self.href).toBeDefined();
+      expect(typeof representationResponse._links.self.href).toBe("string");
+
+      // prev and next may or may not be present depending on pagination
+      if (representationResponse._links.prev) {
+        expect(representationResponse._links.prev.href).toBeDefined();
+        expect(typeof representationResponse._links.prev.href).toBe("string");
+      }
+      if (representationResponse._links.next) {
+        expect(representationResponse._links.next.href).toBeDefined();
+        expect(typeof representationResponse._links.next.href).toBe("string");
+      }
+
+      // Cleanup repository (this will also cleanup the resources)
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should successfully get repository resources with pagination parameters", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Pagination",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      // Create multiple repository resources
+      const resources = [
+        { id: "resource_1", displayName: "Resource One" },
+        { id: "resource_2", displayName: "Resource Two" },
+        { id: "resource_3", displayName: "Resource Three" },
+      ];
+
+      for (const resource of resources) {
+        const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          resource
+        );
+        expect(createResourceResponse.status).toBe(201);
+      }
+
+      // Act - Get repository resources with pagination (top=2) in representation mode to get links
+      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        { top: 2 },
+        "representation"
+      );
+
+      // Assert
+      expect(getResourcesResponse.status).toBe(200);
+      expect(getResourcesResponse.data?.resources).toBeDefined();
+      expect(Array.isArray(getResourcesResponse.data!.resources)).toBe(true);
+      // Note: The actual count may be higher due to default resources, so we just verify we get results
+      expect(getResourcesResponse.data!.resources.length).toBeGreaterThan(0);
+
+      // In representation mode with pagination, _links should be present
+      const representationResponse = getResourcesResponse.data! as any;
+      expect(representationResponse._links).toBeDefined();
+      expect(representationResponse._links.self).toBeDefined();
+      expect(representationResponse._links.self.href).toBeDefined();
+      expect(typeof representationResponse._links.self.href).toBe("string");
+
+      // Verify the self link contains pagination parameters
+      expect(representationResponse._links.self.href).toContain("top=2");
+
+      // Cleanup repository (this will also cleanup the resources)
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should successfully get repository resources with search parameter", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Search",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      // Create repository resources with searchable names
+      const searchableResource = {
+        id: "water_bodies_special",
+        displayName: "Water Bodies Special Feature",
+      };
+      const otherResource = {
+        id: "road_network",
+        displayName: "Road Network System",
+      };
+
+      const createResourceResponse1 = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        searchableResource
+      );
+      expect(createResourceResponse1.status).toBe(201);
+
+      const createResourceResponse2 = await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        otherResource
+      );
+      expect(createResourceResponse2.status).toBe(201);
+
+      // Act - Get repository resources with search parameter
+      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        { search: "water" }
+      );
+
+      // Assert
+      expect(getResourcesResponse.status).toBe(200);
+      expect(getResourcesResponse.data?.resources).toBeDefined();
+      expect(Array.isArray(getResourcesResponse.data!.resources)).toBe(true);
+
+      // Cleanup repository (this will also cleanup the resources)
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should successfully get repository resources with pagination in minimal mode and verify links", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Minimal Mode Pagination",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      // Create multiple repository resources
+      const resources = [
+        { id: "minimal_resource_1", displayName: "Minimal Resource One" },
+        { id: "minimal_resource_2", displayName: "Minimal Resource Two" },
+        { id: "minimal_resource_3", displayName: "Minimal Resource Three" },
+      ];
+
+      for (const resource of resources) {
+        const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          resource
+        );
+        expect(createResourceResponse.status).toBe(201);
+      }
+
+      // Act - Get repository resources with pagination in minimal mode
+      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        { top: 2, skip: 1 },
+        "minimal"
+      );
+
+      // Assert
+      expect(getResourcesResponse.status).toBe(200);
+      expect(getResourcesResponse.data?.resources).toBeDefined();
+      expect(Array.isArray(getResourcesResponse.data!.resources)).toBe(true);
+      expect(getResourcesResponse.data!.resources.length).toBeGreaterThan(0);
+
+      // In minimal mode, _links should be present with pagination parameters
+      const minimalResponse = getResourcesResponse.data! as any;
+      expect(minimalResponse._links).toBeDefined();
+      expect(minimalResponse._links.self).toBeDefined();
+      expect(minimalResponse._links.self.href).toBeDefined();
+      expect(typeof minimalResponse._links.self.href).toBe("string");
+
+      // Verify the self link contains pagination parameters
+      expect(minimalResponse._links.self.href).toContain("top=2");
+      expect(minimalResponse._links.self.href).toContain("skip=1");
+
+      // Verify resources don't have properties (minimal mode characteristic)
+      const resources_response = getResourcesResponse.data!.resources;
+      resources_response.forEach(resource => {
+        expect("properties" in resource).toBe(false);
+      });
+
+      // Cleanup repository (this will also cleanup the resources)
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to get repository resources from a repository that doesn't exist", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const someRandomRepositoryId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+    try {
+      // Act - Try to get repository resources from a non-existent repository
+      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
+        accessToken,
+        iTwinId,
+        someRandomRepositoryId
+      );
+
+      // Assert
+      expect(getResourcesResponse.status).toBe(404);
+      expect(getResourcesResponse.data).toBeUndefined();
+      expect(getResourcesResponse.error).not.toBeUndefined();
+      expect(getResourcesResponse.error!.code).toBe("iTwinRepositoryNotFound");
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to get repository resources from an iTwin that doesn't exist", async () => {
+    // Arrange
+    const someRandomiTwinId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomRepositoryId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+    // Act - Try to get repository resources from a non-existent iTwin
+    const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
+      accessToken,
+      someRandomiTwinId,
+      someRandomRepositoryId
+    );
+
+    // Assert
+    expect(getResourcesResponse.status).toBe(404);
+    expect(getResourcesResponse.data).toBeUndefined();
+    expect(getResourcesResponse.error).not.toBeUndefined();
+    expect(getResourcesResponse.error!.code).toBe("iTwinNotFound");
+  });
+
+  it("should successfully get empty repository resources array from a repository with no resources", async () => {
+    // Arrange
+    const newiTwin: ITwin = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data!.id!;
+
+    const gisRepository: Repository = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Empty Test GIS Repository",
+    };
+
+    try {
+      // Create a GIS repository but don't add any resources
+      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
+        accessToken,
+        iTwinId,
+        gisRepository
+      );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      // Act - Get repository resources from empty repository
+      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+
+      // Assert
+      expect(getResourcesResponse.status).toBe(200);
+      expect(getResourcesResponse.data?.resources).toBeDefined();
+      expect(Array.isArray(getResourcesResponse.data!.resources)).toBe(true);
+      // The array may contain default resources, so we just verify it's an array
+
+      // Cleanup repository
+      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
+        accessToken,
+        iTwinId,
+        repositoryId
+      );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
 });

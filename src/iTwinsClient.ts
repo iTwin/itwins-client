@@ -8,12 +8,32 @@
 
 import type { AccessToken } from "@itwin/core-bentley";
 import { BaseITwinsApiClient } from "./BaseITwinsApiClient.js";
-import type { APIResponse, ResultMode } from "./types/CommonApiTypes";
+import type {
+  APIResponse,
+  ODataQueryParams,
+  ResultMode,
+} from "./types/CommonApiTypes";
 import type { ITwin, ITwinRecentsResponse } from "./types/ITwin";
-import type { ITwinExportMultiResponse, ITwinExportRequestInfo, ITwinExportSingleResponse } from "./types/ITwinExport";
+import type {
+  ITwinExportMultiResponse,
+  ITwinExportRequestInfo,
+  ITwinExportSingleResponse,
+} from "./types/ITwinExport";
 import type { ITwinImageResponse } from "./types/ITwinImage.js";
-import type { ITwinQueryScope, ITwinsQueryArg } from "./types/ITwinsQueryArgs.js";
-import type { MultiRepositoriesResponse, Repository, SingleRepositoryResponse } from "./types/Repository";
+import type {
+  ITwinQueryScope,
+  ITwinsQueryArg,
+} from "./types/ITwinsQueryArgs.js";
+import type {
+  MultiRepositoriesResponse,
+  Repository,
+  PostRepositoryResourceResponse,
+  SingleRepositoryResponse,
+  getRepositoryResourceRepresentationResponse,
+  getRepositoryResourceMinimalResponse,
+  getMultiRepositoryResourceMinimalResponse,
+  getMultiRepositoryResourceRepresentationResponse,
+} from "./types/Repository";
 
 /** Client API to access the itwins service.
  * @beta
@@ -78,7 +98,10 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
   ): Promise<APIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/favorites`;
-    const query = this.getQueryStringArg(ITwinsAccessClient.iTwinsQueryParamMapping, arg);
+    const query = this.getQueryStringArg(
+      ITwinsAccessClient.iTwinsQueryParamMapping,
+      arg
+    );
     if (query !== "") url += `?${query}`;
 
     return this.sendGenericAPIRequest(
@@ -200,7 +223,10 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
   ): Promise<APIResponse<ITwinRecentsResponse>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
-    const query = this.getQueryStringArg(ITwinsAccessClient.iTwinsQueryParamMapping,arg);
+    const query = this.getQueryStringArg(
+      ITwinsAccessClient.iTwinsQueryParamMapping,
+      arg
+    );
     if (query !== "") url += `?${query}`;
     return this.sendGenericAPIRequest(
       accessToken,
@@ -223,7 +249,10 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
   ): Promise<APIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = this._baseUrl;
-    const query = this.getQueryStringArg(ITwinsAccessClient.iTwinsQueryParamMapping, arg);
+    const query = this.getQueryStringArg(
+      ITwinsAccessClient.iTwinsQueryParamMapping,
+      arg
+    );
     if (query !== "") url += `?${query}`;
 
     return this.sendGenericAPIRequest(
@@ -329,7 +358,10 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
   ): Promise<APIResponse<MultiRepositoriesResponse>> {
     let url = `${this._baseUrl}/${iTwinId}/repositories`;
 
-    const query = this.getQueryStringArg(ITwinsAccessClient.repositoryParamMapping, arg);
+    const query = this.getQueryStringArg(
+      ITwinsAccessClient.repositoryParamMapping,
+      arg
+    );
     if (query !== "") {
       url += `?${query}`;
     }
@@ -371,6 +403,101 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
     return this.sendGenericAPIRequest(accessToken, "PATCH", url, repository);
   }
 
+  /**
+   * Create a repository resource for a repository of class GeographicInformationSystem
+   * @param accessToken - The client access token string for authorization
+   * @param iTwinId - The id of the iTwin that contains the repository
+   * @param repositoryId - The id of the GeographicInformationSystem repository to add the resource to
+   * @param repositoryResource - The repository resource to create with required id and displayName properties
+   * @returns Promise that resolves with the created repository resource details
+   *
+   * @beta
+   */
+  public async createRepositoryResource(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    repositoryResource: Pick<Repository, "id" | "displayName">
+  ): Promise<APIResponse<PostRepositoryResourceResponse>> {
+    const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}/resources`;
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "POST",
+      url,
+      repositoryResource
+    );
+  }
+
+  /**
+   * Get a specific repository resource by ID
+   * @param accessToken - The client access token string for authorization
+   * @param iTwinId - The id of the iTwin that contains the repository
+   * @param repositoryId - The id of the repository containing the resource
+   * @param resourceId - The unique id of the repository resource to retrieve
+   * @param resultMode - Optional result mode controlling the level of detail returned (minimal or representation)
+   * @returns Promise that resolves with the repository resource details in the requested format
+   * @beta
+   */
+  public async getRepositoryResource(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    resourceId: string,
+    resultMode?: ResultMode
+  ): Promise<
+    APIResponse<
+      | getRepositoryResourceRepresentationResponse
+      | getRepositoryResourceMinimalResponse
+    >
+  > {
+    const headers = this.getResultModeHeaders(resultMode);
+    const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}/resources/${resourceId}`;
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      "repositoryResource",
+      headers
+    );
+  }
+
+    /**
+   * Get a specific repository resource by ID
+   * @param accessToken - The client access token string for authorization
+   * @param iTwinId - The id of the iTwin that contains the repository
+   * @param repositoryId - The id of the repository containing the resource
+   * @param resultMode - Optional result mode controlling the level of detail returned (minimal or representation)
+   * @returns Promise that resolves with the repository resource details in the requested format
+   * @beta
+   */
+  public async getRepositoryResources(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    args?: Pick<ODataQueryParams, "search" | "skip" | "top">,
+    resultMode?: ResultMode
+  ): Promise<
+    APIResponse<
+      | getMultiRepositoryResourceMinimalResponse
+      | getMultiRepositoryResourceRepresentationResponse
+    >
+  > {
+    const headers = this.getResultModeHeaders(resultMode);
+    let url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}/resources?${this.getQueryStringArg(
+      ITwinsAccessClient.ODataParamMapping,
+      args
+    )}`;
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      "repositoryResource",
+      headers
+    );
+  }
+
   /** Get itwin accessible to the user
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
@@ -405,7 +532,10 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
   ): Promise<APIResponse<ITwin[]>> {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
-    const query = this.getQueryStringArg(ITwinsAccessClient.iTwinsQueryParamMapping, arg);
+    const query = this.getQueryStringArg(
+      ITwinsAccessClient.iTwinsQueryParamMapping,
+      arg
+    );
     if (query !== "") url += `?${query}`;
 
     return this.sendGenericAPIRequest(

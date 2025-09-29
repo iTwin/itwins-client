@@ -8,14 +8,30 @@
 
 import type { AccessToken } from "@itwin/core-bentley";
 import { BaseBentleyAPIClient } from "./BaseBentleyAPIClient";
-import type { APIResponse, ResultMode } from "./types/CommonApiTypes";
+import type {
+  APIResponse,
+  ODataQueryParams,
+  ResultMode,
+} from "./types/CommonApiTypes";
 import type { ITwin, ITwinRecentsResponse } from "./types/ITwin";
-import type { ITwinExportMultiResponse, ITwinExportRequestInfo, ITwinExportSingleResponse } from "./types/ITwinExport";
+import type {
+  ITwinExportMultiResponse,
+  ITwinExportRequestInfo,
+  ITwinExportSingleResponse,
+} from "./types/ITwinExport";
 import type { ITwinImageResponse } from "./types/ITwinImage";
 import type { ITwinsQueryArg } from "./types/ITwinsQueryArgs";
-import type { MultiRepositoriesResponse, Repository, SingleRepositoryResponse } from "./types/Repository";
+import type {
+  MultiRepositoriesResponse,
+  Repository,
+  PostRepositoryResourceResponse,
+  SingleRepositoryResponse,
+  getRepositoryResourceRepresentationResponse,
+  getRepositoryResourceMinimalResponse,
+  getMultiRepositoryResourceMinimalResponse,
+  getMultiRepositoryResourceRepresentationResponse,
+} from "./types/Repository";
 import type { ParameterMapping } from "./types/typeUtils";
-
 
 /** Methods for accessing itwins
  * @beta
@@ -34,23 +50,43 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
    *
    * @readonly
    */
-  protected static readonly iTwinsQueryParamMapping: ParameterMapping<ITwinsQueryArg> =
-    {
-      subClass: "subClass",
-      type: "type",
-      status: "status",
-      search: "$search",
-      displayName: "displayName",
-      // eslint-disable-next-line id-denylist
-      number: "number",
-      top: "$top",
-      skip: "$skip",
-      parentId: "parentId",
-      iTwinAccountId: "iTwinAccountId",
-      includeInactive: "includeInactive",
-      resultMode: "",
-      queryScope: "",
-    } as const;
+  protected static readonly iTwinsQueryParamMapping: ParameterMapping<
+    Omit<ITwinsQueryArg, "resultMode" | "queryScope">
+  > = {
+    subClass: "subClass",
+    type: "type",
+    status: "status",
+    search: "$search",
+    displayName: "displayName",
+    // eslint-disable-next-line id-denylist
+    number: "number",
+    top: "$top",
+    skip: "$skip",
+    parentId: "parentId",
+    iTwinAccountId: "iTwinAccountId",
+    includeInactive: "includeInactive",
+  } as const;
+
+  /**
+   * Maps the properties of {@link ITwinsQueryArg} to their corresponding query parameter names.
+   *
+   * @remarks
+   * This mapping is used to translate internal property names to the expected parameter names
+   * when constructing iTwins queries. Properties mapped to empty strings are excluded from
+   * the query string as they should be sent as headers instead.
+   *
+   * The mapping includes both OData query parameters (prefixed with $) and iTwins-specific
+   * parameters for filtering and pagination.
+   *
+   * @readonly
+   */
+  protected static readonly ODataParamMapping: ParameterMapping<
+    Pick<ODataQueryParams, "search" | "skip" | "top">
+  > = {
+    top: "$top",
+    skip: "$skip",
+    search: "$search",
+  } as const;
 
   /**
    * Maps the properties of class and subclass to their corresponding query parameter names.
@@ -198,6 +234,42 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     repositoryId: string,
     repository: Omit<Repository, "id" | "class" | "subClass">
   ): Promise<APIResponse<SingleRepositoryResponse>>;
+
+  /** Create a repository resource for a repository of class GeographicInformationSystem */
+  public abstract createRepositoryResource(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    repositoryResource: Pick<Repository, "id" | "displayName">
+  ): Promise<APIResponse<PostRepositoryResourceResponse>>;
+
+  /** get a repository resource for a repository */
+  public abstract getRepositoryResource(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    resourceId: string,
+    resultMode?: ResultMode
+  ): Promise<
+    APIResponse<
+      | getRepositoryResourceRepresentationResponse
+      | getRepositoryResourceMinimalResponse
+    >
+  >;
+
+  /** get repository resources for a repository */
+  public abstract getRepositoryResources(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    args?: Pick<ODataQueryParams, "search" | "skip" | "top">,
+    resultMode?: ResultMode
+  ): Promise<
+    APIResponse<
+      | getMultiRepositoryResourceMinimalResponse
+      | getMultiRepositoryResourceRepresentationResponse
+    >
+  >;
 
   /** Adds image for iTwin  */
   public abstract getITwinImage(

@@ -1,4 +1,4 @@
-import { ResultMode } from "./CommonApiTypes.js";
+import { ODataQueryParams, ResultMode } from "./CommonApiTypes.js";
 import { ITwinSubClass } from "./ITwin.js";
 
 /**
@@ -24,17 +24,12 @@ export interface ITwinsQueryArg extends ITwinsQueryArgsApi {
  *
  * @public
  */
-export interface ITwinsQueryArgsApi {
+export interface ITwinsQueryArgsApi
+  extends Pick<ODataQueryParams, "search" | "skip" | "top"> {
   /** Controls the level of detail in the response (minimal or representation) */
   resultMode?: ResultMode;
   /** Limits the scope of the query (memberOfItwin, all, OrganizationAdmin) */
   queryScope?: ITwinQueryScope;
-  /** Maximum number of results to return (for pagination) */
-  top?: number;
-  /** Number of results to skip (for pagination) */
-  skip?: number;
-  /** Search string to filter results by keyword */
-  search?: string;
 }
 
 /**

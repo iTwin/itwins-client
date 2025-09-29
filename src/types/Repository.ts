@@ -1,3 +1,5 @@
+import { Links } from "./links";
+
 /**
  * Repository object representing a service or data source that contains data for an iTwin.
  * A repository can be any external service like imagery providers, map services, or other data sources.
@@ -80,11 +82,49 @@ export interface SingleRepositoryResponse {
   repository: Repository;
 }
 
-
 /**
  * Response interface for multiple repository operations get repositories
  */
 export interface MultiRepositoriesResponse {
   /** Array of repository objects returned by the API */
   repositories: Repository[];
+}
+
+export interface PostRepositoryResourceResponse {
+  resource: Pick<Repository, "id" | "subClass" | "displayName"> & {
+    class: "GeographicInformationSystem";
+  };
+}
+
+export interface getRepositoryResourceMinimalResponse {
+  resource: Pick<Repository, "id" | "subClass" | "displayName"> & {
+    type?: string;
+    class:
+      | "GeographicInformationSystem"
+      | "CesiumCuratedContent"
+      | "GeospatialFeatures"
+      | "RealityData"
+      | "iModels";
+    capabilities?: {
+      graphics: {
+        uri: string;
+      };
+    };
+  };
+}
+
+export interface getRepositoryResourceRepresentationResponse extends getRepositoryResourceMinimalResponse {
+  properties?: {
+    [key: string]: unknown;
+  };
+}
+
+export interface getMultiRepositoryResourceMinimalResponse {
+  resources: getRepositoryResourceMinimalResponse['resource'][];
+  _links: Links;
+}
+
+export interface getMultiRepositoryResourceRepresentationResponse {
+  resources: getRepositoryResourceRepresentationResponse['resource'][];
+  _links: Links;
 }
