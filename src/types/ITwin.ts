@@ -1,4 +1,8 @@
-import { Links } from "./links";
+/*---------------------------------------------------------------------------------------------
+* Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+* See LICENSE.md in the project root for license terms and full copyright notice.
+*--------------------------------------------------------------------------------------------*/
+import type { Links } from "./links";
 
 /**
  * Minimal iTwin interface containing only minimal properties.
@@ -120,7 +124,7 @@ export interface ITwinMinimalResponse {
 export type ItwinCreate =
    Omit<
     ITwinRepresentation,
-    "id" | "createdDateTime" | "lastModifiedDateTime" | "iTwinAccountId"
+    "id" | "createdDateTime" | "lastModifiedDateTime" | "iTwinAccountId" | "createdBy" | "image" | "imageName" | "lastModifiedBy"
   >
 
 /**

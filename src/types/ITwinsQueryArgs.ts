@@ -1,5 +1,9 @@
-import { ODataQueryParams, ResultMode } from "./CommonApiTypes.js";
-import { ITwinSubClass } from "./ITwin.js";
+/*---------------------------------------------------------------------------------------------
+* Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+* See LICENSE.md in the project root for license terms and full copyright notice.
+*--------------------------------------------------------------------------------------------*/
+import type { ODataQueryParams, ResultMode } from "./CommonApiTypes.js";
+import type { ITwinSubClass } from "./ITwin.js";
 
 /**
  * Base set of query arguments for iTwins API operations

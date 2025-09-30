@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import type { AccessToken } from "@itwin/core-bentley";;
 import { beforeAll, describe, expect, it } from "vitest";
-import { ITwinsAccessClient } from "../../iTwinsClient";
+import { ITwinsClient } from "../../iTwinsClient";
 import type { APIResponse } from "../../types/CommonApiTypes";
 import type { ItwinCreate, ITwinMinimal, ITwinRepresentation, ITwinRepresentationResponse, ITwinSubClass } from "../../types/ITwin";
 import { TestConfig } from "../TestConfig";
@@ -18,8 +18,8 @@ describe("iTwinsClient", () => {
     url.hostname = urlPrefix + url.hostname;
     baseUrl = url.href;
   }
-  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
-  const iTwinsCustomClient: ITwinsAccessClient = new ITwinsAccessClient(
+  const iTwinsAccessClient: ITwinsClient = new ITwinsClient();
+  const iTwinsCustomClient: ITwinsClient = new ITwinsClient(
     baseUrl
   );
   let accessToken: AccessToken;

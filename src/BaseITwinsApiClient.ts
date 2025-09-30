@@ -2,10 +2,6 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-/** @packageDocumentation
- * @module iTwinsClient
- */
-
 import type { AccessToken } from "@itwin/core-bentley";
 import { BaseBentleyAPIClient } from "./BaseBentleyAPIClient";
 import type {
@@ -40,7 +36,7 @@ import type {
 } from "./types/Repository";
 import type { ParameterMapping } from "./types/typeUtils";
 
-/** Methods for accessing itwins
+/** Abstract class for accessing working with ITwins Service
  * @beta
  */
 export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
@@ -98,7 +94,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
   } as const;
 
   /**
-   * Maps the properties some of the {@link ODataQueryParams} to their corresponding query parameter names.
+   * Maps the properties some of the {@link ODataQueryParams} and all of the {@link ITwinsQueryArg} to their corresponding query parameter names.
    *
    * @remarks
    * This mapping is used to translate internal property names to the expected parameter names
@@ -193,7 +189,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     args: ITwinExportRequestInfo
   ): Promise<APIResponse<ITwinExportSingleResponse>>;
 
-  /** Create a new iTwin export */
+  /** Get a iTwin export */
   public abstract getExport(
     accessToken: AccessToken,
     id: string
@@ -239,7 +235,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
   ): Promise<APIResponse<undefined>>;
 
   /** Get recently used iTwins for the current user, maximum 25 items ordered by most recent first */
-  public abstract getMyRecentUsedITwins(
+  public abstract getRecentUsedITwins(
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
   ): Promise<
@@ -276,7 +272,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     repositoryId: string
   ): Promise<APIResponse<SingleRepositoryResponse>>;
 
-  /** update a specific repository by ID from an iTwin */
+  /** Update a specific repository by ID from an iTwin */
   public abstract updateRepository(
     accessToken: AccessToken,
     iTwinId: string,
@@ -292,7 +288,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     repositoryResource: Pick<Repository, "id" | "displayName">
   ): Promise<APIResponse<PostRepositoryResourceResponse>>;
 
-  /** get a repository resource for a repository */
+  /** Get a repository resource for a repository */
   public abstract getRepositoryResource(
     accessToken: AccessToken,
     iTwinId: string,
@@ -306,7 +302,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     >
   >;
 
-  /** get repository resources for a repository */
+  /** Get repository resources for a repository */
   public abstract getRepositoryResources(
     accessToken: AccessToken,
     iTwinId: string,
@@ -320,7 +316,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     >
   >;
 
-  /** Adds image for iTwin  */
+  /** Get image for iTwin  */
   public abstract getITwinImage(
     accessToken: AccessToken,
     iTwinId: string

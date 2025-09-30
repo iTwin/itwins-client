@@ -1,4 +1,8 @@
-import { Links } from "./links";
+/*---------------------------------------------------------------------------------------------
+* Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+* See LICENSE.md in the project root for license terms and full copyright notice.
+*--------------------------------------------------------------------------------------------*/
+import type { Links } from "./links";
 
 /**
  * Repository object representing a service or data source that contains data for an iTwin.

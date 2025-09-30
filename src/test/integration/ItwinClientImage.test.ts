@@ -9,11 +9,11 @@ import { resolve } from "path";
 import type { APIResponse } from "../../types/CommonApiTypes";
 import type { ITwinImageResponse } from "../../types/ITwinImage";
 import { beforeAll, describe, expect, it } from "vitest";
-import { ITwinsAccessClient } from "../../iTwinsClient";
+import { ITwinsClient } from "../../iTwinsClient";
 import { TestConfig } from "../TestConfig";
 
 describe("iTwinsClient Image Functionality", () => {
-  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  const iTwinsAccessClient: ITwinsClient = new ITwinsClient();
   let accessToken: AccessToken;
 
   beforeAll(async () => {

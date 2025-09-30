@@ -2,25 +2,21 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-
 import type { AccessToken } from "@itwin/core-bentley";
-import { ITwinRepresentation } from "src/types/ITwin";
+import type { ItwinCreate  } from "../../types/ITwin";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { ITwinsAccessClient } from "../../iTwinsClient";
+import { ITwinsClient } from "../../iTwinsClient";
 import { Repository } from "../../types/Repository";
 import { TestConfig } from "../TestConfig";
 
-type ItwinCreate = Omit<ITwinRepresentation, "id">;
-
 describe("iTwins Client - Repository Integration Tests", () => {
   let accessToken: AccessToken;
-  let iTwinsAccessClient: ITwinsAccessClient;
+  let iTwinsAccessClient: ITwinsClient;
 
   beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
-    iTwinsAccessClient = new ITwinsAccessClient();
+    iTwinsAccessClient = new ITwinsClient();
   });
 
   beforeEach(async () => {

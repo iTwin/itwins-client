@@ -4,11 +4,11 @@
  *--------------------------------------------------------------------------------------------*/
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import type { AccessToken } from "@itwin/core-bentley";
-import { beforeAll, describe, expect, it } from "vitest";
-import { ITwinsAccessClient } from "../../iTwinsClient";
-import { TestConfig } from "../TestConfig";
 import { APIResponse } from "src/types/CommonApiTypes";
-import { ITwinMinimal, ITwinRepresentation } from "src/types/ITwin";
+import type { ITwinMinimal, ITwinRepresentation } from "src/types/ITwin";
+import { beforeAll, describe, expect, it } from "vitest";
+import { ITwinsClient } from "../../iTwinsClient";
+import { TestConfig } from "../TestConfig";
 
 describe("iTwinsClient Recently Used Functionality", () => {
   let baseUrl: string = "https://api.bentley.com/itwins";
@@ -18,7 +18,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
     url.hostname = urlPrefix + url.hostname;
     baseUrl = url.href;
   }
-  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  const iTwinsAccessClient: ITwinsClient = new ITwinsClient();
   let accessToken: AccessToken;
 
   beforeAll(async () => {
@@ -28,7 +28,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
   it("should get a list of recently used iTwins", async () => {
     // Act
     const recentsResponse =
-      await iTwinsAccessClient.getMyRecentUsedITwins(accessToken);
+      await iTwinsAccessClient.getRecentUsedITwins(accessToken);
 
     // Assert
     expect(recentsResponse.status).toBe(200);
@@ -43,7 +43,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
   it("should get recently used iTwins with query parameters", async () => {
     // Act
     const recentsResponse =
-      await iTwinsAccessClient.getMyRecentUsedITwins(accessToken, {
+      await iTwinsAccessClient.getRecentUsedITwins(accessToken, {
         top: 5,
         resultMode: "representation",
       });
@@ -69,7 +69,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
   it("should get recently used iTwins including inactive ones", async () => {
     // Act
     const recentsResponse =
-      await iTwinsAccessClient.getMyRecentUsedITwins(accessToken, {
+      await iTwinsAccessClient.getRecentUsedITwins(accessToken, {
         includeInactive: true,
       });
 
@@ -124,7 +124,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
 
       // Verify iTwin appears in recently used list
       const recentsResponse =
-        await iTwinsAccessClient.getMyRecentUsedITwins(accessToken, {
+        await iTwinsAccessClient.getRecentUsedITwins(accessToken, {
           displayName: newiTwin.displayName,
         });
 
@@ -174,7 +174,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
 
       // Verify iTwin is in recently used list (should appear only once, most recent)
       const recentsResponse =
-        await iTwinsAccessClient.getMyRecentUsedITwins(accessToken, {
+        await iTwinsAccessClient.getRecentUsedITwins(accessToken, {
           displayName: newiTwin.displayName,
         });
 
@@ -194,7 +194,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
 
   it("should return recently used iTwins in correct order (most recent first)", async () => {
     // Act - Get recently used iTwins
-    const recentsResponse = await iTwinsAccessClient.getMyRecentUsedITwins(accessToken, {
+    const recentsResponse = await iTwinsAccessClient.getRecentUsedITwins(accessToken, {
       top: 10,
     });
 

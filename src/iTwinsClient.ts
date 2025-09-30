@@ -13,7 +13,7 @@ import type {
   ODataQueryParams,
   ResultMode,
 } from "./types/CommonApiTypes";
-import {
+import type {
   ItwinCreate,
   ITwinMinimalResponse,
   ITwinRepresentationResponse,
@@ -45,7 +45,7 @@ import type {
 /** Client API to access the itwins service.
  * @beta
  */
-export class ITwinsAccessClient extends BaseITwinsApiClient {
+export class ITwinsClient extends BaseITwinsApiClient {
   constructor(url?: string) {
     super(url);
   }
@@ -107,7 +107,7 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
   > {
     const headers = this.getHeaders(arg);
     const url = `${this._baseUrl}/favorites/?${this.getQueryStringArg(
-      ITwinsAccessClient.iTwinsQueryParamMapping,
+      ITwinsClient.iTwinsQueryParamMapping,
       arg
     )}`;
 
@@ -218,7 +218,7 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
    * @param arg Optional query arguments, for paging, searching, and filtering (including status and includeInactive)
    * @returns Promise that resolves with an array of recently used iTwins (maximum 25), ordered by most recent first
    */
-  public async getMyRecentUsedITwins(
+  public async getRecentUsedITwins(
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
   ): Promise<
@@ -227,7 +227,7 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
     const query = this.getQueryStringArg(
-      ITwinsAccessClient.iTwinsQueryParamMapping,
+      ITwinsClient.iTwinsQueryParamMapping,
       arg
     );
     if (query !== "") url += `?${query}`;
@@ -287,7 +287,7 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
     const url = `${
       this._baseUrl
     }/${iTwinId}/repositories/?${this.getQueryStringArg(
-      ITwinsAccessClient.repositoryParamMapping,
+      ITwinsClient.repositoryParamMapping,
       arg
     )}`;
 
@@ -412,7 +412,7 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
     const url = `${
       this._baseUrl
     }/${iTwinId}/repositories/${repositoryId}/resources?${this.getQueryStringArg(
-      ITwinsAccessClient.ODataParamMapping,
+      ITwinsClient.ODataParamMapping,
       args
     )}`;
     return this.sendGenericAPIRequest(
@@ -460,7 +460,7 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
   > {
     const headers = this.getHeaders(arg);
     const url = `${this._baseUrl}/?${this.getQueryStringArg(
-      ITwinsAccessClient.ITwinsGetQueryParamMapping,
+      ITwinsClient.ITwinsGetQueryParamMapping,
       arg
     )}`;
 

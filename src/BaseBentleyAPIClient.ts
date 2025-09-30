@@ -2,13 +2,9 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-/** @packageDocumentation
- * @module iTwinsClient
- */
 import type { AccessToken } from "@itwin/core-bentley";
 import type { ApimError, APIResponse, Method, RequestConfig } from "./types/CommonApiTypes";
 import { ParameterMapping } from "./types/typeUtils";
-
 
 /**
  * Type guard to validate if an object is a valid Error structure
