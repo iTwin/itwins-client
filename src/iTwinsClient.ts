@@ -42,7 +42,7 @@ import type {
   SingleRepositoryResponse,
 } from "./types/Repository";
 
-/** Client API to access the itwins service.
+/** Client API to access the iTwins service.
  * @beta
  */
 export class ITwinsClient extends BaseITwinsApiClient {
@@ -243,9 +243,9 @@ export class ITwinsClient extends BaseITwinsApiClient {
   /** Create a new iTwin Repository
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
-   * @param repository The Repository to be created
+   * @param repository The Repository data to be created
+   * @returns Promise that resolves with the created repository details
    * @beta
-   * @return Repository
    */
   public async createRepository(
     accessToken: AccessToken,
@@ -259,8 +259,8 @@ export class ITwinsClient extends BaseITwinsApiClient {
   /** Delete the specified iTwin Repository
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
-   * @param repositoryId The id of the Repository
-   * @return No Content
+   * @param repositoryId The id of the Repository to delete
+   * @returns Promise that resolves when the repository is successfully deleted
    */
   public async deleteRepository(
     accessToken: AccessToken,
@@ -271,11 +271,11 @@ export class ITwinsClient extends BaseITwinsApiClient {
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
 
-  /** Get Repositories accessible to user
+  /** Get repositories accessible to user with optional filtering
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
-   * @param arg Optional query arguments, for class and subclass. If subClass is specified, class is also required.
-   * @returns Array of Repositories, may be empty
+   * @param arg Optional query arguments for class and subClass filtering. If subClass is specified, class is also required.
+   * @returns Promise that resolves with an array of repositories, may be empty
    */
   public async getRepositories(
     accessToken: AccessToken,
@@ -294,11 +294,11 @@ export class ITwinsClient extends BaseITwinsApiClient {
     return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
 
-  /** Get Repositories accessible to user
+  /** Get a specific repository by ID
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
    * @param repositoryId The id of the Repository
-   * @returns Repository
+   * @returns Promise that resolves with the repository details
    * @beta
    */
   public async getRepository(
@@ -310,12 +310,12 @@ export class ITwinsClient extends BaseITwinsApiClient {
     return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
 
-  /** Get Repositories accessible to user
+  /** Update the specified iTwin Repository
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
    * @param repositoryId The id of the Repository
-   * @param repository updated repository
-   * @returns Updated repository
+   * @param repository Updated repository data (excluding id, class, and subClass)
+   * @returns Promise that resolves with the updated repository
    * @beta
    */
   public async updateRepository(
@@ -387,13 +387,13 @@ export class ITwinsClient extends BaseITwinsApiClient {
   }
 
   /**
-   * Get a specific repository resource by ID
+   * Get multiple repository resources with optional filtering and pagination
    * @param accessToken - The client access token string for authorization
    * @param iTwinId - The id of the iTwin that contains the repository
-   * @param repositoryId - The id of the repository containing the resource
-   * @param args query params for get query
+   * @param repositoryId - The id of the repository containing the resources
+   * @param args - Optional query parameters for search, pagination (skip, top)
    * @param resultMode - Optional result mode controlling the level of detail returned (minimal or representation)
-   * @returns Promise that resolves with the repository resource details in the requested format
+   * @returns Promise that resolves with an array of repository resources in the requested format
    * @beta
    */
   public async getRepositoryResources(
@@ -424,11 +424,11 @@ export class ITwinsClient extends BaseITwinsApiClient {
     );
   }
 
-  /** Get itwin accessible to the user
+  /** Get a specific iTwin by ID
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
    * @param resultMode (Optional) iTwin result mode: minimal or representation
-   * @returns Array of projects, may be empty
+   * @returns Promise that resolves with the iTwin details
    */
   public async getITwin(
     accessToken: AccessToken,
@@ -446,10 +446,10 @@ export class ITwinsClient extends BaseITwinsApiClient {
     );
   }
 
-  /** Get itwins accessible to the user
+  /** Get iTwins accessible to the user with optional filtering and pagination
    * @param accessToken The client access token string
-   * @param arg Optional query arguments, for paging, searching, and filtering
-   * @returns Array of projects, may be empty
+   * @param arg Optional query arguments for paging, searching, filtering, ordering, and field selection
+   * @returns Promise that resolves with an array of iTwins, may be empty
    */
   public async getITwins(
     accessToken: AccessToken,
@@ -475,8 +475,8 @@ export class ITwinsClient extends BaseITwinsApiClient {
 
   /** Create a new iTwin
    * @param accessToken The client access token string
-   * @param iTwin The iTwin to be created
-   * @returns ITwin
+   * @param iTwin The iTwin data to be created
+   * @returns Promise that resolves with the created iTwin details
    */
   public async createITwin(
     accessToken: AccessToken,
@@ -488,9 +488,9 @@ export class ITwinsClient extends BaseITwinsApiClient {
 
   /** Update the specified iTwin
    * @param accessToken The client access token string
-   * @param iTwinId The id of the iTwin
-   * @param iTwin The iTwin to be created
-   * @returns ITwin
+   * @param iTwinId The id of the iTwin to update
+   * @param iTwin The iTwin data to be updated (partial update supported)
+   * @returns Promise that resolves with the updated iTwin details
    */
   public async updateItwin(
     accessToken: AccessToken,
@@ -503,8 +503,8 @@ export class ITwinsClient extends BaseITwinsApiClient {
 
   /** Delete the specified iTwin
    * @param accessToken The client access token string
-   * @param iTwinId The id of the iTwin
-   * @returns No Content
+   * @param iTwinId The id of the iTwin to delete
+   * @returns Promise that resolves when the iTwin is successfully deleted
    */
   public async deleteItwin(
     accessToken: AccessToken,
@@ -514,8 +514,9 @@ export class ITwinsClient extends BaseITwinsApiClient {
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
 
-  /** Get primary account accessible to the user
-   * @returns Primary account
+  /** Get the primary account accessible to the user
+   * @param accessToken The client access token string
+   * @returns Promise that resolves with the primary account details
    */
   public async getPrimaryAccount(
     accessToken: AccessToken
@@ -525,10 +526,11 @@ export class ITwinsClient extends BaseITwinsApiClient {
   }
 
   /**
-   * Gets the Account for the specified iTwin.
+   * Get the account for the specified iTwin
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
-   * @returns Account
+   * @param resultMode (Optional) Result mode: minimal or representation
+   * @returns Promise that resolves with the account details
    */
   public async getITwinAccount(
     accessToken: AccessToken,
@@ -547,8 +549,9 @@ export class ITwinsClient extends BaseITwinsApiClient {
   }
 
   /**
-   * Format headers from query arguments
+   * Format headers from query arguments including query scope and result mode
    * @param arg (Optional) iTwin query arguments
+   * @returns Headers object with formatted query scope and result mode headers
    * @protected
    */
   protected getHeaders(arg?: ITwinsQueryArg): Record<string, string> {
@@ -560,7 +563,8 @@ export class ITwinsClient extends BaseITwinsApiClient {
 
   /**
    * Format result mode parameter into a headers entry
-   * @param resultMode (Optional) iTwin result mode
+   * @param resultMode (Optional) iTwin result mode, defaults to "minimal"
+   * @returns Headers object with prefer header for result mode
    * @protected
    */
   protected getResultModeHeaders(
@@ -573,7 +577,8 @@ export class ITwinsClient extends BaseITwinsApiClient {
 
   /**
    * Format query scope parameter into a headers entry
-   * @param queryScope (Optional) iTwin query scope
+   * @param queryScope (Optional) iTwin query scope, defaults to "memberOfItwin"
+   * @returns Headers object with x-itwin-query-scope header
    * @protected
    */
   protected getQueryScopeHeaders(
