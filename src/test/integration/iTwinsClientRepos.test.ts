@@ -5,12 +5,14 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { AccessToken } from "@itwin/core-bentley";
-import { TestConfig } from "../TestConfig";
+import { ITwinRepresentation } from "src/types/ITwin";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ITwinsAccessClient } from "../../iTwinsClient";
-import { ITwin } from "../../types/ITwin";
 import { Repository } from "../../types/Repository";
+import { TestConfig } from "../TestConfig";
+
+type ItwinCreate = Omit<ITwinRepresentation, "id">;
 
 describe("iTwins Client - Repository Integration Tests", () => {
   let accessToken: AccessToken;
@@ -31,7 +33,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const someRandomId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
 
     // Act
-    const deleteResponse = await iTwinsAccessClient.deleteiTwin(
+    const deleteResponse = await iTwinsAccessClient.deleteItwin(
       accessToken,
       someRandomId
     );
@@ -68,7 +70,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a 409 conflict when trying to create a duplicate repository", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -77,12 +79,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
 
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data!.iTwin.id!;
 
     const newRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -116,7 +118,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(createResponse2.error!.code).toBe("iTwinRepositoryExists");
     } finally {
       // Cleanup
-      const deleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const deleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -127,7 +129,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a 422 unprocessable entity when trying to create a repository without the uri property", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -136,12 +138,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
 
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data!.iTwin.id!;
 
     const newRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -168,7 +170,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(createResponse.error!.details![0].target).toBe("uri");
     } finally {
       // Cleanup
-      const deleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const deleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -180,7 +182,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
   it("should get a 404 not found when trying to delete an repository that doesn't exist", async () => {
     // Arrange
     const someRandomId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -189,12 +191,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
 
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data!.iTwin.id!;
 
     try {
       // Act
@@ -211,7 +213,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(deleteResponse.error!.code).toBe("iTwinRepositoryNotFound");
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -223,7 +225,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
   it("should create and delete an iTwin Repository", async () => {
     /* CREATE THE ITWIN REPOSITORY */
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -233,12 +235,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
       ianaTimeZone: "America/New_York",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
 
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data!.iTwin.id!;
 
     const newRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -276,7 +278,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(repositoryDeleteResponse.data).toBeUndefined();
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -304,19 +306,20 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get an array with only cesium content when getting repositories from an new iTwin", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       class: "Endeavor",
       subClass: "WorkPackage",
       dataCenterLocation: "East US",
       status: "Inactive",
+      type: "type",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin!.id!;
 
     try {
       // Act
@@ -331,7 +334,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(getResponse.data!.repositories).toHaveLength(1);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -342,7 +345,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get repositories from an iTwin and filter by class", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -351,11 +354,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin!.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -427,7 +430,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -438,7 +441,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get repositories from an iTwin and filter by subClass", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -447,11 +450,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin!.id!;
 
     const wmsRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -508,7 +511,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -519,7 +522,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get repositories from an iTwin and filter by both class and subClass", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -528,11 +531,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin!.id!;
 
     const urlTemplateRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -595,7 +598,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -606,7 +609,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a 404 not found when trying to get a repository that doesn't exist", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -615,11 +618,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data!.iTwin.id!;
     const someRandomRepositoryId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
 
     try {
@@ -637,7 +640,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(getResponse.error!.code).toBe("iTwinRepositoryNotFound");
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -663,12 +666,14 @@ describe("iTwins Client - Repository Integration Tests", () => {
     expect(getResponse.data).toBeUndefined();
     expect(getResponse.error).not.toBeUndefined();
     expect(getResponse.error!.code).toBe("iTwinRepositoryNotFound");
-    expect(getResponse.error?.message).toBe("Requested iTwin Repository is not available.")
+    expect(getResponse.error?.message).toBe(
+      "Requested iTwin Repository is not available."
+    );
   });
 
   it("should successfully get a repository by ID", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -677,11 +682,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data!.iTwin.id!;
 
     const newRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -727,7 +732,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -738,7 +743,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a repository with authentication and options", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -747,11 +752,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin!.id!;
 
     const repositoryWithAuth: Repository = {
       class: "GeographicInformationSystem",
@@ -797,7 +802,9 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(retrievedRepository.class).toBe(repositoryWithAuth.class);
       expect(retrievedRepository.subClass).toBe(repositoryWithAuth.subClass);
       expect(retrievedRepository.uri).toBe(repositoryWithAuth.uri);
-      expect(retrievedRepository.displayName).toBe(repositoryWithAuth.displayName);
+      expect(retrievedRepository.displayName).toBe(
+        repositoryWithAuth.displayName
+      );
 
       // Verify authentication is returned
       expect(retrievedRepository.authentication).toBeDefined();
@@ -808,7 +815,9 @@ describe("iTwins Client - Repository Integration Tests", () => {
       // Verify options are returned
       expect(retrievedRepository.options).toBeDefined();
       expect(retrievedRepository.options!.queryParameters).toBeDefined();
-      expect(retrievedRepository.options!.queryParameters!.apiVersion).toBe("1.5.1");
+      expect(retrievedRepository.options!.queryParameters!.apiVersion).toBe(
+        "1.5.1"
+      );
       expect(retrievedRepository.options!.minimumLevel).toBe(10);
       expect(retrievedRepository.options!.maximumLevel).toBe(20);
 
@@ -822,7 +831,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -833,7 +842,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a 404 not found when trying to update a repository that doesn't exist", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -842,11 +851,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin!.id!;
     const someRandomRepositoryId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
 
     const updateData: Repository = {
@@ -872,7 +881,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(updateResponse.error!.code).toBe("iTwinRepositoryNotFound");
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -906,12 +915,14 @@ describe("iTwins Client - Repository Integration Tests", () => {
     expect(updateResponse.data).toBeUndefined();
     expect(updateResponse.error).not.toBeUndefined();
     expect(updateResponse.error!.code).toBe("iTwinRepositoryNotFound");
-    expect(updateResponse.error?.message).toBe("Requested iTwin Repository is not available.")
+    expect(updateResponse.error?.message).toBe(
+      "Requested iTwin Repository is not available."
+    );
   });
 
   it("should get a 422 unprocessable entity when trying to update a repository with invalid data", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -920,11 +931,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data!.iTwin.id!;
 
     const newRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -975,7 +986,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -986,7 +997,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully update a repository with basic properties", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -995,11 +1006,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin!.id!;
 
     const originalRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -1067,7 +1078,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1078,7 +1089,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully update a repository with authentication and options", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1087,11 +1098,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const originalRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -1183,7 +1194,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1194,7 +1205,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully update only specific fields of a repository", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1203,11 +1214,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const originalRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -1250,8 +1261,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(updatedRepo.id).toBe(repositoryId);
       expect(updatedRepo.class).toBe("GeographicInformationSystem"); // Unchanged
       expect(updatedRepo.subClass).toBe("ArcGIS"); // Unchanged
-      expect(updatedRepo.uri).toBe("https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"); // Updated
-      expect(updatedRepo.displayName).toBe("Updated ArcGIS Street Map Repository"); // Updated
+      expect(updatedRepo.uri).toBe(
+        "https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"
+      ); // Updated
+      expect(updatedRepo.displayName).toBe(
+        "Updated ArcGIS Street Map Repository"
+      ); // Updated
 
       // Cleanup repository
       const repositoryDeleteResponse =
@@ -1263,7 +1278,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1274,7 +1289,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully create a repository resource with required properties", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1283,11 +1298,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -1298,11 +1313,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
@@ -1312,12 +1328,13 @@ describe("iTwins Client - Repository Integration Tests", () => {
       };
 
       // Act - Create repository resource
-      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        repositoryResource
-      );
+      const createResourceResponse =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          repositoryResource
+        );
 
       // Assert
       expect(createResourceResponse.status).toBe(201);
@@ -1330,15 +1347,16 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(createdResource.subClass).toBe("WebMapService");
 
       // Cleanup repository (this will also cleanup the resource)
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1349,7 +1367,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a 422 unprocessable entity when trying to create a repository resource without required properties", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1358,11 +1376,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -1373,11 +1391,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
@@ -1387,12 +1406,13 @@ describe("iTwins Client - Repository Integration Tests", () => {
       } as any;
 
       // Act - Try to create repository resource with missing required property
-      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        invalidRepositoryResource
-      );
+      const createResourceResponse =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          invalidRepositoryResource
+        );
 
       // Assert
       expect(createResourceResponse.status).toBe(422);
@@ -1401,15 +1421,16 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(createResourceResponse.error!.code).toBe("InvalidiTwinsRequest");
 
       // Cleanup repository
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1420,7 +1441,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a 422 unprocessable entity when trying to create a repository resource with empty required properties", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1429,11 +1450,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -1444,11 +1465,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
@@ -1459,12 +1481,13 @@ describe("iTwins Client - Repository Integration Tests", () => {
       };
 
       // Act - Try to create repository resource with empty required properties
-      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        invalidRepositoryResource
-      );
+      const createResourceResponse =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          invalidRepositoryResource
+        );
 
       // Assert
       expect(createResourceResponse.status).toBe(422);
@@ -1473,15 +1496,16 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(createResourceResponse.error!.code).toBe("InvalidiTwinsRequest");
 
       // Cleanup repository
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1492,7 +1516,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a 409 conflict when trying to create a duplicate repository resource", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1501,11 +1525,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -1516,11 +1540,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
@@ -1530,42 +1555,49 @@ describe("iTwins Client - Repository Integration Tests", () => {
       };
 
       // Act - Create repository resource first time
-      const createResourceResponse1 = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        repositoryResource
-      );
+      const createResourceResponse1 =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          repositoryResource
+        );
 
       // Assert - First creation should succeed
       expect(createResourceResponse1.status).toBe(201);
       expect(createResourceResponse1.data?.resource).toBeDefined();
-      expect(createResourceResponse1.data!.resource.id).toBe(repositoryResource.id);
+      expect(createResourceResponse1.data!.resource.id).toBe(
+        repositoryResource.id
+      );
 
       // Act - Try to create the same repository resource again
-      const createResourceResponse2 = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        repositoryResource
-      );
+      const createResourceResponse2 =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          repositoryResource
+        );
 
       // Assert - Second creation should fail with conflict
       expect(createResourceResponse2.status).toBe(409);
       expect(createResourceResponse2.data).toBeUndefined();
       expect(createResourceResponse2.error).not.toBeUndefined();
-      expect(createResourceResponse2.error!.code).toBe("iTwinRepositoryResourceExists");
+      expect(createResourceResponse2.error!.code).toBe(
+        "iTwinRepositoryResourceExists"
+      );
 
       // Cleanup repository (this will also cleanup the resource)
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1576,7 +1608,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a 404 not found when trying to create a repository resource for a repository that doesn't exist", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1585,11 +1617,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
     const someRandomRepositoryId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
 
     const repositoryResource = {
@@ -1599,21 +1631,24 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Act - Try to create repository resource for non-existent repository
-      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        someRandomRepositoryId,
-        repositoryResource
-      );
+      const createResourceResponse =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          someRandomRepositoryId,
+          repositoryResource
+        );
 
       // Assert
       expect(createResourceResponse.status).toBe(404);
       expect(createResourceResponse.data).toBeUndefined();
       expect(createResourceResponse.error).not.toBeUndefined();
-      expect(createResourceResponse.error!.code).toBe("iTwinRepositoryNotFound");
+      expect(createResourceResponse.error!.code).toBe(
+        "iTwinRepositoryNotFound"
+      );
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1633,12 +1668,13 @@ describe("iTwins Client - Repository Integration Tests", () => {
     };
 
     // Act - Try to create repository resource for non-existent iTwin
-    const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
-      accessToken,
-      someRandomiTwinId,
-      someRandomRepositoryId,
-      repositoryResource
-    );
+    const createResourceResponse =
+      await iTwinsAccessClient.createRepositoryResource(
+        accessToken,
+        someRandomiTwinId,
+        someRandomRepositoryId,
+        repositoryResource
+      );
 
     // Assert
     expect(createResourceResponse.status).toBe(404);
@@ -1649,7 +1685,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully get a repository resource with minimal mode", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1658,11 +1694,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -1673,11 +1709,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
@@ -1687,23 +1724,25 @@ describe("iTwins Client - Repository Integration Tests", () => {
       };
 
       // Create a repository resource
-      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        repositoryResource
-      );
+      const createResourceResponse =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          repositoryResource
+        );
       expect(createResourceResponse.status).toBe(201);
       const resourceId = createResourceResponse.data?.resource!.id!;
 
       // Act - Get repository resource with minimal mode
-      const getResourceResponse = await iTwinsAccessClient.getRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        resourceId,
-        "minimal"
-      );
+      const getResourceResponse =
+        await iTwinsAccessClient.getRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          resourceId,
+          "minimal"
+        );
 
       // Assert
       expect(getResourceResponse.status).toBe(200);
@@ -1711,7 +1750,9 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
       const retrievedResource = getResourceResponse.data!.resource;
       expect(retrievedResource.id).toBe(resourceId);
-      expect(retrievedResource.displayName).toBe(repositoryResource.displayName);
+      expect(retrievedResource.displayName).toBe(
+        repositoryResource.displayName
+      );
       expect(retrievedResource.class).toBeDefined();
       expect(retrievedResource.class).toBe("GeographicInformationSystem");
 
@@ -1719,15 +1760,16 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect("properties" in retrievedResource).toBe(false);
 
       // Cleanup repository (this will also cleanup the resource)
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1738,7 +1780,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully get a repository resource with representation mode", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1747,11 +1789,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data!.iTwin.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -1762,11 +1804,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
@@ -1776,23 +1819,25 @@ describe("iTwins Client - Repository Integration Tests", () => {
       };
 
       // Create a repository resource
-      const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        repositoryResource
-      );
+      const createResourceResponse =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          repositoryResource
+        );
       expect(createResourceResponse.status).toBe(201);
       const resourceId = createResourceResponse.data?.resource!.id!;
 
       // Act - Get repository resource with representation mode
-      const getResourceResponse = await iTwinsAccessClient.getRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        resourceId,
-        "representation"
-      );
+      const getResourceResponse =
+        await iTwinsAccessClient.getRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          resourceId,
+          "representation"
+        );
 
       // Assert
       expect(getResourceResponse.status).toBe(200);
@@ -1800,20 +1845,23 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
       const retrievedResource = getResourceResponse.data!.resource;
       expect(retrievedResource.id).toBe(resourceId);
-      expect(retrievedResource.displayName).toBe(repositoryResource.displayName);
+      expect(retrievedResource.displayName).toBe(
+        repositoryResource.displayName
+      );
       expect(retrievedResource.class).toBeDefined();
       expect(retrievedResource.class).toBe("GeographicInformationSystem");
 
       // Cleanup repository (this will also cleanup the resource)
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1824,7 +1872,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a 404 not found when trying to get a repository resource that doesn't exist", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1833,11 +1881,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -1848,40 +1896,45 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
       const someRandomResourceId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
 
       // Act - Try to get a non-existent repository resource
-      const getResourceResponse = await iTwinsAccessClient.getRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        someRandomResourceId
-      );
+      const getResourceResponse =
+        await iTwinsAccessClient.getRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          someRandomResourceId
+        );
 
       // Assert
       expect(getResourceResponse.status).toBe(404);
       expect(getResourceResponse.data).toBeUndefined();
       expect(getResourceResponse.error).not.toBeUndefined();
-      expect(getResourceResponse.error!.code).toBe("iTwinRepositoryResourceNotFound");
+      expect(getResourceResponse.error!.code).toBe(
+        "iTwinRepositoryResourceNotFound"
+      );
 
       // Cleanup repository
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1892,7 +1945,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a 404 not found when trying to get a repository resource from a repository that doesn't exist", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1901,23 +1954,24 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const someRandomRepositoryId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
     const someRandomResourceId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
 
     try {
       // Act - Try to get a repository resource from a non-existent repository
-      const getResourceResponse = await iTwinsAccessClient.getRepositoryResource(
-        accessToken,
-        iTwinId,
-        someRandomRepositoryId,
-        someRandomResourceId
-      );
+      const getResourceResponse =
+        await iTwinsAccessClient.getRepositoryResource(
+          accessToken,
+          iTwinId,
+          someRandomRepositoryId,
+          someRandomResourceId
+        );
 
       // Assert
       expect(getResourceResponse.status).toBe(404);
@@ -1926,7 +1980,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(getResourceResponse.error!.code).toBe("iTwinRepositoryNotFound");
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -1958,7 +2012,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully get repository resources with minimal mode", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -1967,11 +2021,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -1982,11 +2036,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
@@ -2000,41 +2055,46 @@ describe("iTwins Client - Repository Integration Tests", () => {
         displayName: "Vegetation Areas",
       };
 
-      const createResourceResponse1 = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        resource1
-      );
+      const createResourceResponse1 =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          resource1
+        );
       expect(createResourceResponse1.status).toBe(201);
 
-      const createResourceResponse2 = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        resource2
-      );
+      const createResourceResponse2 =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          resource2
+        );
       expect(createResourceResponse2.status).toBe(201);
 
       // Act - Get repository resources with minimal mode
-      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        undefined,
-        "minimal"
-      );
+      const getResourcesResponse =
+        await iTwinsAccessClient.getRepositoryResources(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          undefined,
+          "minimal"
+        );
 
       // Assert
       expect(getResourcesResponse.status).toBe(200);
       expect(getResourcesResponse.data?.resources).toBeDefined();
       expect(Array.isArray(getResourcesResponse.data!.resources)).toBe(true);
-      expect(getResourcesResponse.data!.resources.length).toBeGreaterThanOrEqual(2);
+      expect(
+        getResourcesResponse.data!.resources.length
+      ).toBeGreaterThanOrEqual(2);
 
       // Check that resources contain expected data
       const resources = getResourcesResponse.data!.resources;
-      const waterFeature = resources.find(r => r.id === "water_features");
-      const vegetationArea = resources.find(r => r.id === "vegetation_areas");
+      const waterFeature = resources.find((r) => r.id === "water_features");
+      const vegetationArea = resources.find((r) => r.id === "vegetation_areas");
 
       expect(waterFeature).toBeDefined();
       expect(waterFeature!.displayName).toBe("Water Features");
@@ -2045,7 +2105,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(vegetationArea!.class).toBe("GeographicInformationSystem");
 
       // In minimal mode, properties should not be present
-      resources.forEach(resource => {
+      resources.forEach((resource) => {
         expect("properties" in resource).toBe(false);
       });
 
@@ -2057,15 +2117,16 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(typeof minimalResponse._links.self.href).toBe("string");
 
       // Cleanup repository (this will also cleanup the resources)
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -2076,7 +2137,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully get repository resources with representation mode", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -2085,11 +2146,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -2100,11 +2161,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
@@ -2118,41 +2180,48 @@ describe("iTwins Client - Repository Integration Tests", () => {
         displayName: "Building Footprints",
       };
 
-      const createResourceResponse1 = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        resource1
-      );
+      const createResourceResponse1 =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          resource1
+        );
       expect(createResourceResponse1.status).toBe(201);
 
-      const createResourceResponse2 = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        resource2
-      );
+      const createResourceResponse2 =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          resource2
+        );
       expect(createResourceResponse2.status).toBe(201);
 
       // Act - Get repository resources with representation mode
-      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        undefined,
-        "representation"
-      );
+      const getResourcesResponse =
+        await iTwinsAccessClient.getRepositoryResources(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          undefined,
+          "representation"
+        );
 
       // Assert
       expect(getResourcesResponse.status).toBe(200);
       expect(getResourcesResponse.data?.resources).toBeDefined();
       expect(Array.isArray(getResourcesResponse.data!.resources)).toBe(true);
-      expect(getResourcesResponse.data!.resources.length).toBeGreaterThanOrEqual(2);
+      expect(
+        getResourcesResponse.data!.resources.length
+      ).toBeGreaterThanOrEqual(2);
 
       // Check that resources contain expected data
       const resources = getResourcesResponse.data!.resources;
-      const roadsNetwork = resources.find(r => r.id === "roads_network");
-      const buildingFootprints = resources.find(r => r.id === "building_footprints");
+      const roadsNetwork = resources.find((r) => r.id === "roads_network");
+      const buildingFootprints = resources.find(
+        (r) => r.id === "building_footprints"
+      );
 
       expect(roadsNetwork).toBeDefined();
       expect(roadsNetwork!.displayName).toBe("Roads Network");
@@ -2180,15 +2249,16 @@ describe("iTwins Client - Repository Integration Tests", () => {
       }
 
       // Cleanup repository (this will also cleanup the resources)
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -2199,7 +2269,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully get repository resources with pagination parameters", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -2208,11 +2278,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -2223,11 +2293,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
@@ -2239,23 +2310,25 @@ describe("iTwins Client - Repository Integration Tests", () => {
       ];
 
       for (const resource of resources) {
-        const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
-          accessToken,
-          iTwinId,
-          repositoryId,
-          resource
-        );
+        const createResourceResponse =
+          await iTwinsAccessClient.createRepositoryResource(
+            accessToken,
+            iTwinId,
+            repositoryId,
+            resource
+          );
         expect(createResourceResponse.status).toBe(201);
       }
 
       // Act - Get repository resources with pagination (top=2) in representation mode to get links
-      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        { top: 2 },
-        "representation"
-      );
+      const getResourcesResponse =
+        await iTwinsAccessClient.getRepositoryResources(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          { top: 2 },
+          "representation"
+        );
 
       // Assert
       expect(getResourcesResponse.status).toBe(200);
@@ -2275,15 +2348,16 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(representationResponse._links.self.href).toContain("top=2");
 
       // Cleanup repository (this will also cleanup the resources)
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -2294,7 +2368,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully get repository resources with search parameter", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -2303,11 +2377,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -2318,11 +2392,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
@@ -2336,29 +2411,32 @@ describe("iTwins Client - Repository Integration Tests", () => {
         displayName: "Road Network System",
       };
 
-      const createResourceResponse1 = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        searchableResource
-      );
+      const createResourceResponse1 =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          searchableResource
+        );
       expect(createResourceResponse1.status).toBe(201);
 
-      const createResourceResponse2 = await iTwinsAccessClient.createRepositoryResource(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        otherResource
-      );
+      const createResourceResponse2 =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          otherResource
+        );
       expect(createResourceResponse2.status).toBe(201);
 
       // Act - Get repository resources with search parameter
-      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        { search: "water" }
-      );
+      const getResourcesResponse =
+        await iTwinsAccessClient.getRepositoryResources(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          { search: "water" }
+        );
 
       // Assert
       expect(getResourcesResponse.status).toBe(200);
@@ -2366,15 +2444,16 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(Array.isArray(getResourcesResponse.data!.resources)).toBe(true);
 
       // Cleanup repository (this will also cleanup the resources)
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -2385,7 +2464,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully get repository resources with pagination in minimal mode and verify links", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -2394,11 +2473,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -2409,11 +2488,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository first
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
@@ -2425,23 +2505,25 @@ describe("iTwins Client - Repository Integration Tests", () => {
       ];
 
       for (const resource of resources) {
-        const createResourceResponse = await iTwinsAccessClient.createRepositoryResource(
-          accessToken,
-          iTwinId,
-          repositoryId,
-          resource
-        );
+        const createResourceResponse =
+          await iTwinsAccessClient.createRepositoryResource(
+            accessToken,
+            iTwinId,
+            repositoryId,
+            resource
+          );
         expect(createResourceResponse.status).toBe(201);
       }
 
       // Act - Get repository resources with pagination in minimal mode
-      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
-        accessToken,
-        iTwinId,
-        repositoryId,
-        { top: 2, skip: 1 },
-        "minimal"
-      );
+      const getResourcesResponse =
+        await iTwinsAccessClient.getRepositoryResources(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          { top: 2, skip: 1 },
+          "minimal"
+        );
 
       // Assert
       expect(getResourcesResponse.status).toBe(200);
@@ -2462,20 +2544,21 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
       // Verify resources don't have properties (minimal mode characteristic)
       const resourcesResponse = getResourcesResponse.data!.resources;
-      resourcesResponse.forEach(resource => {
+      resourcesResponse.forEach((resource) => {
         expect("properties" in resource).toBe(false);
       });
 
       // Cleanup repository (this will also cleanup the resources)
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -2486,7 +2569,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should get a 404 not found when trying to get repository resources from a repository that doesn't exist", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -2495,21 +2578,22 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const someRandomRepositoryId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
 
     try {
       // Act - Try to get repository resources from a non-existent repository
-      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
-        accessToken,
-        iTwinId,
-        someRandomRepositoryId
-      );
+      const getResourcesResponse =
+        await iTwinsAccessClient.getRepositoryResources(
+          accessToken,
+          iTwinId,
+          someRandomRepositoryId
+        );
 
       // Assert
       expect(getResourcesResponse.status).toBe(404);
@@ -2518,7 +2602,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(getResourcesResponse.error!.code).toBe("iTwinRepositoryNotFound");
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );
@@ -2533,11 +2617,12 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const someRandomRepositoryId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
 
     // Act - Try to get repository resources from a non-existent iTwin
-    const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
-      accessToken,
-      someRandomiTwinId,
-      someRandomRepositoryId
-    );
+    const getResourcesResponse =
+      await iTwinsAccessClient.getRepositoryResources(
+        accessToken,
+        someRandomiTwinId,
+        someRandomRepositoryId
+      );
 
     // Assert
     expect(getResourcesResponse.status).toBe(404);
@@ -2548,7 +2633,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
   it("should successfully get empty repository resources array from a repository with no resources", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -2557,11 +2642,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       dataCenterLocation: "East US",
       status: "Trial",
     };
-    const iTwinResponse = await iTwinsAccessClient.createiTwin(
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
       accessToken,
       newiTwin
     );
-    const iTwinId = iTwinResponse.data!.id!;
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
     const gisRepository: Repository = {
       class: "GeographicInformationSystem",
@@ -2572,20 +2657,22 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     try {
       // Create a GIS repository but don't add any resources
-      const createRepositoryResponse = await iTwinsAccessClient.createRepository(
-        accessToken,
-        iTwinId,
-        gisRepository
-      );
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
       // Act - Get repository resources from empty repository
-      const getResourcesResponse = await iTwinsAccessClient.getRepositoryResources(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const getResourcesResponse =
+        await iTwinsAccessClient.getRepositoryResources(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
 
       // Assert
       expect(getResourcesResponse.status).toBe(200);
@@ -2594,15 +2681,16 @@ describe("iTwins Client - Repository Integration Tests", () => {
       // The array may contain default resources, so we just verify it's an array
 
       // Cleanup repository
-      const repositoryDeleteResponse = await iTwinsAccessClient.deleteRepository(
-        accessToken,
-        iTwinId,
-        repositoryId
-      );
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
       expect(repositoryDeleteResponse.status).toBe(204);
     } finally {
       // Cleanup
-      const iTwinDeleteResponse = await iTwinsAccessClient.deleteiTwin(
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinId
       );

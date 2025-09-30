@@ -2,12 +2,13 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import type { AccessToken } from "@itwin/core-bentley";
-import type { ITwin, ITwinRecentsResponse } from "../../types/ITwin";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsAccessClient } from "../../iTwinsClient";
 import { TestConfig } from "../TestConfig";
 import { APIResponse } from "src/types/CommonApiTypes";
+import { ITwinMinimal, ITwinRepresentation } from "src/types/ITwin";
 
 describe("iTwinsClient Recently Used Functionality", () => {
   let baseUrl: string = "https://api.bentley.com/itwins";
@@ -26,7 +27,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
 
   it("should get a list of recently used iTwins", async () => {
     // Act
-    const recentsResponse: APIResponse<ITwinRecentsResponse> =
+    const recentsResponse =
       await iTwinsAccessClient.getMyRecentUsedITwins(accessToken);
 
     // Assert
@@ -41,7 +42,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
 
   it("should get recently used iTwins with query parameters", async () => {
     // Act
-    const recentsResponse: APIResponse<ITwinRecentsResponse> =
+    const recentsResponse =
       await iTwinsAccessClient.getMyRecentUsedITwins(accessToken, {
         top: 5,
         resultMode: "representation",
@@ -56,7 +57,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
       expect(recentsResponse.data!.iTwins.length).toBeLessThanOrEqual(5);
 
       // Verify representation mode returns additional properties
-      recentsResponse.data!.iTwins.forEach((iTwin: ITwin) => {
+      recentsResponse.data!.iTwins.forEach((iTwin: ITwinMinimal) => {
         expect(iTwin.id).toBeDefined();
         expect(iTwin.displayName).toBeDefined();
         expect(iTwin.class).toBeDefined();
@@ -67,7 +68,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
 
   it("should get recently used iTwins including inactive ones", async () => {
     // Act
-    const recentsResponse: APIResponse<ITwinRecentsResponse> =
+    const recentsResponse =
       await iTwinsAccessClient.getMyRecentUsedITwins(accessToken, {
         includeInactive: true,
       });
@@ -96,7 +97,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
 
   it("should successfully add and retrieve iTwin from recently used list", async () => {
     // Arrange - Create a test iTwin
-    const newiTwin: ITwin = {
+    const newiTwin: Omit<ITwinRepresentation, "id">= {
       displayName: `APIM iTwin Recents Test ${new Date().toISOString()}`,
       number: `APIM iTwin Recents Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -107,9 +108,9 @@ describe("iTwinsClient Recently Used Functionality", () => {
       status: "Trial",
     };
 
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
+    const iTwinId = createResponse.data?.iTwin!.id!;
 
     try {
       expect(createResponse.status).toBe(201);
@@ -122,7 +123,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
       expect(addRecentResponse.status).toBe(204);
 
       // Verify iTwin appears in recently used list
-      const recentsResponse: APIResponse<ITwinRecentsResponse> =
+      const recentsResponse =
         await iTwinsAccessClient.getMyRecentUsedITwins(accessToken, {
           displayName: newiTwin.displayName,
         });
@@ -132,19 +133,19 @@ describe("iTwinsClient Recently Used Functionality", () => {
 
       // Find our iTwin in the recents list
       const foundRecent = recentsResponse.data!.iTwins?.find(
-        (iTwin: ITwin) => iTwin.id === iTwinId
+        (iTwin: ITwinRepresentation) => iTwin.id === iTwinId
       );
       expect(foundRecent).toBeDefined();
       expect(foundRecent!.displayName).toBe(newiTwin.displayName);
     } finally {
       // Clean up - Delete the test iTwin
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+      await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
     }
   });
 
   it("should handle adding the same iTwin to recents multiple times", async () => {
     // Arrange - Create a test iTwin
-    const newiTwin: ITwin = {
+    const newiTwin: Omit<ITwinRepresentation, "id"> = {
       displayName: `APIM iTwin Recents Duplicate Test ${new Date().toISOString()}`,
       number: `APIM iTwin Recents Duplicate Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -155,9 +156,9 @@ describe("iTwinsClient Recently Used Functionality", () => {
       status: "Trial",
     };
 
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
+    const iTwinId = createResponse.data?.iTwin!.id!;
 
     try {
       // Act - Add iTwin to recents twice
@@ -172,7 +173,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
       expect(secondAddResponse.status).toBe(204);
 
       // Verify iTwin is in recently used list (should appear only once, most recent)
-      const recentsResponse: APIResponse<ITwinRecentsResponse> =
+      const recentsResponse =
         await iTwinsAccessClient.getMyRecentUsedITwins(accessToken, {
           displayName: newiTwin.displayName,
         });
@@ -181,22 +182,21 @@ describe("iTwinsClient Recently Used Functionality", () => {
 
       // Should find exactly one instance of our iTwin
       const matchingRecents = recentsResponse.data!.iTwins?.filter(
-        (iTwin: ITwin) => iTwin.id === iTwinId
+        (iTwin: ITwinRepresentation) => iTwin.id === iTwinId
       );
       expect(matchingRecents).toBeDefined();
       expect(matchingRecents.length).toBe(1);
     } finally {
       // Clean up - Delete the test iTwin
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+      await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
     }
   });
 
   it("should return recently used iTwins in correct order (most recent first)", async () => {
     // Act - Get recently used iTwins
-    const recentsResponse: APIResponse<ITwinRecentsResponse> =
-      await iTwinsAccessClient.getMyRecentUsedITwins(accessToken, {
-        top: 10,
-      });
+    const recentsResponse = await iTwinsAccessClient.getMyRecentUsedITwins(accessToken, {
+      top: 10,
+    });
 
     // Assert
     expect(recentsResponse.status).toBe(200);
@@ -208,7 +208,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
       const iTwins = recentsResponse.data!.iTwins;
 
       // Basic validation that we have iTwins and they have required properties
-      iTwins.forEach((iTwin: ITwin) => {
+      iTwins.forEach((iTwin: ITwinRepresentation) => {
         expect(iTwin.id).toBeDefined();
         expect(iTwin.displayName).toBeDefined();
       });

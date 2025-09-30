@@ -1,31 +1,36 @@
 import { Links } from "./links";
 
 /**
- * Base iTwin interface containing core properties that are always available
- * in standard API responses.
+ * Minimal iTwin interface containing only minimal properties.
  */
-export interface ITwin {
+export interface ITwinMinimal {
   /** Unique identifier for the iTwin */
-  id?: string;
+  id: string;
   /** Main classification of the iTwin */
-  class?: ITwinClass;
+  class: ITwinClass;
   /** Sub-classification providing more specific categorization */
-  subClass?: ITwinSubClass;
+  subClass: ITwinSubClass;
   /** Type of the iTwin */
-  type?: string;
+  type: string;
   /** Human-readable name for the iTwin */
-  displayName?: string;
+  displayName: string;
   /** Numeric identifier for the iTwin */
   // eslint-disable-next-line id-denylist
   number?: string;
+  /** Account identifier associated with this iTwin */
+  iTwinAccountId?: string;
+}
+
+/**
+ * Complete iTwin interface extending minimal with full representation properties.
+ */
+export interface ITwinRepresentation extends ITwinMinimal {
   /** Geographic location of the data center hosting this iTwin */
   dataCenterLocation?: string;
   /** Current status of the iTwin */
   status?: ITwinStatus;
   /** Identifier of the parent iTwin in hierarchical relationships */
   parentId?: string;
-  /** Account identifier associated with this iTwin */
-  iTwinAccountId?: string;
   /** IANA timezone identifier for the iTwin's geographic location */
   ianaTimeZone?: string;
   /** Name of the image file associated with this iTwin */
@@ -51,19 +56,11 @@ export interface ITwin {
 /**
  * iTwin status types that indicate the current operational state
  * of the digital twin.
- *
- * @public
  */
-export type ITwinStatus =
-  | "Trial"
-  | "Active"
-  | "Inactive";
+export type ITwinStatus = "Trial" | "Active" | "Inactive";
 
 /**
  * iTwin sub-classification types that provide specific categorization
- * for different types of digital twins and organizational structures.
- *
- * @public
  */
 export type ITwinSubClass =
   | "Account"
@@ -76,21 +73,57 @@ export type ITwinSubClass =
 /**
  * iTwin main classification types that define the primary category
  * of the digital twin within the organizational hierarchy.
- *
- * @public
  */
-export type ITwinClass =
-  | "Thing"
-  | "Endeavor";
+export type ITwinClass = "Thing" | "Endeavor";
 
+/**
+ * Response interface for multiple iTwins in minimal mode.
+ */
+export interface MultiITwinMinimalResponse {
+  /** Array of iTwin objects */
+  iTwins: ITwinMinimal[];
+  /** Navigation links for pagination and related resources */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _links: Links;
+}
 
-  /**
-   * Response interface for recently used iTwins operations
-   */
-  export interface ITwinRecentsResponse {
-    /** Array of recently used iTwin objects */
-    iTwins: ITwin[];
-    /** Navigation links for pagination and related resources */
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    _links: Links;
-  }
+/**
+ * Response interface for multiple iTwins in representation mode.
+ */
+export interface MultiITwinRepresentationResponse {
+  /** Array of iTwin objects */
+  iTwins: ITwinRepresentation[];
+  /** Navigation links for pagination and related resources */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _links: Links;
+}
+
+/**
+ * Response interface for single iTwin operations in representation mode.
+ */
+export interface ITwinRepresentationResponse {
+  /** The complete iTwin object with all properties */
+  iTwin: ITwinRepresentation;
+}
+
+/**
+ * Response interface for single iTwin operations in minimal mode.
+ */
+export interface ITwinMinimalResponse {
+  /** The minimal iTwin object with essential properties */
+  iTwin: ITwinMinimal;
+}
+
+/**
+ * Type for creating new iTwins.
+ */
+export type ItwinCreate =
+   Omit<
+    ITwinRepresentation,
+    "id" | "createdDateTime" | "lastModifiedDateTime" | "iTwinAccountId"
+  >
+
+/**
+ * Type for updating existing iTwins.
+ */
+export type ItwinUpdate = Partial<ItwinCreate>

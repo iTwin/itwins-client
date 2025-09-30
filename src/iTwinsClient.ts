@@ -13,7 +13,14 @@ import type {
   ODataQueryParams,
   ResultMode,
 } from "./types/CommonApiTypes";
-import type { ITwin, ITwinRecentsResponse } from "./types/ITwin";
+import {
+  ItwinCreate,
+  ITwinMinimalResponse,
+  ITwinRepresentationResponse,
+  ItwinUpdate,
+  MultiITwinMinimalResponse,
+  MultiITwinRepresentationResponse,
+} from "./types/ITwin";
 import type {
   ITwinExportMultiResponse,
   ITwinExportRequestInfo,
@@ -51,7 +58,7 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
     accessToken: AccessToken
   ): Promise<APIResponse<ITwinExportMultiResponse>> {
     const url = `${this._baseUrl}/exports`;
-    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
+    return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
 
   /** Get details of a specific iTwin export operation
@@ -64,7 +71,7 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
     id: string
   ): Promise<APIResponse<ITwinExportSingleResponse>> {
     const url = `${this._baseUrl}/exports/${id}`;
-    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
+    return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
 
   /**
@@ -95,21 +102,20 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
   public async getFavoritesITwins(
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
-  ): Promise<APIResponse<ITwin[]>> {
+  ): Promise<
+    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+  > {
     const headers = this.getHeaders(arg);
-    let url = `${this._baseUrl}/favorites`;
-    const query = this.getQueryStringArg(
+    const url = `${this._baseUrl}/favorites/?${this.getQueryStringArg(
       ITwinsAccessClient.iTwinsQueryParamMapping,
       arg
-    );
-    if (query !== "") url += `?${query}`;
+    )}`;
 
     return this.sendGenericAPIRequest(
       accessToken,
       "GET",
       url,
       undefined,
-      "iTwins",
       headers
     );
   }
@@ -154,14 +160,9 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
     contentType: "image/png" | "image/jpeg"
   ): Promise<APIResponse<ITwinImageResponse>> {
     const url = `${this._baseUrl}/${iTwinId}/image`;
-    return this.sendGenericAPIRequest(
-      accessToken,
-      "PUT",
-      url,
-      imageBlob,
-      undefined,
-      { contentType }
-    );
+    return this.sendGenericAPIRequest(accessToken, "PUT", url, imageBlob, {
+      contentType,
+    });
   }
 
   /** Get the image associated with the specified iTwin
@@ -220,7 +221,9 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
   public async getMyRecentUsedITwins(
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
-  ): Promise<APIResponse<ITwinRecentsResponse>> {
+  ): Promise<
+    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+  > {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
     const query = this.getQueryStringArg(
@@ -233,83 +236,8 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
       "GET",
       url,
       undefined,
-      undefined,
       headers
     );
-  }
-
-  /** Get itwins accessible to the user
-   * @param accessToken The client access token string
-   * @param arg Optional query arguments, for paging, searching, and filtering
-   * @returns Array of projects, may be empty
-   */
-  public async queryAsync(
-    accessToken: AccessToken,
-    arg?: ITwinsQueryArg
-  ): Promise<APIResponse<ITwin[]>> {
-    const headers = this.getHeaders(arg);
-    let url = this._baseUrl;
-    const query = this.getQueryStringArg(
-      ITwinsAccessClient.iTwinsQueryParamMapping,
-      arg
-    );
-    if (query !== "") url += `?${query}`;
-
-    return this.sendGenericAPIRequest(
-      accessToken,
-      "GET",
-      url,
-      undefined,
-      "iTwins",
-      headers
-    );
-  }
-
-  /** Create a new iTwin
-   * @param accessToken The client access token string
-   * @param iTwin The iTwin to be created
-   * @returns ITwin
-   */
-  public async createiTwin(
-    accessToken: AccessToken,
-    iTwin: ITwin
-  ): Promise<APIResponse<ITwin>> {
-    const url = `${this._baseUrl}/`;
-    return this.sendGenericAPIRequest(accessToken, "POST", url, iTwin, "iTwin");
-  }
-
-  /** Update the specified iTwin
-   * @param accessToken The client access token string
-   * @param iTwinId The id of the iTwin
-   * @param iTwin The iTwin to be created
-   * @returns ITwin
-   */
-  public async updateiTwin(
-    accessToken: AccessToken,
-    iTwinId: string,
-    iTwin: ITwin
-  ): Promise<APIResponse<ITwin>> {
-    const url = `${this._baseUrl}/${iTwinId}`;
-    return this.sendGenericAPIRequest(
-      accessToken,
-      "PATCH",
-      url,
-      iTwin,
-      "iTwin"
-    );
-  }
-
-  /** Delete the specified iTwin
-   * @param accessToken The client access token string
-   * @param iTwinId The id of the iTwin
-   * @returns No Content
-   */
-  public async deleteiTwin(
-    accessToken: AccessToken,
-    iTwinId: string
-  ): Promise<APIResponse<undefined>> {
-    const url = `${this._baseUrl}/${iTwinId}`;
-    return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
 
   /** Create a new iTwin Repository
@@ -356,17 +284,14 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
       | { class: Repository["class"] }
       | { class: Repository["class"]; subClass: Repository["subClass"] }
   ): Promise<APIResponse<MultiRepositoriesResponse>> {
-    let url = `${this._baseUrl}/${iTwinId}/repositories`;
-
-    const query = this.getQueryStringArg(
+    const url = `${
+      this._baseUrl
+    }/${iTwinId}/repositories/?${this.getQueryStringArg(
       ITwinsAccessClient.repositoryParamMapping,
       arg
-    );
-    if (query !== "") {
-      url += `?${query}`;
-    }
+    )}`;
 
-    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
+    return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
 
   /** Get Repositories accessible to user
@@ -382,7 +307,7 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
     repositoryId: string
   ): Promise<APIResponse<SingleRepositoryResponse>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}`;
-    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
+    return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
 
   /** Get Repositories accessible to user
@@ -457,12 +382,11 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
       "GET",
       url,
       undefined,
-      "repositoryResource",
       headers
     );
   }
 
-    /**
+  /**
    * Get a specific repository resource by ID
    * @param accessToken - The client access token string for authorization
    * @param iTwinId - The id of the iTwin that contains the repository
@@ -485,7 +409,9 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
     >
   > {
     const headers = this.getResultModeHeaders(resultMode);
-    const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}/resources?${this.getQueryStringArg(
+    const url = `${
+      this._baseUrl
+    }/${iTwinId}/repositories/${repositoryId}/resources?${this.getQueryStringArg(
       ITwinsAccessClient.ODataParamMapping,
       args
     )}`;
@@ -494,7 +420,6 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
       "GET",
       url,
       undefined,
-      "repositoryResource",
       headers
     );
   }
@@ -505,11 +430,11 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
    * @param resultMode (Optional) iTwin result mode: minimal or representation
    * @returns Array of projects, may be empty
    */
-  public async getAsync(
+  public async getITwin(
     accessToken: AccessToken,
     iTwinId: string,
     resultMode?: ResultMode
-  ): Promise<APIResponse<ITwin>> {
+  ): Promise<APIResponse<ITwinMinimalResponse | ITwinRepresentationResponse>> {
     const headers = this.getResultModeHeaders(resultMode);
     const url = `${this._baseUrl}/${iTwinId}`;
     return this.sendGenericAPIRequest(
@@ -517,7 +442,6 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
       "GET",
       url,
       undefined,
-      "iTwin",
       headers
     );
   }
@@ -527,42 +451,77 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
    * @param arg Optional query arguments, for paging, searching, and filtering
    * @returns Array of projects, may be empty
    */
-  public async queryRecentsAsync(
+  public async getITwins(
     accessToken: AccessToken,
-    arg?: ITwinsQueryArg
-  ): Promise<APIResponse<ITwin[]>> {
+    arg?: ITwinsQueryArg &
+      Pick<ODataQueryParams, "filter" | "orderby" | "select">
+  ): Promise<
+    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+  > {
     const headers = this.getHeaders(arg);
-    let url = `${this._baseUrl}/recents`;
-    const query = this.getQueryStringArg(
-      ITwinsAccessClient.iTwinsQueryParamMapping,
+    const url = `${this._baseUrl}/?${this.getQueryStringArg(
+      ITwinsAccessClient.ITwinsGetQueryParamMapping,
       arg
-    );
-    if (query !== "") url += `?${query}`;
+    )}`;
 
     return this.sendGenericAPIRequest(
       accessToken,
       "GET",
       url,
       undefined,
-      "iTwins",
       headers
     );
+  }
+
+  /** Create a new iTwin
+   * @param accessToken The client access token string
+   * @param iTwin The iTwin to be created
+   * @returns ITwin
+   */
+  public async createITwin(
+    accessToken: AccessToken,
+    iTwin: ItwinCreate
+  ): Promise<APIResponse<ITwinRepresentationResponse>> {
+    const url = `${this._baseUrl}/`;
+    return this.sendGenericAPIRequest(accessToken, "POST", url, iTwin);
+  }
+
+  /** Update the specified iTwin
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @param iTwin The iTwin to be created
+   * @returns ITwin
+   */
+  public async updateItwin(
+    accessToken: AccessToken,
+    iTwinId: string,
+    iTwin: ItwinUpdate
+  ): Promise<APIResponse<ITwinRepresentationResponse>> {
+    const url = `${this._baseUrl}/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "PATCH", url, iTwin);
+  }
+
+  /** Delete the specified iTwin
+   * @param accessToken The client access token string
+   * @param iTwinId The id of the iTwin
+   * @returns No Content
+   */
+  public async deleteItwin(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<APIResponse<undefined>> {
+    const url = `${this._baseUrl}/${iTwinId}`;
+    return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
 
   /** Get primary account accessible to the user
    * @returns Primary account
    */
-  public async getPrimaryAccountAsync(
+  public async getPrimaryAccount(
     accessToken: AccessToken
-  ): Promise<APIResponse<ITwin>> {
+  ): Promise<APIResponse<ITwinMinimalResponse>> {
     const url = `${this._baseUrl}/myprimaryaccount`;
-    return this.sendGenericAPIRequest(
-      accessToken,
-      "GET",
-      url,
-      undefined,
-      "iTwin"
-    );
+    return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
   }
 
   /**
@@ -571,11 +530,11 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
    * @param iTwinId The id of the iTwin
    * @returns Account
    */
-  public async getAccountAsync(
+  public async getITwinAccount(
     accessToken: AccessToken,
     iTwinId: string,
     resultMode?: ResultMode
-  ): Promise<APIResponse<ITwin>> {
+  ): Promise<APIResponse<ITwinMinimalResponse>> {
     const headers = this.getResultModeHeaders(resultMode);
     const url = `${this._baseUrl}/${iTwinId}/account`;
     return this.sendGenericAPIRequest(
@@ -583,7 +542,6 @@ export class ITwinsAccessClient extends BaseITwinsApiClient {
       "GET",
       url,
       undefined,
-      "iTwin",
       headers
     );
   }

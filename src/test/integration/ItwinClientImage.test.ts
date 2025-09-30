@@ -2,11 +2,11 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import type { AccessToken } from "@itwin/core-bentley";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import type { APIResponse } from "../../types/CommonApiTypes";
-import type { ITwin } from "../../types/ITwin";
 import type { ITwinImageResponse } from "../../types/ITwinImage";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsAccessClient } from "../../iTwinsClient";
@@ -44,7 +44,9 @@ describe("iTwinsClient Image Functionality", () => {
 
   it("should return 422 when image file is too large (exceeds 5MB)", async () => {
     // Arrange - Create a test iTwin
-    const newiTwin: ITwin = {
+
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, {
       displayName: `APIM iTwin Large Image Test ${new Date().toISOString()}`,
       number: `APIM iTwin Large Image Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -53,11 +55,8 @@ describe("iTwinsClient Image Functionality", () => {
       dataCenterLocation: "East US",
       ianaTimeZone: "America/New_York",
       status: "Trial",
-    };
-
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    });
+    const iTwinId = createResponse.data!.iTwin.id;
 
     try {
       // Create a large image blob (simulate > 5MB)
@@ -88,26 +87,23 @@ describe("iTwinsClient Image Functionality", () => {
       expect(uploadResponse.status).toBe(413);
     } finally {
       // Clean up - Delete the test iTwin
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+      await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
     }
   });
 
   it("should return 422 when image has invalid aspect ratio (width/height > 5:1)", async () => {
-    // Arrange - Create a test iTwin
-    const newiTwin: ITwin = {
-      displayName: `APIM iTwin Aspect Ratio Test ${new Date().toISOString()}`,
-      number: `APIM iTwin Aspect Ratio Number ${new Date().toISOString()}`,
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, {
+      displayName: `APIM iTwin Large Image Test ${new Date().toISOString()}`,
+      number: `APIM iTwin Large Image Number ${new Date().toISOString()}`,
       type: "Bridge",
       subClass: "Asset",
       class: "Thing",
       dataCenterLocation: "East US",
       ianaTimeZone: "America/New_York",
       status: "Trial",
-    };
-
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    });
+    const iTwinId = createResponse.data!.iTwin.id!;
 
     try {
       // Create a PNG with invalid aspect ratio (6:1 ratio, which exceeds 5:1 limit)
@@ -177,13 +173,14 @@ describe("iTwinsClient Image Functionality", () => {
       expect(uploadResponse.status).toBe(422);
     } finally {
       // Clean up - Delete the test iTwin
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+      await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
     }
   });
 
   it("should successfully upload and process a valid JPEG image", async () => {
-    // Arrange - Create a test iTwin
-    const newiTwin: ITwin = {
+
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, {
       displayName: `APIM iTwin Image Upload Test ${new Date().toISOString()}`,
       number: `APIM iTwin Image Upload Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -192,11 +189,8 @@ describe("iTwinsClient Image Functionality", () => {
       dataCenterLocation: "East US",
       ianaTimeZone: "America/New_York",
       status: "Trial",
-    };
-
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    });
+    const iTwinId = createResponse.data?.iTwin?.id!;
 
     try {
       // Load test JPEG image
@@ -232,13 +226,14 @@ describe("iTwinsClient Image Functionality", () => {
       );
     } finally {
       // Clean up - Delete the test iTwin
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+      await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
     }
   });
 
   it("should successfully upload and process a valid PNG image", async () => {
-    // Arrange - Create a test iTwin
-    const newiTwin: ITwin = {
+
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken,  {
       displayName: `APIM iTwin PNG Upload Test ${new Date().toISOString()}`,
       number: `APIM iTwin PNG Upload Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -247,11 +242,8 @@ describe("iTwinsClient Image Functionality", () => {
       dataCenterLocation: "East US",
       ianaTimeZone: "America/New_York",
       status: "Trial",
-    };
-
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    });
+    const iTwinId = createResponse.data?.iTwin?.id!;
 
     try {
       // Load test PNG image
@@ -293,7 +285,7 @@ describe("iTwinsClient Image Functionality", () => {
       );
     } finally {
       // Clean up - Delete the test iTwin
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+      await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
     }
   });
 
@@ -301,7 +293,9 @@ describe("iTwinsClient Image Functionality", () => {
 
   it("should successfully retrieve an existing iTwin image", async () => {
     // Arrange - Create a test iTwin and upload an image first
-    const newiTwin: ITwin = {
+
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, {
       displayName: `APIM iTwin Get Image Test ${new Date().toISOString()}`,
       number: `APIM iTwin Get Image Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -310,11 +304,8 @@ describe("iTwinsClient Image Functionality", () => {
       dataCenterLocation: "East US",
       ianaTimeZone: "America/New_York",
       status: "Trial",
-    };
-
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    });
+    const iTwinId = createResponse.data?.iTwin?.id!;
 
     try {
       // First upload an image
@@ -360,7 +351,7 @@ describe("iTwinsClient Image Functionality", () => {
       );
     } finally {
       // Clean up - Delete the test iTwin
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+      await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
     }
   });
 
@@ -378,7 +369,8 @@ describe("iTwinsClient Image Functionality", () => {
 
   it("should return 404 when trying to get image from iTwin that has no image", async () => {
     // Arrange - Create a test iTwin without uploading an image
-    const newiTwin: ITwin = {
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, {
       displayName: `APIM iTwin No Image Test ${new Date().toISOString()}`,
       number: `APIM iTwin No Image Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -387,11 +379,8 @@ describe("iTwinsClient Image Functionality", () => {
       dataCenterLocation: "East US",
       ianaTimeZone: "America/New_York",
       status: "Trial",
-    };
-
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    });
+    const iTwinId = createResponse.data?.iTwin?.id!;
 
     try {
       // Act - Try to get image from iTwin that has no image
@@ -402,13 +391,14 @@ describe("iTwinsClient Image Functionality", () => {
       expect(getResponse.status).toBe(404);
     } finally {
       // Clean up - Delete the test iTwin
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+      await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
     }
   });
 
   it("should successfully delete an existing iTwin image", async () => {
     // Arrange - Create a test iTwin and upload an image first
-    const newiTwin: ITwin = {
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, {
       displayName: `APIM iTwin Delete Image Test ${new Date().toISOString()}`,
       number: `APIM iTwin Delete Image Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -417,11 +407,8 @@ describe("iTwinsClient Image Functionality", () => {
       dataCenterLocation: "East US",
       ianaTimeZone: "America/New_York",
       status: "Trial",
-    };
-
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    });
+    const iTwinId = createResponse.data?.iTwin?.id!;
 
     try {
       // First upload an image
@@ -457,7 +444,7 @@ describe("iTwinsClient Image Functionality", () => {
       expect(getAfterDeleteResponse.status).toBe(404);
     } finally {
       // Clean up - Delete the test iTwin
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+      await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
     }
   });
 
@@ -478,7 +465,9 @@ describe("iTwinsClient Image Functionality", () => {
 
   it("should return 404 when trying to delete image from iTwin that has no image", async () => {
     // Arrange - Create a test iTwin without uploading an image
-    const newiTwin: ITwin = {
+
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, {
       displayName: `APIM iTwin No Image Delete Test ${new Date().toISOString()}`,
       number: `APIM iTwin No Image Delete Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -487,11 +476,8 @@ describe("iTwinsClient Image Functionality", () => {
       dataCenterLocation: "East US",
       ianaTimeZone: "America/New_York",
       status: "Trial",
-    };
-
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    });
+    const iTwinId = createResponse.data?.iTwin?.id!;
 
     try {
       // Act - Try to delete image from iTwin that has no image
@@ -502,7 +488,7 @@ describe("iTwinsClient Image Functionality", () => {
       expect(deleteResponse.status).toBe(404);
     } finally {
       // Clean up - Delete the test iTwin
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+      await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
     }
   });
 });

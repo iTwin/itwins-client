@@ -7,7 +7,7 @@
  */
 import type { AccessToken } from "@itwin/core-bentley";
 import type { ApimError, APIResponse, Method, RequestConfig } from "./types/CommonApiTypes";
-import { hasProperty, ParameterMapping } from "./types/typeUtils";
+import { ParameterMapping } from "./types/typeUtils";
 
 
 /**
@@ -53,7 +53,6 @@ export abstract class BaseBentleyAPIClient {
    * @param method - The HTTP method type (GET, POST, DELETE, etc.)
    * @param url - The complete URL of the request endpoint
    * @param data - Optional payload data for the request body
-   * @param property - Optional target property for response parsing (ex. iTwins, repositories, etc.)
    * @param headers - Optional additional request headers
    * @returns Promise that resolves to the parsed API response with type safety
    */
@@ -62,7 +61,6 @@ export abstract class BaseBentleyAPIClient {
     method: Method,
     url: string,
     data?: TData,
-    property?: string,
     headers?: Record<string, string>
   ): Promise<APIResponse<TResponse>> {
     try {
@@ -96,8 +94,6 @@ export abstract class BaseBentleyAPIClient {
         data:
           responseData === undefined || responseData === ""
             ? undefined
-            : property && hasProperty(responseData, property)
-            ? (responseData[property] as TResponse)
             : (responseData as TResponse),
       };
     } catch {

@@ -2,12 +2,14 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
+
 import type { AccessToken } from "@itwin/core-bentley";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsAccessClient } from "../../iTwinsClient";
 import type { APIResponse } from "../../types/CommonApiTypes";
-import type { ITwin } from "../../types/ITwin";
+import type { ITwinRepresentation } from "../../types/ITwin";
 import { TestConfig } from "../TestConfig";
+import { ItwinCreate } from '../../types/ITwin';
 
 describe("iTwinsClient Favorites Functionality", () => {
   const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
@@ -19,15 +21,15 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   it("should get a list of favorited project iTwins", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken, {
         subClass: "Project",
       });
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    iTwinsResponse.data?.iTwins!.forEach((actualiTwin: ITwinRepresentation) => {
       expect(actualiTwin.class).toBe("Endeavor");
       expect(actualiTwin.subClass).toBe("Project");
     });
@@ -35,15 +37,15 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   it("should get a list of favorited asset iTwins", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken, {
         subClass: "Asset",
       });
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinRepresentation) => {
       expect(actualiTwin.class).toBe("Thing");
       expect(actualiTwin.subClass).toBe("Asset");
     });
@@ -51,26 +53,26 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   it("should get a list of favorited project iTwins without subClass query", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken);
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
   });
 
   it("should get more properties of favorited project iTwins in representation result mode", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken, {
         subClass: "Project",
         resultMode: "representation",
       });
 
     // Assert
-    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
 
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+    iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinRepresentation) => {
       expect(actualiTwin.parentId).toBeTypeOf("string");
       expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
       expect(actualiTwin.createdDateTime).toBeTypeOf("string");
@@ -80,7 +82,7 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   it("should get a list of favorited project iTwins using all query scope", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken, {
         queryScope: "all",
         subClass: "Project",
@@ -88,8 +90,8 @@ describe("iTwinsClient Favorites Functionality", () => {
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinRepresentation) => {
       expect(actualiTwin.class).toBe("Endeavor");
       expect(actualiTwin.subClass).toBe("Project");
     });
@@ -97,7 +99,7 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   it("should get a list of favorited project iTwins using all query scope", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken, {
         queryScope: "all",
         subClass: "Project",
@@ -105,8 +107,8 @@ describe("iTwinsClient Favorites Functionality", () => {
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    iTwinsResponse.data?.iTwins!.forEach((actualiTwin: ITwinRepresentation) => {
       expect(actualiTwin.class).toBe("Endeavor");
       expect(actualiTwin.subClass).toBe("Project");
     });
@@ -114,7 +116,7 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   it("should return 422 when top query option exceeds maximum allowed value", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken, {
         top: 1001, // Exceeds maximum of 1000
       });
@@ -125,7 +127,7 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   it("should return 422 when top query option is negative", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken, {
         top: -1, // Negative value not allowed
       });
@@ -136,7 +138,7 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   it("should return 422 when skip query option is negative", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken, {
         skip: -1, // Negative value not allowed
       });
@@ -147,7 +149,7 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   it("should return 422 when invalid subClass is provided", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken, {
         subClass: "InvalidSubClass" as any, // Invalid subClass value
       });
@@ -158,7 +160,7 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   it("should return 422 when invalid status is provided", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken, {
         status: "InvalidStatus" as any, // Invalid status value
       });
@@ -169,7 +171,7 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   it("should return 422 when includeInactive is used with status parameter", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
+    const iTwinsResponse =
       await iTwinsAccessClient.getFavoritesITwins(accessToken, {
         status: "Active",
         includeInactive: true, // Should not be used together with status
@@ -206,7 +208,7 @@ describe("iTwinsClient Favorites Functionality", () => {
   it("should create, favorite, and delete an iTwin", async () => {
     /* CREATE THE ITWIN */
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -218,16 +220,16 @@ describe("iTwinsClient Favorites Functionality", () => {
     };
 
     // Act
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
+    const iTwinId = createResponse.data?.iTwin?.id;
 
     try {
       // Assert
       expect(createResponse.status).toBe(201);
-      expect(createResponse.data!.displayName).toBe(newiTwin.displayName);
-      expect(createResponse.data!.class).toBe(newiTwin.class);
-      expect(createResponse.data!.subClass).toBe(newiTwin.subClass);
+      expect(createResponse.data?.iTwin?.displayName).toBe(newiTwin.displayName);
+      expect(createResponse.data?.iTwin?.class).toBe(newiTwin.class);
+      expect(createResponse.data?.iTwin?.subClass).toBe(newiTwin.subClass);
 
       /* ADD ITWIN TO FAVORITES */
 
@@ -241,14 +243,14 @@ describe("iTwinsClient Favorites Functionality", () => {
 
       /* VERIFY ITWIN IS IN FAVORITES */
       // Act
-      let getFavoritesResponse: APIResponse<ITwin[]> =
+      let getFavoritesResponse =
         await iTwinsAccessClient.getFavoritesITwins(accessToken, {
           displayName: newiTwin.displayName,
         });
       // Assert
       expect(getFavoritesResponse.status).toBe(200);
-      expect(getFavoritesResponse.data).toHaveLength(1);
-      expect(getFavoritesResponse.data![0].id).toBe(iTwinId);
+      expect(getFavoritesResponse.data?.iTwins).toHaveLength(1);
+      expect(getFavoritesResponse.data?.iTwins![0].id).toBe(iTwinId);
 
       /* DELETE ITWIN FROM FAVORITES */
       const removeFavoriteResponse: APIResponse<undefined> =
@@ -269,11 +271,11 @@ describe("iTwinsClient Favorites Functionality", () => {
 
       // Assert
       expect(getFavoritesResponse.status).toBe(200);
-      expect(getFavoritesResponse.data).toHaveLength(0);
+      expect(getFavoritesResponse.data?.iTwins).toHaveLength(0);
     } finally {
       // Clean up - Delete the test iTwin
       const deleteResponse: APIResponse<undefined> =
-        await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+        await iTwinsAccessClient.deleteItwin(accessToken, iTwinId!);
 
       // Assert cleanup was successful
       expect(deleteResponse.status).toBe(204);

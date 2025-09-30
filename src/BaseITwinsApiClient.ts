@@ -13,7 +13,14 @@ import type {
   ODataQueryParams,
   ResultMode,
 } from "./types/CommonApiTypes";
-import type { ITwin, ITwinRecentsResponse } from "./types/ITwin";
+import type {
+  ItwinCreate,
+  ITwinMinimalResponse,
+  ITwinRepresentationResponse,
+  ItwinUpdate,
+  MultiITwinMinimalResponse,
+  MultiITwinRepresentationResponse,
+} from "./types/ITwin";
 import type {
   ITwinExportMultiResponse,
   ITwinExportRequestInfo,
@@ -50,25 +57,26 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
    *
    * @readonly
    */
-  protected static readonly iTwinsQueryParamMapping: ParameterMapping<ITwinsQueryArg> = {
-    subClass: "subClass",
-    type: "type",
-    status: "status",
-    search: "$search",
-    displayName: "displayName",
-    // eslint-disable-next-line id-denylist
-    number: "number",
-    top: "$top",
-    skip: "$skip",
-    parentId: "parentId",
-    iTwinAccountId: "iTwinAccountId",
-    includeInactive: "includeInactive",
-    resultMode:"",
-    queryScope:""
-  } as const;
+  protected static readonly iTwinsQueryParamMapping: ParameterMapping<ITwinsQueryArg> =
+    {
+      subClass: "subClass",
+      type: "type",
+      status: "status",
+      search: "$search",
+      displayName: "displayName",
+      // eslint-disable-next-line id-denylist
+      number: "number",
+      top: "$top",
+      skip: "$skip",
+      parentId: "parentId",
+      iTwinAccountId: "iTwinAccountId",
+      includeInactive: "includeInactive",
+      resultMode: "",
+      queryScope: "",
+    } as const;
 
   /**
-   * Maps the properties of {@link ITwinsQueryArg} to their corresponding query parameter names.
+   * Maps the properties some of the {@link ODataQueryParams} to their corresponding query parameter names.
    *
    * @remarks
    * This mapping is used to translate internal property names to the expected parameter names
@@ -87,6 +95,42 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     top: "$top",
     skip: "$skip",
     search: "$search",
+  } as const;
+
+  /**
+   * Maps the properties some of the {@link ODataQueryParams} to their corresponding query parameter names.
+   *
+   * @remarks
+   * This mapping is used to translate internal property names to the expected parameter names
+   * when constructing iTwins queries. Properties mapped to empty strings are excluded from
+   * the query string as they should be sent as headers instead.
+   *
+   * The mapping includes both OData query parameters (prefixed with $) and iTwins-specific
+   * parameters for filtering and pagination.
+   *
+   * @readonly
+   */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  protected static readonly ITwinsGetQueryParamMapping: ParameterMapping<
+    ITwinsQueryArg & Pick<ODataQueryParams, "filter" | "orderby" | "select">
+  > = {
+    subClass: "subClass",
+    type: "type",
+    status: "status",
+    search: "$search",
+    displayName: "displayName",
+    // eslint-disable-next-line id-denylist
+    number: "number",
+    top: "$top",
+    skip: "$skip",
+    parentId: "parentId",
+    iTwinAccountId: "iTwinAccountId",
+    includeInactive: "includeInactive",
+    resultMode: "",
+    queryScope: "",
+    filter: "$filter",
+    orderby: "$orderby",
+    select: "$select",
   } as const;
 
   /**
@@ -164,7 +208,9 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
   public abstract getFavoritesITwins(
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
-  ): Promise<APIResponse<ITwin[]>>;
+  ): Promise<
+    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+  >;
 
   /** Add iTwin to favorites */
   public abstract addITwinToFavorites(
@@ -196,7 +242,9 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
   public abstract getMyRecentUsedITwins(
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
-  ): Promise<APIResponse<ITwinRecentsResponse>>;
+  ): Promise<
+    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+  >;
 
   /** Create a new repository for the specified iTwin */
   public abstract createRepository(
@@ -285,33 +333,48 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
   ): Promise<APIResponse<undefined>>;
 
   /** Get iTwins */
-  public abstract queryAsync(
+  public abstract getITwins(
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
-  ): Promise<APIResponse<ITwin[]>>;
+  ): Promise<
+    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+  >;
+
+  /** Delete the specified iTwin */
+  public abstract deleteItwin(
+    accessToken: AccessToken,
+    iTwinId: string
+  ): Promise<APIResponse<undefined>>;
 
   /** Get an ITwin */
-  public abstract getAsync(
+  public abstract getITwin(
     accessToken: AccessToken,
     iTwinId: string,
     resultMode?: ResultMode
-  ): Promise<APIResponse<ITwin>>;
-
-  /** Get recent iTwins */
-  public abstract queryRecentsAsync(
-    accessToken: AccessToken,
-    arg?: ITwinsQueryArg
-  ): Promise<APIResponse<ITwin[]>>;
+  ): Promise<APIResponse<ITwinMinimalResponse | ITwinRepresentationResponse>>;
 
   /** Get the primary account ITwin */
-  public abstract getPrimaryAccountAsync(
+  public abstract getPrimaryAccount(
     accessToken: AccessToken
-  ): Promise<APIResponse<ITwin>>;
+  ): Promise<APIResponse<ITwinMinimalResponse>>;
 
   /* Get the account for an iTwin */
-  public abstract getAccountAsync(
+  public abstract getITwinAccount(
     accessToken: AccessToken,
     iTwinId: string,
     resultMode?: ResultMode
-  ): Promise<APIResponse<ITwin>>;
+  ): Promise<APIResponse<ITwinMinimalResponse>>;
+
+  /** Create a new iTwin */
+  public abstract createITwin(
+    accessToken: AccessToken,
+    iTwin: ItwinCreate
+  ): Promise<APIResponse<ITwinRepresentationResponse>>;
+
+  /** Update the specified iTwin */
+  public abstract updateItwin(
+    accessToken: AccessToken,
+    iTwinId: string,
+    iTwin: ItwinUpdate
+  ): Promise<APIResponse<ITwinRepresentationResponse>>;
 }

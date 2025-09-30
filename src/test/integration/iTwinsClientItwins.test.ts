@@ -2,12 +2,12 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import type { AccessToken } from "@itwin/core-bentley";
-import { ITwin } from "src/types/ITwin";
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+import type { AccessToken } from "@itwin/core-bentley";;
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsAccessClient } from "../../iTwinsClient";
 import type { APIResponse } from "../../types/CommonApiTypes";
-import type { ITwinSubClass } from "../../types/ITwin";
+import type { ItwinCreate, ITwinMinimal, ITwinRepresentation, ITwinRepresentationResponse, ITwinSubClass } from "../../types/ITwin";
 import { TestConfig } from "../TestConfig";
 
 describe("iTwinsClient", () => {
@@ -30,37 +30,37 @@ describe("iTwinsClient", () => {
 
   it("should get a list of project iTwins with custom url", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsCustomClient.queryAsync(accessToken, { subClass: "Project" });
+    const iTwinsResponse =
+      await iTwinsCustomClient.getITwins(accessToken, { subClass: "Project" });
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
-    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
   });
 
   it("should get a list of project iTwins without provided subClass", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsCustomClient.queryAsync(accessToken);
+    const iTwinsResponse =
+      await iTwinsCustomClient.getITwins(accessToken);
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
-    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
   });
 
   it("should get a list of project iTwins with provided subClass inside arg", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsCustomClient.queryAsync(accessToken, {
+    const iTwinsResponse =
+      await iTwinsCustomClient.getITwins(accessToken, {
         subClass: "Project",
       });
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
-    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
   });
 
   it("should get a 404 when trying to get an iTwin", async () => {
@@ -68,8 +68,8 @@ describe("iTwinsClient", () => {
     const notAniTwinId = "22acf21e-0575-4faf-849b-bcd538718269";
 
     // Act
-    const iTwinsResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.getAsync(accessToken, notAniTwinId);
+    const iTwinsResponse =
+      await iTwinsAccessClient.getITwin(accessToken, notAniTwinId);
 
     // Assert
     expect(iTwinsResponse.status).toBe(404);
@@ -79,8 +79,8 @@ describe("iTwinsClient", () => {
 
   it("should get a 422 when querying with an unsupported subClass", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse =
+      await iTwinsAccessClient.getITwins(accessToken, {
         subClass: "Invalid" as ITwinSubClass,
       });
 
@@ -95,22 +95,22 @@ describe("iTwinsClient", () => {
 
   it("should get a list of project iTwins", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryAsync(accessToken, { subClass: "Project" });
+    const iTwinsResponse =
+      await iTwinsAccessClient.getITwins(accessToken, { subClass: "Project" });
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
   });
 
   it("should get a list of project iTwins without providing subClass", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryAsync(accessToken);
+    const iTwinsResponse =
+      await iTwinsAccessClient.getITwins(accessToken);
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
   });
 
   it("should get a project iTwin", async () => {
@@ -118,16 +118,16 @@ describe("iTwinsClient", () => {
     const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
 
     // Act
-    const iTwinsResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.getAsync(accessToken, iTwinId!);
+    const iTwinsResponse =
+      await iTwinsAccessClient.getITwin(accessToken, iTwinId!);
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
     const actualiTwin = iTwinsResponse.data!;
-    expect(actualiTwin.id).toBe(iTwinId);
-    expect(actualiTwin.class).toBe("Endeavor");
-    expect(actualiTwin.subClass).toBe("Project");
+    expect(actualiTwin.iTwin.id).toBe(iTwinId);
+    expect(actualiTwin.iTwin.class).toBe("Endeavor");
+    expect(actualiTwin.iTwin.subClass).toBe("Project");
   });
 
   it("should get more project iTwin properties in representation result mode", async () => {
@@ -135,8 +135,8 @@ describe("iTwinsClient", () => {
     const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
 
     // Act
-    const iTwinsResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.getAsync(
+    const iTwinsResponse: APIResponse<ITwinRepresentationResponse> =
+      await iTwinsAccessClient.getITwin(
         accessToken,
         iTwinId!,
         "representation"
@@ -144,12 +144,12 @@ describe("iTwinsClient", () => {
 
     // Assert
     const actualiTwin = iTwinsResponse.data!;
-    expect(actualiTwin.parentId).toBeTypeOf("string");
-    expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
-    expect(actualiTwin.imageName).toBeNull();
-    expect(actualiTwin.image).toBeNull();
-    expect(actualiTwin.createdDateTime).toBeTypeOf("string");
-    expect(actualiTwin.createdBy).toBeTypeOf("string");
+    expect(actualiTwin.iTwin.parentId).toBeTypeOf("string");
+    expect(actualiTwin.iTwin.iTwinAccountId).toBeTypeOf("string");
+    expect(actualiTwin.iTwin.imageName).toBeNull();
+    expect(actualiTwin.iTwin.image).toBeNull();
+    expect(actualiTwin.iTwin.createdDateTime).toBeTypeOf("string");
+    expect(actualiTwin.iTwin.createdBy).toBeTypeOf("string");
   });
 
   it("should get an account", async () => {
@@ -157,16 +157,16 @@ describe("iTwinsClient", () => {
     const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
 
     // Act
-    const iTwinsResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.getAccountAsync(accessToken, iTwinId!);
+    const iTwinsResponse =
+      await iTwinsAccessClient.getITwinAccount(accessToken, iTwinId!);
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
     const actualiTwin = iTwinsResponse.data!;
-    expect(actualiTwin.id).not.toBe(iTwinId); // should be a different entity
-    expect(actualiTwin.class).toBe("Account");
-    expect(actualiTwin.subClass).toBe("Account");
+    expect(actualiTwin.iTwin.id).not.toBe(iTwinId); // should be a different entity
+    expect(actualiTwin.iTwin.class).toBe("Account");
+    expect(actualiTwin.iTwin.subClass).toBe("Account");
   });
 
   it("should get more details for an account in represenatation result mode", async () => {
@@ -174,8 +174,8 @@ describe("iTwinsClient", () => {
     const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
 
     // Act
-    const iTwinsResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.getAccountAsync(
+    const iTwinsResponse : APIResponse<ITwinRepresentationResponse> =
+      await iTwinsAccessClient.getITwinAccount(
         accessToken,
         iTwinId!,
         "representation"
@@ -185,11 +185,11 @@ describe("iTwinsClient", () => {
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
     const actualiTwin = iTwinsResponse.data!;
-    expect(actualiTwin.id).not.toBe(iTwinId); // should be a different entity
-    expect(actualiTwin.class).toBe("Account");
-    expect(actualiTwin.subClass).toBe("Account");
-    expect(actualiTwin.createdDateTime).toBeTypeOf("string");
-    expect(actualiTwin.createdBy).toBeTypeOf("string");
+    expect(actualiTwin.iTwin.id).not.toBe(iTwinId); // should be a different entity
+    expect(actualiTwin.iTwin.class).toBe("Account");
+    expect(actualiTwin.iTwin.subClass).toBe("Account");
+    expect(actualiTwin.iTwin.createdDateTime).toBeTypeOf("string");
+    expect(actualiTwin.iTwin.createdBy).toBeTypeOf("string");
   });
 
   it("should get the account specified by the iTwinAccountId", async () => {
@@ -197,10 +197,10 @@ describe("iTwinsClient", () => {
     const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
 
     // Act
-    const accountResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.getAccountAsync(accessToken, iTwinId!);
-    const iTwinsResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.getAsync(
+    const accountResponse =
+      await iTwinsAccessClient.getITwinAccount(accessToken, iTwinId!);
+    const iTwinsResponse =
+      await iTwinsAccessClient.getITwin(
         accessToken,
         iTwinId!,
         "representation"
@@ -210,18 +210,18 @@ describe("iTwinsClient", () => {
     expect(accountResponse.status).toBe(200);
     expect(accountResponse.data).toBeDefined();
     const actualAccount = accountResponse.data!;
-    expect(actualAccount.id).not.toBe(iTwinId); // should be a different entity
-    expect(actualAccount.class).toBe("Account");
-    expect(actualAccount.subClass).toBe("Account");
+    expect(actualAccount.iTwin.id).not.toBe(iTwinId); // should be a different entity
+    expect(actualAccount.iTwin.class).toBe("Account");
+    expect(actualAccount.iTwin.subClass).toBe("Account");
 
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
     const actualiTwin = iTwinsResponse.data!;
-    expect(actualiTwin.id).toBe(iTwinId);
-    expect(actualiTwin.class).toBe("Endeavor");
-    expect(actualiTwin.subClass).toBe("Project");
+    expect(actualiTwin.iTwin.id).toBe(iTwinId);
+    expect(actualiTwin.iTwin.class).toBe("Endeavor");
+    expect(actualiTwin.iTwin.subClass).toBe("Project");
 
-    expect(actualiTwin.iTwinAccountId).toBe(actualAccount.id);
+    expect(actualiTwin.iTwin.iTwinAccountId).toBe(actualAccount.iTwin.id);
   });
 
   it("should get a paged list of project iTwins using top", async () => {
@@ -229,15 +229,15 @@ describe("iTwinsClient", () => {
     const numberOfiTwins = 3;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Project",
       top: numberOfiTwins,
     });
 
     // Assert
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    expect(iTwinsResponse.data!.length).toBe(3);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?.iTwins!.length).toBe(3);
+    iTwinsResponse.data?.iTwins!.forEach((actualiTwin: ITwinMinimal) => {
       expect(actualiTwin.class).toBe("Endeavor");
       expect(actualiTwin.subClass).toBe("Project");
     });
@@ -249,16 +249,16 @@ describe("iTwinsClient", () => {
     const numberToSkip = 3;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Project",
       top: numberOfiTwins,
       skip: numberToSkip,
     });
 
     // Assert
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    expect(iTwinsResponse.data!.length).toBe(3);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data!.iTwins.length).toBe(3);
+    iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinMinimal) => {
       expect(actualiTwin.class).toBe("Endeavor");
       expect(actualiTwin.subClass).toBe("Project");
     });
@@ -271,16 +271,16 @@ describe("iTwinsClient", () => {
 
     // Act
     for (let skip = 0; skip < numberOfPages * pageSize; skip += pageSize) {
-      const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+      const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
         subClass: "Project",
         top: pageSize,
         skip,
       });
 
       // Assert
-      expect(iTwinsResponse.data).not.toHaveLength(0);
-      expect(iTwinsResponse.data!.length).toBe(pageSize);
-      iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+      expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+      expect(iTwinsResponse.data!.iTwins.length).toBe(pageSize);
+      iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinMinimal) => {
         expect(actualiTwin.class).toBe("Endeavor");
         expect(actualiTwin.subClass).toBe("Project");
       });
@@ -292,15 +292,15 @@ describe("iTwinsClient", () => {
     const iTwinName = TestConfig.iTwinProjectName;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Project",
       displayName: iTwinName,
     });
-    const iTwins = iTwinsResponse.data!;
+    const iTwins = iTwinsResponse.data?.iTwins!;
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
-    iTwins.forEach((actualiTwin: ITwin) => {
+    iTwins.forEach((actualiTwin: ITwinMinimal) => {
       expect(actualiTwin.displayName).toBe(iTwinName);
       expect(actualiTwin.class).toBe("Endeavor");
       expect(actualiTwin.subClass).toBe("Project");
@@ -312,16 +312,16 @@ describe("iTwinsClient", () => {
     const iTwinNumber = TestConfig.iTwinProjectNumber;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Project",
       number: iTwinNumber,
     });
-    const iTwins = iTwinsResponse.data!;
+    const iTwins = iTwinsResponse.data?.iTwins!;
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
     // All items match the name
-    iTwins.forEach((actualiTwin: ITwin) => {
+    iTwins.forEach((actualiTwin: ITwinMinimal) => {
       expect(actualiTwin.number).toBe(iTwinNumber);
       expect(actualiTwin.class).toBe("Endeavor");
       expect(actualiTwin.subClass).toBe("Project");
@@ -333,16 +333,16 @@ describe("iTwinsClient", () => {
     const iTwinSearchString = TestConfig.iTwinSearchString;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Project",
       search: iTwinSearchString,
     });
-    const iTwins = iTwinsResponse.data!;
+    const iTwins = iTwinsResponse.data?.iTwins!;
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
     // All items match the name
-    iTwins.forEach((actualiTwin: ITwin) => {
+    iTwins.forEach((actualiTwin: ITwinMinimal) => {
       expect(actualiTwin.displayName).toContain(iTwinSearchString);
       expect(actualiTwin.class).toBe("Endeavor");
       expect(actualiTwin.subClass).toBe("Project");
@@ -354,18 +354,18 @@ describe("iTwinsClient", () => {
     const iTwinSearchString = TestConfig.iTwinSearchString;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Project",
       search: iTwinSearchString,
       resultMode: "representation",
     });
 
-    const iTwins = iTwinsResponse.data!;
+    const iTwins = iTwinsResponse.data?.iTwins!;
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
 
-    iTwins.forEach((actualiTwin: ITwin) => {
+    iTwins.forEach((actualiTwin: ITwinRepresentation) => {
       expect(actualiTwin.parentId).toBeTypeOf("string");
       expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
       expect(actualiTwin.createdDateTime).toBeTypeOf("string");
@@ -378,84 +378,40 @@ describe("iTwinsClient", () => {
     const iTwinSearchString = TestConfig.iTwinSearchString;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Project",
       search: iTwinSearchString,
       queryScope: "all",
     });
 
-    const iTwins = iTwinsResponse.data!;
+    const iTwins = iTwinsResponse.data?.iTwins!;
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
-  });
-
-  it("should get a list of recent project iTwins", async () => {
-    // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryRecentsAsync(accessToken, {
-        subClass: "Project",
-      });
-
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-  });
-
-  it("should get a list of recent project iTwins without subClass query", async () => {
-    // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryRecentsAsync(accessToken);
-
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-  });
-
-  it("should get more properties of recent project iTwins in representation result mode", async () => {
-    // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryRecentsAsync(accessToken, {
-        subClass: "Project",
-        resultMode: "representation",
-      });
-
-    const iTwins = iTwinsResponse.data!;
-
-    // Assert
-    expect(iTwins).not.toHaveLength(0);
-
-    // All items have the field "createdDateTime"
-    iTwins.forEach((actualiTwin: ITwin) => {
-      expect(actualiTwin.parentId).toBeTypeOf("string");
-      expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
-      expect(actualiTwin.createdDateTime).toBeTypeOf("string");
-      expect(actualiTwin.createdBy).toBeTypeOf("string");
-    });
   });
 
   it("should get a list of asset iTwins", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryAsync(accessToken, { subClass: "Asset" });
+    const iTwinsResponse =
+      await iTwinsAccessClient.getITwins(accessToken, { subClass: "Asset" });
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
   });
 
   it("should get more properties of asset iTwins in representation result mode", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse =
+      await iTwinsAccessClient.getITwins(accessToken, {
         subClass: "Asset",
         resultMode: "representation",
       });
 
     // Assert
-    expect(iTwinsResponse.data).not.toHaveLength(0);
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
 
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+    iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwin) => {
       expect(actualiTwin.parentId).toBeTypeOf("string");
       expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
       expect(actualiTwin.createdDateTime).toBeTypeOf("string");
@@ -468,13 +424,13 @@ describe("iTwinsClient", () => {
     const iTwinId = process.env.IMJS_TEST_ASSET_ID;
 
     // Act
-    const iTwinsResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.getAsync(accessToken, iTwinId!);
+    const iTwinsResponse =
+      await iTwinsAccessClient.getITwin(accessToken, iTwinId!);
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
-    const actualiTwin = iTwinsResponse.data!;
+    const actualiTwin = iTwinsResponse.data?.iTwin!;
     expect(iTwinId).toBe(actualiTwin.id);
   });
 
@@ -483,15 +439,15 @@ describe("iTwinsClient", () => {
     const iTwinId = process.env.IMJS_TEST_ASSET_ID;
 
     // Act
-    const iTwinsResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.getAsync(
+    const iTwinsResponse =
+      await iTwinsAccessClient.getITwin(
         accessToken,
         iTwinId!,
         "representation"
       );
 
     // Assert
-    const actualiTwin = iTwinsResponse.data!;
+    const actualiTwin: ITwinRepresentation = iTwinsResponse.data?.iTwin!;
     expect(actualiTwin.parentId).toBeTypeOf("string");
     expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
     expect(actualiTwin.imageName).toBeNull();
@@ -505,15 +461,15 @@ describe("iTwinsClient", () => {
     const numberOfiTwins = 3;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Asset",
       top: numberOfiTwins,
     });
 
     // Assert
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    expect(iTwinsResponse.data!.length).toBe(3);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data!.iTwins.length).toBe(3);
+    iTwinsResponse.data!.iTwins.forEach((actualiTwin) => {
       expect(actualiTwin.class).toBe("Thing");
       expect(actualiTwin.subClass).toBe("Asset");
     });
@@ -525,16 +481,16 @@ describe("iTwinsClient", () => {
     const numberToSkip = 3;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Asset",
       top: numberOfiTwins,
       skip: numberToSkip,
     });
 
     // Assert
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    expect(iTwinsResponse.data!.length).toBe(3);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data!.iTwins.length).toBe(3);
+    iTwinsResponse.data!.iTwins.forEach((actualiTwin) => {
       expect(actualiTwin.class).toBe("Thing");
       expect(actualiTwin.subClass).toBe("Asset");
     });
@@ -547,16 +503,16 @@ describe("iTwinsClient", () => {
 
     // Act
     for (let skip = 0; skip < numberOfPages * pageSize; skip += pageSize) {
-      const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+      const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
         subClass: "Asset",
         top: pageSize,
         skip,
       });
 
       // Assert
-      expect(iTwinsResponse.data).not.toHaveLength(0);
-      expect(iTwinsResponse.data!.length).toBe(pageSize);
-      iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
+      expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+      expect(iTwinsResponse.data?.iTwins.length).toBe(pageSize);
+      iTwinsResponse.data?.iTwins.forEach((actualiTwin) => {
         expect(actualiTwin.class).toBe("Thing");
         expect(actualiTwin.subClass).toBe("Asset");
       });
@@ -568,16 +524,16 @@ describe("iTwinsClient", () => {
     const iTwinName = TestConfig.iTwinAssetName;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Asset",
       displayName: iTwinName,
     });
-    const iTwins = iTwinsResponse.data!;
+    const iTwins = iTwinsResponse.data?.iTwins!;
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
     // All items match the name
-    iTwins.forEach((actualiTwin: ITwin) => {
+    iTwins.forEach((actualiTwin) => {
       expect(actualiTwin.displayName).toBe(iTwinName);
       expect(actualiTwin.class).toBe("Thing");
       expect(actualiTwin.subClass).toBe("Asset");
@@ -589,16 +545,16 @@ describe("iTwinsClient", () => {
     const iTwinNumber = TestConfig.iTwinAssetNumber;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Asset",
       number: iTwinNumber,
     });
-    const iTwins = iTwinsResponse.data!;
+    const iTwins = iTwinsResponse.data?.iTwins!;
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
     // All items match the name
-    iTwins.forEach((actualiTwin: ITwin) => {
+    iTwins.forEach((actualiTwin) => {
       expect(actualiTwin.number).toBe(iTwinNumber);
       expect(actualiTwin.class).toBe("Thing");
       expect(actualiTwin.subClass).toBe("Asset");
@@ -610,52 +566,17 @@ describe("iTwinsClient", () => {
     const iTwinSearchString = TestConfig.iTwinSearchString;
 
     // Act
-    const iTwinsResponse = await iTwinsAccessClient.queryAsync(accessToken, {
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
       subClass: "Asset",
       search: iTwinSearchString,
     });
-    const iTwins = iTwinsResponse.data!;
+    const iTwins = iTwinsResponse.data?.iTwins!;
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
     // All items match the name
-    iTwins.forEach((actualiTwin: ITwin) => {
+    iTwins.forEach((actualiTwin) => {
       expect(actualiTwin.displayName).toContain(iTwinSearchString);
-      expect(actualiTwin.class).toBe("Thing");
-      expect(actualiTwin.subClass).toBe("Asset");
-    });
-  });
-
-  it("should get a list of recent asset iTwins", async () => {
-    // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryRecentsAsync(accessToken, {
-        subClass: "Asset",
-      });
-
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
-      expect(actualiTwin.class).toBe("Thing");
-      expect(actualiTwin.subClass).toBe("Asset");
-    });
-  });
-
-  it("should get a list of recent asset iTwins using all query scope", async () => {
-    // Act
-    const iTwinsResponse: APIResponse<ITwin[]> =
-      await iTwinsAccessClient.queryRecentsAsync(
-        accessToken,
-        { subClass: "Asset",
-          queryScope:"all"
-         },
-      );
-
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data).not.toHaveLength(0);
-    iTwinsResponse.data!.forEach((actualiTwin: ITwin) => {
       expect(actualiTwin.class).toBe("Thing");
       expect(actualiTwin.subClass).toBe("Asset");
     });
@@ -663,20 +584,20 @@ describe("iTwinsClient", () => {
 
   it("should get the primary account iTwin", async () => {
     // Act
-    const iTwinsResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.getPrimaryAccountAsync(accessToken);
+    const iTwinsResponse =
+      await iTwinsAccessClient.getPrimaryAccount(accessToken);
 
     // Assert
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
-    const actualiTwin = iTwinsResponse.data!;
+    const actualiTwin = iTwinsResponse.data?.iTwin!;
     expect(actualiTwin.id).toBeTruthy();
   });
 
   it("should create, update, and delete an iTwin", async () => {
     /* CREATE THE ITWIN */
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -688,34 +609,34 @@ describe("iTwinsClient", () => {
     };
 
     // Act
-    const createResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinId = createResponse.data!.id!;
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
+    const iTwinId = createResponse.data!.iTwin.id!;
 
     // Assert
     expect(createResponse.status).toBe(201);
-    expect(createResponse.data!.displayName).toBe(newiTwin.displayName);
-    expect(createResponse.data!.class).toBe(newiTwin.class);
-    expect(createResponse.data!.subClass).toBe(newiTwin.subClass);
+    expect(createResponse.data?.iTwin!.displayName).toBe(newiTwin.displayName);
+    expect(createResponse.data?.iTwin!.class).toBe(newiTwin.class);
+    expect(createResponse.data?.iTwin!.subClass).toBe(newiTwin.subClass);
 
     /* UPDATE ITWIN */
     // Arrange
-    const updatediTwin: ITwin = {
+    const updatediTwin = {
       displayName: "UPDATED APIM iTwin Test Display Name",
     };
 
     // Act
-    const updateResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.updateiTwin(accessToken, iTwinId, updatediTwin);
+    const updateResponse =
+      await iTwinsAccessClient.updateItwin(accessToken, iTwinId, updatediTwin);
 
     // Assert
     expect(updateResponse.status).toBe(200);
-    expect(updateResponse.data!.displayName).toBe(updatediTwin.displayName);
+    expect(updateResponse.data!.iTwin.displayName).toBe(updatediTwin.displayName);
 
     /* DELETE ITWIN */
     // Act
     const deleteResponse: APIResponse<undefined> =
-      await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+      await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
 
     // Assert
     expect(deleteResponse.status).toBe(204);
@@ -724,7 +645,7 @@ describe("iTwinsClient", () => {
 
   it("should get a 409 conflict when trying to create a duplicate", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
@@ -735,14 +656,14 @@ describe("iTwinsClient", () => {
     };
 
     // Act
-    const iTwinResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-    const iTwinResponse2: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
+    const iTwinResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
+    const iTwinResponse2 =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
     const deleteResponse: APIResponse<undefined> =
-      await iTwinsAccessClient.deleteiTwin(
+      await iTwinsAccessClient.deleteItwin(
         accessToken,
-        iTwinResponse.data!.id!
+        iTwinResponse.data!.iTwin.id!
       );
 
     // Assert
@@ -759,18 +680,18 @@ describe("iTwinsClient", () => {
 
   it("should get a 422 unprocessable entity when trying to create an iTwin without a class specified", async () => {
     // Arrange
-    const newiTwin: ITwin = {
+    const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
       number: `APIM iTwin Test Number ${new Date().toISOString()}`,
       type: "Bridge",
       subClass: "Asset",
       dataCenterLocation: "East US",
       status: "Trial",
-    };
+    } as ItwinCreate;
 
     // Act
-    const iTwinResponse: APIResponse<ITwin> =
-      await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
+    const iTwinResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
 
     // Assert
     expect(iTwinResponse.status).toBe(422);
