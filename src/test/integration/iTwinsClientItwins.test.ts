@@ -37,6 +37,8 @@ describe("iTwinsClient", () => {
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
     expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
   });
 
   it("should get a list of project iTwins without provided subClass", async () => {
@@ -48,6 +50,8 @@ describe("iTwinsClient", () => {
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
     expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
   });
 
   it("should get a list of project iTwins with provided subClass inside arg", async () => {
@@ -61,6 +65,8 @@ describe("iTwinsClient", () => {
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data).toBeDefined();
     expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
   });
 
   it("should get a 404 when trying to get an iTwin", async () => {
@@ -101,6 +107,8 @@ describe("iTwinsClient", () => {
     // Assert
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
   });
 
   it("should get a list of project iTwins without providing subClass", async () => {
@@ -111,6 +119,8 @@ describe("iTwinsClient", () => {
     // Assert
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
   });
 
   it("should get a project iTwin", async () => {
@@ -237,6 +247,8 @@ describe("iTwinsClient", () => {
     // Assert
     expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
     expect(iTwinsResponse.data?.iTwins!.length).toBe(3);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
     iTwinsResponse.data?.iTwins!.forEach((actualiTwin: ITwinMinimal) => {
       expect(actualiTwin.class).toBe("Endeavor");
       expect(actualiTwin.subClass).toBe("Project");
@@ -258,6 +270,12 @@ describe("iTwinsClient", () => {
     // Assert
     expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
     expect(iTwinsResponse.data!.iTwins.length).toBe(3);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
+    // For skip-based pagination, there might be next/prev links
+    if (numberToSkip > 0) {
+      expect(iTwinsResponse.data?._links?.prev).toBeDefined();
+    }
     iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinMinimal) => {
       expect(actualiTwin.class).toBe("Endeavor");
       expect(actualiTwin.subClass).toBe("Project");
@@ -280,6 +298,12 @@ describe("iTwinsClient", () => {
       // Assert
       expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
       expect(iTwinsResponse.data!.iTwins.length).toBe(pageSize);
+      expect(iTwinsResponse.data?._links).toBeDefined();
+      expect(iTwinsResponse.data?._links?.self).toBeDefined();
+      // For pagination, check for next/prev links based on position
+      if (skip > 0) {
+        expect(iTwinsResponse.data?._links?.prev).toBeDefined();
+      }
       iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinMinimal) => {
         expect(actualiTwin.class).toBe("Endeavor");
         expect(actualiTwin.subClass).toBe("Project");
@@ -300,6 +324,8 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
     iTwins.forEach((actualiTwin: ITwinMinimal) => {
       expect(actualiTwin.displayName).toBe(iTwinName);
       expect(actualiTwin.class).toBe("Endeavor");
@@ -320,6 +346,8 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
     // All items match the name
     iTwins.forEach((actualiTwin: ITwinMinimal) => {
       expect(actualiTwin.number).toBe(iTwinNumber);
@@ -341,6 +369,8 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
     // All items match the name
     iTwins.forEach((actualiTwin: ITwinMinimal) => {
       expect(actualiTwin.displayName).toContain(iTwinSearchString);
@@ -364,6 +394,8 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
 
     iTwins.forEach((actualiTwin: ITwinRepresentation) => {
       expect(actualiTwin.parentId).toBeTypeOf("string");
@@ -388,6 +420,8 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
   });
 
   it("should filter iTwins using OData filter parameter", async () => {
@@ -403,6 +437,8 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
     iTwins.forEach((actualiTwin: ITwinRepresentation) => {
       expect(actualiTwin.status).toBe("Active");
       expect(actualiTwin.subClass).toBe("Project");
@@ -421,6 +457,8 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
 
     // Verify ascending order by displayName
     for (let i = 1; i < iTwins.length; i++) {
@@ -440,6 +478,8 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
 
     // Verify descending order by displayName
     for (let i = 1; i < iTwins.length; i++) {
@@ -459,6 +499,8 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
     iTwins.forEach((actualiTwin: ITwinMinimal) => {
       // Selected fields should be present
       expect(actualiTwin.id).toBeDefined();
@@ -484,6 +526,8 @@ describe("iTwinsClient", () => {
     // Assert
     expect(iTwins).not.toHaveLength(0);
     expect(iTwins.length).toBeLessThanOrEqual(5);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
 
     iTwins.forEach((actualiTwin: ITwinRepresentation) => {
       expect(actualiTwin.status).toBe("Active");
@@ -511,6 +555,8 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
     iTwins.forEach((actualiTwin: ITwinRepresentation) => {
       expect(["Active", "Trial"]).toContain(actualiTwin.status);
       expect(actualiTwin.subClass).toBe("Project");
@@ -525,6 +571,8 @@ describe("iTwinsClient", () => {
     // Assert
     expect(iTwinsResponse.status).toBe(200);
     expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
   });
 
   it("should get more properties of asset iTwins in representation result mode", async () => {
@@ -537,6 +585,8 @@ describe("iTwinsClient", () => {
 
     // Assert
     expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    expect(iTwinsResponse.data?._links).toBeDefined();
+    expect(iTwinsResponse.data?._links?.self).toBeDefined();
 
     iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinRepresentation) => {
       expect(actualiTwin.parentId).toBeTypeOf("string");
