@@ -390,6 +390,133 @@ describe("iTwinsClient", () => {
     expect(iTwins).not.toHaveLength(0);
   });
 
+  it("should filter iTwins using OData filter parameter", async () => {
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
+      subClass: "Project",
+      filter: "status eq 'Active'",
+      resultMode: "representation",
+      top: 10,
+    });
+
+    const iTwins = iTwinsResponse.data?.iTwins!;
+
+    // Assert
+    expect(iTwins).not.toHaveLength(0);
+    iTwins.forEach((actualiTwin: ITwinRepresentation) => {
+      expect(actualiTwin.status).toBe("Active");
+      expect(actualiTwin.subClass).toBe("Project");
+    });
+  });
+
+  it("should order iTwins using OData orderby parameter", async () => {
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
+      subClass: "Project",
+      orderby: "displayName asc",
+      top: 10,
+    });
+
+    const iTwins = iTwinsResponse.data?.iTwins!;
+
+    // Assert
+    expect(iTwins).not.toHaveLength(0);
+
+    // Verify ascending order by displayName
+    for (let i = 1; i < iTwins.length; i++) {
+      expect(iTwins[i].displayName.localeCompare(iTwins[i - 1].displayName)).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("should order iTwins in descending order using OData orderby parameter", async () => {
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
+      subClass: "Project",
+      orderby: "displayName desc",
+      top: 10,
+    });
+
+    const iTwins = iTwinsResponse.data?.iTwins!;
+
+    // Assert
+    expect(iTwins).not.toHaveLength(0);
+
+    // Verify descending order by displayName
+    for (let i = 1; i < iTwins.length; i++) {
+      expect(iTwins[i].displayName.localeCompare(iTwins[i - 1].displayName)).toBeLessThanOrEqual(0);
+    }
+  });
+
+  it("should select specific fields using OData select parameter", async () => {
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
+      subClass: "Project",
+      select: "id,displayName,class,subClass",
+      top: 5,
+    });
+
+    const iTwins = iTwinsResponse.data?.iTwins!;
+
+    // Assert
+    expect(iTwins).not.toHaveLength(0);
+    iTwins.forEach((actualiTwin: ITwinMinimal) => {
+      // Selected fields should be present
+      expect(actualiTwin.id).toBeDefined();
+      expect(actualiTwin.displayName).toBeDefined();
+      expect(actualiTwin.class).toBeDefined();
+      expect(actualiTwin.subClass).toBe("Project");
+    });
+  });
+
+  it("should combine multiple OData parameters", async () => {
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
+      subClass: "Project",
+      filter: "status eq 'Active'",
+      orderby: "displayName asc",
+      select: "id,displayName,status,class,subClass",
+      resultMode: "representation",
+      top: 5,
+    });
+
+    const iTwins = iTwinsResponse.data?.iTwins!;
+
+    // Assert
+    expect(iTwins).not.toHaveLength(0);
+    expect(iTwins.length).toBeLessThanOrEqual(5);
+
+    iTwins.forEach((actualiTwin: ITwinRepresentation) => {
+      expect(actualiTwin.status).toBe("Active");
+      expect(actualiTwin.subClass).toBe("Project");
+      expect(actualiTwin.id).toBeDefined();
+      expect(actualiTwin.displayName).toBeDefined();
+    });
+
+    // Verify ascending order by displayName
+    for (let i = 1; i < iTwins.length; i++) {
+      expect(iTwins[i].displayName.localeCompare(iTwins[i - 1].displayName)).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("should handle complex OData filter expressions", async () => {
+    // Act
+    const iTwinsResponse = await iTwinsAccessClient.getITwins(accessToken, {
+      subClass: "Project",
+      filter: "status eq 'Active' or status eq 'Trial'",
+      resultMode: "representation",
+      top: 10,
+    });
+
+    const iTwins = iTwinsResponse.data?.iTwins!;
+
+    // Assert
+    expect(iTwins).not.toHaveLength(0);
+    iTwins.forEach((actualiTwin: ITwinRepresentation) => {
+      expect(["Active", "Trial"]).toContain(actualiTwin.status);
+      expect(actualiTwin.subClass).toBe("Project");
+    });
+  });
+
   it("should get a list of asset iTwins", async () => {
     // Act
     const iTwinsResponse =
@@ -411,7 +538,7 @@ describe("iTwinsClient", () => {
     // Assert
     expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
 
-    iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwin) => {
+    iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinRepresentation) => {
       expect(actualiTwin.parentId).toBeTypeOf("string");
       expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
       expect(actualiTwin.createdDateTime).toBeTypeOf("string");
