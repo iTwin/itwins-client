@@ -16,21 +16,21 @@ Contains the **@itwin/itwins-client** package that wraps sending requests to the
 
 ```typescript
 import type { AccessToken } from "@itwin/core-bentley";
-import {
-  ITwinsAccessClient,
-  ITwin,
-  ITwinsAPIResponse,
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  MultiITwinMinimalResponse,
 } from "@itwin/itwins-client";
 
 /** Function that queries all iTwins and prints their ids to the console. */
 async function printiTwinIds(): Promise<void> {
-  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  const iTwinsClient: ITwinsClient = new ITwinsClient();
   const accessToken: AccessToken = { get_access_token_logic_here };
 
-  const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
-    await iTwinsAccessClient.queryAsync(accessToken, "Project");
+  const iTwinsResponse: BentleyAPIResponse<MultiITwinMinimalResponse> =
+    await iTwinsClient.getITwins(accessToken, { subClass: "Project" });
 
-  iTwinsResponse.data!.forEach((actualiTwin) => {
+  iTwinsResponse.data!.iTwins.forEach((actualiTwin) => {
     console.log(actualiTwin.id);
   });
 }
@@ -40,21 +40,21 @@ async function printiTwinIds(): Promise<void> {
 
 ```typescript
 import type { AccessToken } from "@itwin/core-bentley";
-import {
-  ITwinsAccessClient,
-  ITwin,
-  ITwinsAPIResponse,
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  MultiITwinMinimalResponse,
 } from "@itwin/itwins-client";
 
 /** Function that queries all iTwins and prints their ids to the console. */
 async function printiTwinIds(): Promise<void> {
-  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient("https://api.bentley.com/itwins");
+  const iTwinsClient: ITwinsClient = new ITwinsClient("https://api.bentley.com/itwins");
   const accessToken: AccessToken = { get_access_token_logic_here };
 
-  const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
-    await iTwinsAccessClient.queryAsync(accessToken, "Project");
+  const iTwinsResponse: BentleyAPIResponse<MultiITwinMinimalResponse> =
+    await iTwinsClient.getITwins(accessToken, { subClass: "Project" });
 
-  iTwinsResponse.data!.forEach((actualiTwin) => {
+  iTwinsResponse.data!.iTwins.forEach((actualiTwin) => {
     console.log(actualiTwin.id);
   });
 }
@@ -64,24 +64,25 @@ async function printiTwinIds(): Promise<void> {
 
 ```typescript
 import type { AccessToken } from "@itwin/core-bentley";
-import {
-  ITwinsAccessClient,
-  ITwin,
-  ITwinsAPIResponse,
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  MultiITwinMinimalResponse,
 } from "@itwin/itwins-client";
 
 /** Function that queries all iTwins and prints their ids to the console. */
 async function printiTwinIds(): Promise<void> {
-  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  const iTwinsClient: ITwinsClient = new ITwinsClient();
   const accessToken: AccessToken = { get_access_token_logic_here };
 
-  const iTwinsResponse: ITwinsAPIResponse<ITwin[]> =
-    await iTwinsAccessClient.queryAsync(accessToken, "Project", {
+  const iTwinsResponse: BentleyAPIResponse<MultiITwinMinimalResponse> =
+    await iTwinsClient.getITwins(accessToken, {
+      subClass: "Project",
       top: 25,
       skip: 13,
     });
 
-  iTwinsResponse.data!.forEach((actualiTwin) => {
+  iTwinsResponse.data!.iTwins.forEach((actualiTwin) => {
     console.log(actualiTwin.id);
   });
 }
@@ -91,23 +92,23 @@ async function printiTwinIds(): Promise<void> {
 
 ```typescript
 import type { AccessToken } from "@itwin/core-bentley";
-import {
-  ITwinsAccessClient,
-  ITwin,
-  ITwinsAPIResponse,
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  ITwinMinimalResponse,
 } from "@itwin/itwins-client";
 
 /** Function that gets iTwin by id and prints the id and displayName. */
-async function printiTwinIds(): Promise<void> {
-  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+async function printiTwinDetails(): Promise<void> {
+  const iTwinsClient: ITwinsClient = new ITwinsClient();
   const accessToken: AccessToken = { get_access_token_logic_here };
 
-  const iTwinsResponse: ITwinsAPIResponse<ITwin> =
-    await iTwinsAccessClient.getAsync(
+  const iTwinsResponse: BentleyAPIResponse<ITwinMinimalResponse> =
+    await iTwinsClient.getITwin(
       accessToken,
       "3865240b-cfd9-4ba1-a9e5-65e8813d006b"
     );
-  const actualiTwin = iTwinsResponse.data!;
+  const actualiTwin = iTwinsResponse.data!.iTwin;
   console.log(actualiTwin.id, actualiTwin.displayName);
 }
 ```
@@ -116,24 +117,24 @@ async function printiTwinIds(): Promise<void> {
 
 ```typescript
 import type { AccessToken } from "@itwin/core-bentley";
-import {
-  ITwinsAccessClient,
-  Repository,
-  ITwinsAPIResponse,
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  MultiRepositoriesResponse,
 } from "@itwin/itwins-client";
 
 /** Function that queries all iTwin Repositories and prints their ids to the console. */
-async function printiTwinIds(): Promise<void> {
-  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+async function printRepositoryIds(): Promise<void> {
+  const iTwinsClient: ITwinsClient = new ITwinsClient();
   const accessToken: AccessToken = { get_access_token_logic_here };
 
-  const iTwinsResponse: ITwinsAPIResponse<Repository[]> =
-    await iTwinsAccessClient.queryRepositoriesAsync(
+  const repositoriesResponse: BentleyAPIResponse<MultiRepositoriesResponse> =
+    await iTwinsClient.getRepositories(
       accessToken,
       "e36e29fa-11c0-4ac8-9ead-e8678ebc393c"
     );
 
-  iTwinsResponse.data!.forEach((actualRepository) => {
+  repositoriesResponse.data!.repositories.forEach((actualRepository) => {
     console.log(actualRepository.id);
   });
 }
@@ -143,30 +144,69 @@ async function printiTwinIds(): Promise<void> {
 
 ```typescript
 import type { AccessToken } from "@itwin/core-bentley";
-import {
-  ITwinsAccessClient,
-  Repository,
-  ITwinsAPIResponse,
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  MultiRepositoriesResponse,
 } from "@itwin/itwins-client";
 
 /** Function that queries all iTwin Repositories and prints their ids to the console. */
-async function printiTwinIds(): Promise<void> {
-  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+async function printRepositoryIds(): Promise<void> {
+  const iTwinsClient: ITwinsClient = new ITwinsClient();
   const accessToken: AccessToken = { get_access_token_logic_here };
 
-  const iTwinsResponse: ITwinsAPIResponse<Repository[]> =
-    await iTwinsAccessClient.queryRepositoriesAsync(
+  const repositoriesResponse: BentleyAPIResponse<MultiRepositoriesResponse> =
+    await iTwinsClient.getRepositories(
       accessToken,
       "e36e29fa-11c0-4ac8-9ead-e8678ebc393c",
       {
         class: "GeographicInformationSystem",
-        subClass: "MapServer",
+        subClass: "WebMapService",
       }
     );
 
-  iTwinsResponse.data!.forEach((actualRepository) => {
+  repositoriesResponse.data!.repositories.forEach((actualRepository) => {
     console.log(actualRepository.id);
   });
+}
+```
+
+### Environment Configuration with globalThis.IMJS_URL_PREFIX
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  MultiITwinMinimalResponse,
+} from "@itwin/itwins-client";
+
+/** Function that demonstrates environment configuration for different deployment environments. */
+async function configureEnvironment(): Promise<void> {
+  // Set URL prefix for different environments
+  // This works in both Node.js and browser environments
+  globalThis.IMJS_URL_PREFIX = "dev-";  // For development environment
+  // globalThis.IMJS_URL_PREFIX = "qa-";   // For QA environment
+  // globalThis.IMJS_URL_PREFIX = undefined; // For production environment
+
+  // Client will automatically use the configured environment
+  const iTwinsClient: ITwinsClient = new ITwinsClient();
+  const accessToken: AccessToken = { get_access_token_logic_here };
+
+  // This will now hit dev-api.bentley.com/itwins instead of api.bentley.com/itwins
+  const iTwinsResponse: BentleyAPIResponse<MultiITwinMinimalResponse> =
+    await iTwinsClient.getITwins(accessToken, { subClass: "Project" });
+
+  console.log(`Fetched ${iTwinsResponse.data!.iTwins.length} iTwins from development environment`);
+}
+
+/** Alternative: Configure environment from process.env in Node.js applications */
+function configureFromEnvironment(): void {
+  // In test files or Node.js applications, you can bridge from process.env
+  globalThis.IMJS_URL_PREFIX = process.env.IMJS_URL_PREFIX;
+
+  // Now all iTwins client instances will use the configured environment
+  const iTwinsClient: ITwinsClient = new ITwinsClient();
 }
 ```
 
@@ -174,42 +214,43 @@ async function printiTwinIds(): Promise<void> {
 
 ```typescript
 import type { AccessToken } from "@itwin/core-bentley";
-import type { ITwin, ITwinsAPIResponse } from "@itwin/itwins-client";
-import {
-  ITwinsAccessClient,
-  ITwinClass,
-  ITwinSubClass,
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  ItwinCreate,
+  ItwinUpdate,
+  ITwinRepresentationResponse,
 } from "@itwin/itwins-client";
 
 /** Function that creates, updates, and then deletes an iTwin. */
 async function demoCRUD(): Promise<void> {
-  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  const iTwinsClient: ITwinsClient = new ITwinsClient();
   const accessToken: AccessToken = { get_access_token_logic_here };
 
   /* Create the iTwin */
-  const newiTwin: ITwin = {
+  const newiTwin: ItwinCreate = {
     displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
     number: `APIM iTwin Test Number ${new Date().toISOString()}`,
     type: "Bridge",
-    subClass: ITwinSubClass.Asset,
-    class: ITwinClass.Thing,
+    subClass: "Asset",
+    class: "Thing",
     dataCenterLocation: "East US",
     status: "Trial",
   };
-  const createResponse: ITwinsAPIResponse<ITwin> =
-    await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-  const iTwinId = createResponse.data!.id;
+  const createResponse: BentleyAPIResponse<ITwinRepresentationResponse> =
+    await iTwinsClient.createITwin(accessToken, newiTwin);
+  const iTwinId = createResponse.data!.iTwin.id;
 
   /* Update the iTwin */
-  const updatediTwin: ITwin = {
+  const updatediTwin: ItwinUpdate = {
     displayName: "UPDATED APIM iTwin Test Display Name",
   };
-  const updateResponse: ITwinsAPIResponse<ITwin> =
-    await iTwinsAccessClient.updateiTwin(accessToken, iTwinId, updatediTwin);
+  const updateResponse: BentleyAPIResponse<ITwinRepresentationResponse> =
+    await iTwinsClient.updateItwin(accessToken, iTwinId, updatediTwin);
 
   /* Delete the iTwin */
-  const deleteResponse: ITwinsAPIResponse<undefined> =
-    await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+  const deleteResponse: BentleyAPIResponse<undefined> =
+    await iTwinsClient.deleteItwin(accessToken, iTwinId);
 }
 ```
 
@@ -217,62 +258,171 @@ async function demoCRUD(): Promise<void> {
 
 ```typescript
 import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
 import type {
-  ITwin,
+  BentleyAPIResponse,
+  ItwinCreate,
+  ITwinRepresentationResponse,
   Repository,
-  ITwinsAPIResponse,
-} from "@itwin/itwins-client";
-import {
-  ITwinsAccessClient,
-  ITwinClass,
-  ITwinSubClass,
-  RepositoryClass,
-  RepositorySubClass,
+  SingleRepositoryResponse,
 } from "@itwin/itwins-client";
 
-/** Function that creates, updates, and then deletes an iTwin. */
+/** Function that creates an iTwin, creates a repository, then deletes both. */
 async function demoCRUD(): Promise<void> {
-  const iTwinsAccessClient: ITwinsAccessClient = new ITwinsAccessClient();
+  const iTwinsClient: ITwinsClient = new ITwinsClient();
   const accessToken: AccessToken = { get_access_token_logic_here };
 
   /* Create the iTwin Repository */
   // Create an iTwin first
-  const newiTwin: ITwin = {
+  const newiTwin: ItwinCreate = {
     displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
     number: `APIM iTwin Test Number ${new Date().toISOString()}`,
     type: "Bridge",
-    subClass: ITwinSubClass.Asset,
-    class: ITwinClass.Thing,
+    subClass: "Asset",
+    class: "Thing",
     dataCenterLocation: "East US",
     status: "Trial",
   };
-  const createResponse: ITwinsAPIResponse<ITwin> =
-    await iTwinsAccessClient.createiTwin(accessToken, newiTwin);
-  const iTwinId = createResponse.data!.id;
+  const createResponse: BentleyAPIResponse<ITwinRepresentationResponse> =
+    await iTwinsClient.createITwin(accessToken, newiTwin);
+  const iTwinId = createResponse.data!.iTwin.id;
 
   // Now create the iTwin Repository
-  const newRepository: Repository = {
-    class: RepositoryClass.GeographicInformationSystem,
-    subClass: RepositorySubClass.WebMapService,
+  const newRepository: Omit<Repository, "id"> = {
+    class: "GeographicInformationSystem",
+    subClass: "WebMapService",
     uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
   };
-  const createResponse: ITwinsAPIResponse<Repository> =
-    await iTwinsAccessClient.createRepository(
+  const repositoryCreateResponse: BentleyAPIResponse<SingleRepositoryResponse> =
+    await iTwinsClient.createRepository(
       accessToken,
       iTwinId,
       newRepository
     );
 
   /* Delete the iTwin Repository */
-  const repositoryDeleteResponse: ITwinsAPIResponse<undefined> =
-    await iTwinsAccessClient.deleteRepository(
+  const repositoryDeleteResponse: BentleyAPIResponse<undefined> =
+    await iTwinsClient.deleteRepository(
       accessToken,
       iTwinId,
-      createResponse.data!.id
+      repositoryCreateResponse.data!.repository.id
     );
-  // Cleanup:  deleting iTwin
-  const iTwinDeleteResponse: ITwinsAPIResponse<undefined> =
-    await iTwinsAccessClient.deleteiTwin(accessToken, iTwinId);
+  // Cleanup: deleting iTwin
+  const iTwinDeleteResponse: BentleyAPIResponse<undefined> =
+    await iTwinsClient.deleteItwin(accessToken, iTwinId);
+}
+```
+
+### Get iTwins with Enhanced ODATA Query
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  MultiITwinRepresentationResponse,
+} from "@itwin/itwins-client";
+
+/** Function that demonstrates enhanced query capabilities with OData parameters. */
+async function advancedQuery(): Promise<void> {
+  const iTwinsClient: ITwinsClient = new iTwinsClient();
+  const accessToken: AccessToken = { get_access_token_logic_here };
+
+  const iTwinsResponse: BentleyAPIResponse<MultiITwinRepresentationResponse> =
+    await iTwinsClient.getITwins(accessToken, {
+      subClass: "Project",
+      resultMode: "representation",
+      filter: "status eq 'Active'",
+      orderby: "displayName asc",
+      select: "id,displayName,status,createdDateTime",
+      top: 10,
+    });
+
+  // Access iTwins data
+  const iTwins = iTwinsResponse.data!.iTwins;
+
+  // Access HAL navigation links
+  const links = iTwinsResponse.data!._links;
+  console.log("Self link:", links.self?.href);
+  console.log("Next page:", links.next?.href);
+
+  iTwins.forEach((itwin) => {
+    console.log(`${itwin.displayName} (${itwin.status}) - Created: ${itwin.createdDateTime}`);
+  });
+}
+```
+
+### Upload and Manage iTwin Images
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  ITwinImageResponse,
+} from "@itwin/itwins-client";
+
+/** Function that demonstrates image management capabilities. */
+async function manageImages(): Promise<void> {
+  const iTwinsClient: ITwinsClient = new ITwinsClient();
+  const accessToken: AccessToken = { get_access_token_logic_here };
+  const iTwinId = "your-itwin-id";
+
+  // Upload an image
+  const imageFile = new File([/* your image data */], "itwin-image.png", { type: "image/png" });
+  const uploadResponse: BentleyAPIResponse<ITwinImageResponse> =
+    await iTwinsClient.uploadITwinImage(accessToken, iTwinId, imageFile, "image/png");
+
+  console.log("Image uploaded:", uploadResponse.data!.image.id);
+
+  // Get the image
+  const getResponse: BentleyAPIResponse<ITwinImageResponse> =
+    await iTwinsClient.getITwinImage(accessToken, iTwinId);
+
+  console.log("Retrieved image:", getResponse.data!.image.url);
+
+  // Delete the image
+  await iTwinsClient.deleteITwinImage(accessToken, iTwinId);
+  console.log("Image deleted");
+}
+```
+
+### Work with Favorites and Recents
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  MultiITwinMinimalResponse,
+} from "@itwin/itwins-client";
+
+/** Function that demonstrates favorites and recents management. */
+async function manageFavoritesAndRecents(): Promise<void> {
+  const iTwinsClient: ITwinsClient = new ITwinsClient();
+  const accessToken: AccessToken = { get_access_token_logic_here };
+  const iTwinId = "your-itwin-id";
+
+  // Add to favorites
+  await iTwinsClient.addITwinToFavorites(accessToken, iTwinId);
+
+  // Add to recents
+  await iTwinsClient.addITwinToMyRecents(accessToken, iTwinId);
+
+  // Get favorite iTwins
+  const favoritesResponse: BentleyAPIResponse<MultiITwinMinimalResponse> =
+    await iTwinsClient.getFavoritesITwins(accessToken, { subClass: "Project" });
+
+  console.log("Favorite iTwins:", favoritesResponse.data!.iTwins.length);
+
+  // Get recent iTwins
+  const recentsResponse: BentleyAPIResponse<MultiITwinMinimalResponse> =
+    await iTwinsClient.getRecentUsedITwins(accessToken);
+
+  console.log("Recent iTwins:", recentsResponse.data!.iTwins.length);
+
+  // Remove from favorites
+  await iTwinsClient.removeITwinFromFavorites(accessToken, iTwinId);
 }
 ```
 
