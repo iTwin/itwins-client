@@ -33,7 +33,7 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf lib",
     "lint": "eslint -f visualstudio \"./src/**/*.ts\" 1>&2",
-    "lint:fix": "pnpm run lint -- --fix",
+    "lint:fix": "pnpm run lint --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",

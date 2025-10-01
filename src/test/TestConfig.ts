@@ -6,6 +6,9 @@ import type { AccessToken } from "@itwin/core-bentley";
 import { TestUtility } from "@itwin/oidc-signin-tool";
 import type { TestUserCredentials } from "@itwin/oidc-signin-tool";
 
+// Set up global configuration for tests
+globalThis.IMJS_URL_PREFIX = process.env.IMJS_URL_PREFIX;
+
 /** Basic configuration used by all tests
  */
 export class TestConfig {
