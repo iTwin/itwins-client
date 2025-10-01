@@ -1,0 +1,7 @@
+{
+  "type": "major",
+  "comment": "Added all repros endpoints",
+  "packageName": "@itwin/itwins-client",
+  "email": "caleb.german@bentley.com",
+  "dependentChangeType": "patch"
+}
