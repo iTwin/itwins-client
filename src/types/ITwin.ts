@@ -78,7 +78,7 @@ export type ITwinSubClass =
  * iTwin main classification types that define the primary category
  * of the digital twin within the organizational hierarchy.
  */
-export type ITwinClass = "Thing" | "Endeavor";
+export type ITwinClass = "Thing" | "Endeavor" | "Account";
 
 /**
  * Response interface for multiple iTwins in minimal mode.
