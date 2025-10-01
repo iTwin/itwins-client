@@ -9,6 +9,7 @@ This guide will help you migrate from iTwins Client v1.x.x to v2.x.x. Version 2.
 - [Type Renames and Remapping](#type-renames-and-remapping)
 - [Method Renames](#method-renames)
 - [Response Structure Changes](#response-structure-changes)
+- [Environment Configuration Changes](#environment-configuration-changes)
 - [Parameter Changes](#parameter-changes)
 - [New Public Exports Available](#new-public-exports-available)
 - [New Methods Available](#new-methods-available)
@@ -49,11 +50,11 @@ The constructor signature remains the same, supporting optional custom URL param
 
 ```typescript
 // v1.x.x
-ITwinsAPIResponse<T>
+ITwinAPIResponse
 ITwinResultMode
 
 // v2.x.x
-APIResponse<T>
+BentleyAPIResponse
 ResultMode
 ```
 
@@ -201,6 +202,27 @@ Single response now just include the object wrapped in a property name such as:
 
 ```
 
+## Environment Configuration Changes
+
+### URL Prefix Configuration
+
+Version 2.0 changes how environment-based URL prefixes are configured for better cross-platform compatibility:
+
+```typescript
+// v1.x.x - Node.js specific
+process.env.IMJS_URL_PREFIX
+
+// v2.x.x - Universal (works in both Node.js and browsers)
+globalThis.IMJS_URL_PREFIX
+```
+
+**Benefits of the new approach:**
+
+- **Cross-Platform Compatibility**: Works in both Node.js and browser environments
+- **Runtime Configuration**: Can be modified at runtime, not just at process startup
+- **Modern Standards**: Uses ES2020 `globalThis` standard for accessing global objects
+- **Dynamic Environment Switching**: Enables scenarios like switching environments without restart
+
 ## Parameter Changes
 
 ### Deprecated subClass Parameter Removal
@@ -261,7 +283,7 @@ import { ITwinsAccessClient, ITwinClass, SomeUtilFunction } from '@itwin/itwins-
 
 // v2.x.x - Separate type and value imports enable tree shaking
 import { ITwinsClient } from '@itwin/itwins-client'; // Runtime code only
-import type { ITwinClass, APIResponse } from '@itwin/itwins-client'; // Types only
+import type { ITwinClass, BentleyAPIResponse } from '@itwin/itwins-client'; // Types only
 
 // Result: Only ITwinsClient runtime code is bundled, types are stripped at compile time
 ```
@@ -310,14 +332,14 @@ import type {
   ITwinsQueryArg,
   Links,
   ResultMode,
-  APIResponse
+  BentleyAPIResponse
 } from '@itwin/itwins-client';
 ```
 
 **Sources**:
 
 - [`src/types/ITwinsQueryArgs.ts`](src/types/ITwinsQueryArgs.ts) - `ITwinsQueryArg`
-- [`src/types/CommonApiTypes.ts`](src/types/CommonApiTypes.ts) - `ODataQueryParams`, `APIResponse`, `ResultMode`
+- [`src/types/CommonApiTypes.ts`](src/types/CommonApiTypes.ts) - `ODataQueryParams`, `BentleyAPIResponse`, `ResultMode`
 - [`src/types/links.ts`](src/types/links.ts) - `Links`
 
 ## New Methods Available
@@ -480,7 +502,7 @@ const itwin: ITwinRepresentation = response.data.iTwin; // For representation mo
 const response: ITwinsAPIResponse<ITwin[]> = await client.queryAsync(token);
 
 // With this
-const response: APIResponse<MultiITwinMinimalResponse> = await client.getITwins(token);
+const response: BentleyAPIResponse<MultiITwinMinimalResponse> = await client.getITwins(token);
 ```
 
 ## Migration Examples
@@ -510,12 +532,12 @@ async function getProjectITwins(token: string) {
 
 // v2.x.x
 import { ITwinsClient } from '@itwin/itwins-client';
-import type {APIResponse, MultiITwinRepresentationResponse} from '@itwin/itwins-client'
+import type {BentleyAPIResponse, MultiITwinRepresentationResponse} from '@itwin/itwins-client'
 
 const client = new ITwinsClient();
 
 async function getProjectITwins(token: string) {
-  const response: APIResponse<MultiITwinRepresentationResponse> = await client.getITwins(
+  const response: BentleyAPIResponse<MultiITwinRepresentationResponse> = await client.getITwins(
     token,
     {
       subClass: "Project", // Moved into args object

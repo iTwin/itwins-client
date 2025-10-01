@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import type { AccessToken } from "@itwin/core-bentley";
-import { APIResponse } from "src/types/CommonApiTypes";
+import { BentleyAPIResponse } from "src/types/CommonApiTypes";
 import type { ITwinMinimal, ITwinRepresentation } from "src/types/ITwin";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
@@ -88,7 +88,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
     const nonExistentITwinId = "33333333-3333-3333-3333-333333333333";
 
     // Act
-    const addRecentResponse: APIResponse<undefined> =
+    const addRecentResponse: BentleyAPIResponse<undefined> =
       await iTwinsAccessClient.addITwinToMyRecents(accessToken, nonExistentITwinId);
 
     // Assert
@@ -116,7 +116,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
       expect(createResponse.status).toBe(201);
 
       // Act - Add iTwin to recently used list
-      const addRecentResponse: APIResponse<undefined> =
+      const addRecentResponse: BentleyAPIResponse<undefined> =
         await iTwinsAccessClient.addITwinToMyRecents(accessToken, iTwinId);
 
       // Assert add operation
@@ -162,10 +162,10 @@ describe("iTwinsClient Recently Used Functionality", () => {
 
     try {
       // Act - Add iTwin to recents twice
-      const firstAddResponse: APIResponse<undefined> =
+      const firstAddResponse: BentleyAPIResponse<undefined> =
         await iTwinsAccessClient.addITwinToMyRecents(accessToken, iTwinId);
 
-      const secondAddResponse: APIResponse<undefined> =
+      const secondAddResponse: BentleyAPIResponse<undefined> =
         await iTwinsAccessClient.addITwinToMyRecents(accessToken, iTwinId);
 
       // Assert - Both operations should succeed (idempotent behavior)

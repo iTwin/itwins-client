@@ -6,7 +6,7 @@
 import type { AccessToken } from "@itwin/core-bentley";
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import type { APIResponse } from "../../types/CommonApiTypes";
+import type { BentleyAPIResponse } from "../../types/CommonApiTypes";
 import type { ITwinImageResponse } from "../../types/ITwinImage";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
@@ -30,7 +30,7 @@ describe("iTwinsClient Image Functionality", () => {
     const imageBlob = new Blob([imageBuffer], { type: "image/jpeg" });
 
     // Act
-    const uploadResponse: APIResponse<ITwinImageResponse> =
+    const uploadResponse: BentleyAPIResponse<ITwinImageResponse> =
       await iTwinsAccessClient.uploadITwinImage(
         accessToken,
         nonExistentITwinId,
@@ -75,7 +75,7 @@ describe("iTwinsClient Image Functionality", () => {
       });
 
       // Act
-      const uploadResponse: APIResponse<ITwinImageResponse> =
+      const uploadResponse: BentleyAPIResponse<ITwinImageResponse> =
         await iTwinsAccessClient.uploadITwinImage(
           accessToken,
           iTwinId,
@@ -161,7 +161,7 @@ describe("iTwinsClient Image Functionality", () => {
       });
 
       // Act
-      const uploadResponse: APIResponse<ITwinImageResponse> =
+      const uploadResponse: BentleyAPIResponse<ITwinImageResponse> =
         await iTwinsAccessClient.uploadITwinImage(
           accessToken,
           iTwinId,
@@ -199,7 +199,7 @@ describe("iTwinsClient Image Functionality", () => {
       const imageBlob = new Blob([imageBuffer], { type: "image/jpeg" });
 
       // Act
-      const uploadResponse: APIResponse<ITwinImageResponse> =
+      const uploadResponse: BentleyAPIResponse<ITwinImageResponse> =
         await iTwinsAccessClient.uploadITwinImage(
           accessToken,
           iTwinId,
@@ -252,7 +252,7 @@ describe("iTwinsClient Image Functionality", () => {
       const imageBlob = new Blob([imageBuffer], { type: "image/png" });
 
       // Act
-      const uploadResponse: APIResponse<ITwinImageResponse> =
+      const uploadResponse: BentleyAPIResponse<ITwinImageResponse> =
         await iTwinsAccessClient.uploadITwinImage(
           accessToken,
           iTwinId,
@@ -313,7 +313,7 @@ describe("iTwinsClient Image Functionality", () => {
       const imageBuffer = readFileSync(imagePath);
       const imageBlob = new Blob([imageBuffer], { type: "image/jpeg" });
 
-      const uploadResponse: APIResponse<ITwinImageResponse> =
+      const uploadResponse: BentleyAPIResponse<ITwinImageResponse> =
         await iTwinsAccessClient.uploadITwinImage(
           accessToken,
           iTwinId,
@@ -324,7 +324,7 @@ describe("iTwinsClient Image Functionality", () => {
       expect(uploadResponse.status).toBe(201);
 
       // Act - Get the uploaded image
-      const getResponse: APIResponse<ITwinImageResponse> =
+      const getResponse: BentleyAPIResponse<ITwinImageResponse> =
         await iTwinsAccessClient.getITwinImage(accessToken, iTwinId);
 
       // Assert
@@ -360,7 +360,7 @@ describe("iTwinsClient Image Functionality", () => {
     const nonExistentITwinId = "87654321-4321-4321-4321-210987654321";
 
     // Act
-    const getResponse: APIResponse<ITwinImageResponse> =
+    const getResponse: BentleyAPIResponse<ITwinImageResponse> =
       await iTwinsAccessClient.getITwinImage(accessToken, nonExistentITwinId);
 
     // Assert
@@ -384,7 +384,7 @@ describe("iTwinsClient Image Functionality", () => {
 
     try {
       // Act - Try to get image from iTwin that has no image
-      const getResponse: APIResponse<ITwinImageResponse> =
+      const getResponse: BentleyAPIResponse<ITwinImageResponse> =
         await iTwinsAccessClient.getITwinImage(accessToken, iTwinId);
 
       // Assert
@@ -416,7 +416,7 @@ describe("iTwinsClient Image Functionality", () => {
       const imageBuffer = readFileSync(imagePath);
       const imageBlob = new Blob([imageBuffer], { type: "image/jpeg" });
 
-      const uploadResponse: APIResponse<ITwinImageResponse> =
+      const uploadResponse: BentleyAPIResponse<ITwinImageResponse> =
         await iTwinsAccessClient.uploadITwinImage(
           accessToken,
           iTwinId,
@@ -427,19 +427,19 @@ describe("iTwinsClient Image Functionality", () => {
       expect(uploadResponse.status).toBe(201);
 
       // Verify image exists
-      const getResponse: APIResponse<ITwinImageResponse> =
+      const getResponse: BentleyAPIResponse<ITwinImageResponse> =
         await iTwinsAccessClient.getITwinImage(accessToken, iTwinId);
       expect(getResponse.status).toBe(200);
 
       // Act - Delete the uploaded image
-      const deleteResponse: APIResponse<undefined> =
+      const deleteResponse: BentleyAPIResponse<undefined> =
         await iTwinsAccessClient.deleteITwinImage(accessToken, iTwinId);
 
       // Assert
       expect(deleteResponse.status).toBe(204);
 
       // Verify image is actually deleted by trying to get it
-      const getAfterDeleteResponse: APIResponse<ITwinImageResponse> =
+      const getAfterDeleteResponse: BentleyAPIResponse<ITwinImageResponse> =
         await iTwinsAccessClient.getITwinImage(accessToken, iTwinId);
       expect(getAfterDeleteResponse.status).toBe(404);
     } finally {
@@ -453,7 +453,7 @@ describe("iTwinsClient Image Functionality", () => {
     const nonExistentITwinId = "11111111-1111-1111-1111-111111111111";
 
     // Act
-    const deleteResponse: APIResponse<undefined> =
+    const deleteResponse: BentleyAPIResponse<undefined> =
       await iTwinsAccessClient.deleteITwinImage(
         accessToken,
         nonExistentITwinId
@@ -481,7 +481,7 @@ describe("iTwinsClient Image Functionality", () => {
 
     try {
       // Act - Try to delete image from iTwin that has no image
-      const deleteResponse: APIResponse<undefined> =
+      const deleteResponse: BentleyAPIResponse<undefined> =
         await iTwinsAccessClient.deleteITwinImage(accessToken, iTwinId);
 
       // Assert

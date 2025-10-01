@@ -5,7 +5,7 @@
 import type { AccessToken } from "@itwin/core-bentley";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
-import type { APIResponse } from "../../types/CommonApiTypes";
+import type { BentleyAPIResponse } from "../../types/CommonApiTypes";
 import type { ItwinCreate, ITwinRepresentation } from "../../types/ITwin";
 import { TestConfig } from "../TestConfig";
 
@@ -184,7 +184,7 @@ describe("iTwinsClient Favorites Functionality", () => {
     const nonExistentITwinId = "12345678-1234-1234-1234-123456789abc";
 
     // Act
-    const addFavoriteResponse: APIResponse<undefined> =
+    const addFavoriteResponse: BentleyAPIResponse<undefined> =
       await iTwinsAccessClient.addITwinToFavorites(accessToken, nonExistentITwinId);
 
     // Assert
@@ -196,7 +196,7 @@ describe("iTwinsClient Favorites Functionality", () => {
     const nonExistentITwinId = "87654321-4321-4321-4321-ba9876543210";
 
     // Act
-    const removeFavoriteResponse: APIResponse<undefined> =
+    const removeFavoriteResponse: BentleyAPIResponse<undefined> =
       await iTwinsAccessClient.removeITwinFromFavorites(accessToken, nonExistentITwinId);
 
     // Assert
@@ -232,7 +232,7 @@ describe("iTwinsClient Favorites Functionality", () => {
       /* ADD ITWIN TO FAVORITES */
 
       // Act add to favorites
-      const addFavoriteResponse: APIResponse<undefined> =
+      const addFavoriteResponse: BentleyAPIResponse<undefined> =
         await iTwinsAccessClient.addITwinToFavorites(accessToken, iTwinId);
 
       // Assert
@@ -251,7 +251,7 @@ describe("iTwinsClient Favorites Functionality", () => {
       expect(getFavoritesResponse.data?.iTwins![0].id).toBe(iTwinId);
 
       /* DELETE ITWIN FROM FAVORITES */
-      const removeFavoriteResponse: APIResponse<undefined> =
+      const removeFavoriteResponse: BentleyAPIResponse<undefined> =
         await iTwinsAccessClient.removeITwinFromFavorites(accessToken, iTwinId);
 
       // Assert
@@ -272,7 +272,7 @@ describe("iTwinsClient Favorites Functionality", () => {
       expect(getFavoritesResponse.data?.iTwins).toHaveLength(0);
     } finally {
       // Clean up - Delete the test iTwin
-      const deleteResponse: APIResponse<undefined> =
+      const deleteResponse: BentleyAPIResponse<undefined> =
         await iTwinsAccessClient.deleteItwin(accessToken, iTwinId!);
 
       // Assert cleanup was successful

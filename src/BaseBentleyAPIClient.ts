@@ -3,7 +3,7 @@
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 import type { AccessToken } from "@itwin/core-bentley";
-import type { ApimError, APIResponse, Method, RequestConfig } from "./types/CommonApiTypes";
+import type { ApimError, BentleyAPIResponse, Method, RequestConfig } from "./types/CommonApiTypes";
 import { ParameterMapping } from "./types/typeUtils";
 
 /**
@@ -58,7 +58,7 @@ export abstract class BaseBentleyAPIClient {
     url: string,
     data?: TData,
     headers?: Record<string, string>
-  ): Promise<APIResponse<TResponse>> {
+  ): Promise<BentleyAPIResponse<TResponse>> {
     try {
       const requestOptions = this.createRequestOptions(
         accessToken,

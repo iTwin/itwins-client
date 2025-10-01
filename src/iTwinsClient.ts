@@ -9,7 +9,7 @@
 import type { AccessToken } from "@itwin/core-bentley";
 import { BaseITwinsApiClient } from "./BaseITwinsApiClient.js";
 import type {
-  APIResponse,
+  BentleyAPIResponse,
   ODataQueryParams,
   ResultMode,
 } from "./types/CommonApiTypes";
@@ -56,7 +56,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
    */
   public async getExports(
     accessToken: AccessToken
-  ): Promise<APIResponse<ITwinExportMultiResponse>> {
+  ): Promise<BentleyAPIResponse<ITwinExportMultiResponse>> {
     const url = `${this._baseUrl}/exports`;
     return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
@@ -69,7 +69,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
   public async getExport(
     accessToken: AccessToken,
     id: string
-  ): Promise<APIResponse<ITwinExportSingleResponse>> {
+  ): Promise<BentleyAPIResponse<ITwinExportSingleResponse>> {
     const url = `${this._baseUrl}/exports/${id}`;
     return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
@@ -83,7 +83,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
   public async createExport(
     accessToken: AccessToken,
     args: ITwinExportRequestInfo
-  ): Promise<APIResponse<ITwinExportSingleResponse>> {
+  ): Promise<BentleyAPIResponse<ITwinExportSingleResponse>> {
     const url = `${this._baseUrl}/exports`;
     return this.sendGenericAPIRequest(
       accessToken,
@@ -103,7 +103,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
   ): Promise<
-    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+    BentleyAPIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
   > {
     const headers = this.getHeaders(arg);
     const url = `${this._baseUrl}/favorites/?${this.getQueryStringArg(
@@ -128,7 +128,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
   public async addITwinToFavorites(
     accessToken: AccessToken,
     iTwinId?: string
-  ): Promise<APIResponse<undefined>> {
+  ): Promise<BentleyAPIResponse<undefined>> {
     const url = `${this._baseUrl}/favorites/${iTwinId}`;
     return this.sendGenericAPIRequest(accessToken, "POST", url);
   }
@@ -141,7 +141,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
   public async removeITwinFromFavorites(
     accessToken: AccessToken,
     iTwinId?: string
-  ): Promise<APIResponse<undefined>> {
+  ): Promise<BentleyAPIResponse<undefined>> {
     const url = `${this._baseUrl}/favorites/${iTwinId}`;
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
@@ -158,7 +158,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     iTwinId: string,
     imageBlob: Blob,
     contentType: "image/png" | "image/jpeg"
-  ): Promise<APIResponse<ITwinImageResponse>> {
+  ): Promise<BentleyAPIResponse<ITwinImageResponse>> {
     const url = `${this._baseUrl}/${iTwinId}/image`;
     return this.sendGenericAPIRequest(accessToken, "PUT", url, imageBlob, {
       contentType,
@@ -173,7 +173,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
   public async getITwinImage(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<APIResponse<ITwinImageResponse>> {
+  ): Promise<BentleyAPIResponse<ITwinImageResponse>> {
     const url = `${this._baseUrl}/${iTwinId}/image`;
     return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
@@ -186,7 +186,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
   public async deleteITwinImage(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<APIResponse<undefined>> {
+  ): Promise<BentleyAPIResponse<undefined>> {
     const url = `${this._baseUrl}/${iTwinId}/image`;
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
@@ -199,7 +199,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
   public async addITwinToMyRecents(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<APIResponse<undefined>> {
+  ): Promise<BentleyAPIResponse<undefined>> {
     const url = `${this._baseUrl}/recents/${iTwinId}`;
     return this.sendGenericAPIRequest(accessToken, "POST", url);
   }
@@ -222,7 +222,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
   ): Promise<
-    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+    BentleyAPIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
   > {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
@@ -251,7 +251,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     accessToken: AccessToken,
     iTwinId: string,
     repository: Omit<Repository, "id">
-  ): Promise<APIResponse<SingleRepositoryResponse>> {
+  ): Promise<BentleyAPIResponse<SingleRepositoryResponse>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories`;
     return this.sendGenericAPIRequest(accessToken, "POST", url, repository);
   }
@@ -266,7 +266,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     accessToken: AccessToken,
     iTwinId: string,
     repositoryId: string
-  ): Promise<APIResponse<undefined>> {
+  ): Promise<BentleyAPIResponse<undefined>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}`;
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
@@ -283,7 +283,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     arg?:
       | { class: Repository["class"] }
       | { class: Repository["class"]; subClass: Repository["subClass"] }
-  ): Promise<APIResponse<MultiRepositoriesResponse>> {
+  ): Promise<BentleyAPIResponse<MultiRepositoriesResponse>> {
     const url = `${
       this._baseUrl
     }/${iTwinId}/repositories/?${this.getQueryStringArg(
@@ -305,7 +305,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     accessToken: AccessToken,
     iTwinId: string,
     repositoryId: string
-  ): Promise<APIResponse<SingleRepositoryResponse>> {
+  ): Promise<BentleyAPIResponse<SingleRepositoryResponse>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}`;
     return this.sendGenericAPIRequest(accessToken, "GET", url);
   }
@@ -323,7 +323,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     iTwinId: string,
     repositoryId: string,
     repository: Omit<Repository, "id" | "class" | "subClass">
-  ): Promise<APIResponse<SingleRepositoryResponse>> {
+  ): Promise<BentleyAPIResponse<SingleRepositoryResponse>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}`;
     return this.sendGenericAPIRequest(accessToken, "PATCH", url, repository);
   }
@@ -343,7 +343,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     iTwinId: string,
     repositoryId: string,
     repositoryResource: Pick<Repository, "id" | "displayName">
-  ): Promise<APIResponse<PostRepositoryResourceResponse>> {
+  ): Promise<BentleyAPIResponse<PostRepositoryResourceResponse>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}/resources`;
     return this.sendGenericAPIRequest(
       accessToken,
@@ -370,7 +370,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     resourceId: string,
     resultMode?: ResultMode
   ): Promise<
-    APIResponse<
+    BentleyAPIResponse<
       | GetRepositoryResourceRepresentationResponse
       | GetRepositoryResourceMinimalResponse
     >
@@ -403,7 +403,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     args?: Pick<ODataQueryParams, "search" | "skip" | "top">,
     resultMode?: ResultMode
   ): Promise<
-    APIResponse<
+    BentleyAPIResponse<
       | GetMultiRepositoryResourceMinimalResponse
       | GetMultiRepositoryResourceRepresentationResponse
     >
@@ -434,7 +434,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     accessToken: AccessToken,
     iTwinId: string,
     resultMode?: ResultMode
-  ): Promise<APIResponse<ITwinMinimalResponse | ITwinRepresentationResponse>> {
+  ): Promise<BentleyAPIResponse<ITwinMinimalResponse | ITwinRepresentationResponse>> {
     const headers = this.getResultModeHeaders(resultMode);
     const url = `${this._baseUrl}/${iTwinId}`;
     return this.sendGenericAPIRequest(
@@ -456,7 +456,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     arg?: ITwinsQueryArg &
       Pick<ODataQueryParams, "filter" | "orderby" | "select">
   ): Promise<
-    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+    BentleyAPIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
   > {
     const headers = this.getHeaders(arg);
     const url = `${this._baseUrl}/?${this.getQueryStringArg(
@@ -481,7 +481,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
   public async createITwin(
     accessToken: AccessToken,
     iTwin: ItwinCreate
-  ): Promise<APIResponse<ITwinRepresentationResponse>> {
+  ): Promise<BentleyAPIResponse<ITwinRepresentationResponse>> {
     const url = `${this._baseUrl}/`;
     return this.sendGenericAPIRequest(accessToken, "POST", url, iTwin);
   }
@@ -496,7 +496,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     accessToken: AccessToken,
     iTwinId: string,
     iTwin: ItwinUpdate
-  ): Promise<APIResponse<ITwinRepresentationResponse>> {
+  ): Promise<BentleyAPIResponse<ITwinRepresentationResponse>> {
     const url = `${this._baseUrl}/${iTwinId}`;
     return this.sendGenericAPIRequest(accessToken, "PATCH", url, iTwin);
   }
@@ -509,7 +509,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
   public async deleteItwin(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<APIResponse<undefined>> {
+  ): Promise<BentleyAPIResponse<undefined>> {
     const url = `${this._baseUrl}/${iTwinId}`;
     return this.sendGenericAPIRequest(accessToken, "DELETE", url);
   }
@@ -520,7 +520,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
    */
   public async getPrimaryAccount(
     accessToken: AccessToken
-  ): Promise<APIResponse<ITwinMinimalResponse>> {
+  ): Promise<BentleyAPIResponse<ITwinMinimalResponse>> {
     const url = `${this._baseUrl}/myprimaryaccount`;
     return this.sendGenericAPIRequest(accessToken, "GET", url, undefined);
   }
@@ -536,7 +536,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     accessToken: AccessToken,
     iTwinId: string,
     resultMode?: ResultMode
-  ): Promise<APIResponse<ITwinMinimalResponse>> {
+  ): Promise<BentleyAPIResponse<ITwinMinimalResponse>> {
     const headers = this.getResultModeHeaders(resultMode);
     const url = `${this._baseUrl}/${iTwinId}/account`;
     return this.sendGenericAPIRequest(

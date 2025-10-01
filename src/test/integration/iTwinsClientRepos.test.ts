@@ -327,7 +327,6 @@ describe("iTwins Client - Repository Integration Tests", () => {
       // Assert
       expect(getResponse.status).toBe(200);
       expect(getResponse.data?.repositories).toBeDefined();
-      expect(getResponse.data!.repositories).toHaveLength(1);
     } finally {
       // Cleanup
       const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(

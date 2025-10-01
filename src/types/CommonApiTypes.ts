@@ -2,6 +2,12 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
+
+// Add this at the top of the file or in a types file
+declare global {
+  var IMJS_URL_PREFIX: string | undefined;
+}
+
 /**
  * Common HTTP methods used in API requests
  */
@@ -21,7 +27,7 @@ export interface RequestConfig {
  * Standard response structure for all Bentley public API operations
  * @template T The type of data returned in the response
  */
-export interface APIResponse<T> {
+export interface BentleyAPIResponse<T> {
   data?: T;
   status: number;
   error?: ApimError;

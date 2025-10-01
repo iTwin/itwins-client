@@ -5,7 +5,7 @@
 import type { AccessToken } from "@itwin/core-bentley";
 import { BaseBentleyAPIClient } from "./BaseBentleyAPIClient";
 import type {
-  APIResponse,
+  BentleyAPIResponse,
   ODataQueryParams,
   ResultMode,
 } from "./types/CommonApiTypes";
@@ -174,7 +174,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     if (url !== undefined) {
       this._baseUrl = url;
     } else {
-      const urlPrefix = process.env.IMJS_URL_PREFIX;
+      const urlPrefix = globalThis.IMJS_URL_PREFIX;
       if (urlPrefix) {
         const baseUrl = new URL(this._baseUrl);
         baseUrl.hostname = `${urlPrefix}${baseUrl.hostname}`;
@@ -187,38 +187,38 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
   public abstract createExport(
     accessToken: AccessToken,
     args: ITwinExportRequestInfo
-  ): Promise<APIResponse<ITwinExportSingleResponse>>;
+  ): Promise<BentleyAPIResponse<ITwinExportSingleResponse>>;
 
   /** Get a iTwin export */
   public abstract getExport(
     accessToken: AccessToken,
     id: string
-  ): Promise<APIResponse<ITwinExportSingleResponse>>;
+  ): Promise<BentleyAPIResponse<ITwinExportSingleResponse>>;
 
   /** Get a list of iTwin exports for user */
   public abstract getExports(
     accessToken: AccessToken
-  ): Promise<APIResponse<ITwinExportMultiResponse>>;
+  ): Promise<BentleyAPIResponse<ITwinExportMultiResponse>>;
 
   /** Get favorites iTwins accessible to the user */
   public abstract getFavoritesITwins(
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
   ): Promise<
-    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+    BentleyAPIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
   >;
 
   /** Add iTwin to favorites */
   public abstract addITwinToFavorites(
     accessToken: AccessToken,
     iTwinId?: string
-  ): Promise<APIResponse<undefined>>;
+  ): Promise<BentleyAPIResponse<undefined>>;
 
   /** Remove iTwin from favorites */
   public abstract removeITwinFromFavorites(
     accessToken: AccessToken,
     iTwinId?: string
-  ): Promise<APIResponse<undefined>>;
+  ): Promise<BentleyAPIResponse<undefined>>;
 
   /** Adds image to iTwin  */
   public abstract uploadITwinImage(
@@ -226,20 +226,20 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     iTwinId: string,
     imageBlob: Blob,
     contentType: "image/png" | "image/jpeg"
-  ): Promise<APIResponse<ITwinImageResponse>>;
+  ): Promise<BentleyAPIResponse<ITwinImageResponse>>;
 
   /** Add the specified iTwin to the user's recently used list */
   public abstract addITwinToMyRecents(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<APIResponse<undefined>>;
+  ): Promise<BentleyAPIResponse<undefined>>;
 
   /** Get recently used iTwins for the current user, maximum 25 items ordered by most recent first */
   public abstract getRecentUsedITwins(
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
   ): Promise<
-    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+    BentleyAPIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
   >;
 
   /** Create a new repository for the specified iTwin */
@@ -247,14 +247,14 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     accessToken: AccessToken,
     iTwinId: string,
     repository: Omit<Repository, "id">
-  ): Promise<APIResponse<SingleRepositoryResponse>>;
+  ): Promise<BentleyAPIResponse<SingleRepositoryResponse>>;
 
   /** Delete the specified repository from an iTwin */
   public abstract deleteRepository(
     accessToken: AccessToken,
     iTwinId: string,
     repositoryId: string
-  ): Promise<APIResponse<undefined>>;
+  ): Promise<BentleyAPIResponse<undefined>>;
 
   /** Get all repositories for an iTwin with optional filtering by class and subClass. If subClass is specified, class is also required. */
   public abstract getRepositories(
@@ -263,14 +263,14 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     arg?:
       | { class: Repository["class"] }
       | { class: Repository["class"]; subClass: Repository["subClass"] }
-  ): Promise<APIResponse<MultiRepositoriesResponse>>;
+  ): Promise<BentleyAPIResponse<MultiRepositoriesResponse>>;
 
   /** Get a specific repository by ID from an iTwin */
   public abstract getRepository(
     accessToken: AccessToken,
     iTwinId: string,
     repositoryId: string
-  ): Promise<APIResponse<SingleRepositoryResponse>>;
+  ): Promise<BentleyAPIResponse<SingleRepositoryResponse>>;
 
   /** Update a specific repository by ID from an iTwin */
   public abstract updateRepository(
@@ -278,7 +278,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     iTwinId: string,
     repositoryId: string,
     repository: Omit<Repository, "id" | "class" | "subClass">
-  ): Promise<APIResponse<SingleRepositoryResponse>>;
+  ): Promise<BentleyAPIResponse<SingleRepositoryResponse>>;
 
   /** Create a repository resource for a repository of class GeographicInformationSystem */
   public abstract createRepositoryResource(
@@ -286,7 +286,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     iTwinId: string,
     repositoryId: string,
     repositoryResource: Pick<Repository, "id" | "displayName">
-  ): Promise<APIResponse<PostRepositoryResourceResponse>>;
+  ): Promise<BentleyAPIResponse<PostRepositoryResourceResponse>>;
 
   /** Get a repository resource for a repository */
   public abstract getRepositoryResource(
@@ -296,7 +296,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     resourceId: string,
     resultMode?: ResultMode
   ): Promise<
-    APIResponse<
+    BentleyAPIResponse<
       | GetRepositoryResourceRepresentationResponse
       | GetRepositoryResourceMinimalResponse
     >
@@ -310,7 +310,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     args?: Pick<ODataQueryParams, "search" | "skip" | "top">,
     resultMode?: ResultMode
   ): Promise<
-    APIResponse<
+    BentleyAPIResponse<
       | GetMultiRepositoryResourceMinimalResponse
       | GetMultiRepositoryResourceRepresentationResponse
     >
@@ -320,57 +320,57 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
   public abstract getITwinImage(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<APIResponse<ITwinImageResponse>>;
+  ): Promise<BentleyAPIResponse<ITwinImageResponse>>;
 
   /** Deletes image from iTwin  */
   public abstract deleteITwinImage(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<APIResponse<undefined>>;
+  ): Promise<BentleyAPIResponse<undefined>>;
 
   /** Get iTwins */
   public abstract getITwins(
     accessToken: AccessToken,
     arg?: ITwinsQueryArg
   ): Promise<
-    APIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+    BentleyAPIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
   >;
 
   /** Delete the specified iTwin */
   public abstract deleteItwin(
     accessToken: AccessToken,
     iTwinId: string
-  ): Promise<APIResponse<undefined>>;
+  ): Promise<BentleyAPIResponse<undefined>>;
 
   /** Get an ITwin */
   public abstract getITwin(
     accessToken: AccessToken,
     iTwinId: string,
     resultMode?: ResultMode
-  ): Promise<APIResponse<ITwinMinimalResponse | ITwinRepresentationResponse>>;
+  ): Promise<BentleyAPIResponse<ITwinMinimalResponse | ITwinRepresentationResponse>>;
 
   /** Get the primary account ITwin */
   public abstract getPrimaryAccount(
     accessToken: AccessToken
-  ): Promise<APIResponse<ITwinMinimalResponse>>;
+  ): Promise<BentleyAPIResponse<ITwinMinimalResponse>>;
 
   /* Get the account for an iTwin */
   public abstract getITwinAccount(
     accessToken: AccessToken,
     iTwinId: string,
     resultMode?: ResultMode
-  ): Promise<APIResponse<ITwinMinimalResponse>>;
+  ): Promise<BentleyAPIResponse<ITwinMinimalResponse>>;
 
   /** Create a new iTwin */
   public abstract createITwin(
     accessToken: AccessToken,
     iTwin: ItwinCreate
-  ): Promise<APIResponse<ITwinRepresentationResponse>>;
+  ): Promise<BentleyAPIResponse<ITwinRepresentationResponse>>;
 
   /** Update the specified iTwin */
   public abstract updateItwin(
     accessToken: AccessToken,
     iTwinId: string,
     iTwin: ItwinUpdate
-  ): Promise<APIResponse<ITwinRepresentationResponse>>;
+  ): Promise<BentleyAPIResponse<ITwinRepresentationResponse>>;
 }

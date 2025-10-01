@@ -6,7 +6,7 @@
 import type { AccessToken } from "@itwin/core-bentley";;
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
-import type { APIResponse } from "../../types/CommonApiTypes";
+import type { BentleyAPIResponse } from "../../types/CommonApiTypes";
 import type { ItwinCreate, ITwinMinimal, ITwinRepresentation, ITwinRepresentationResponse, ITwinSubClass } from "../../types/ITwin";
 import { TestConfig } from "../TestConfig";
 
@@ -145,7 +145,7 @@ describe("iTwinsClient", () => {
     const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
 
     // Act
-    const iTwinsResponse: APIResponse<ITwinRepresentationResponse> =
+    const iTwinsResponse: BentleyAPIResponse<ITwinRepresentationResponse> =
       await iTwinsAccessClient.getITwin(
         accessToken,
         iTwinId!,
@@ -184,7 +184,7 @@ describe("iTwinsClient", () => {
     const iTwinId = process.env.IMJS_TEST_PROJECT_ID;
 
     // Act
-    const iTwinsResponse : APIResponse<ITwinRepresentationResponse> =
+    const iTwinsResponse : BentleyAPIResponse<ITwinRepresentationResponse> =
       await iTwinsAccessClient.getITwinAccount(
         accessToken,
         iTwinId!,
@@ -812,7 +812,7 @@ describe("iTwinsClient", () => {
 
     /* DELETE ITWIN */
     // Act
-    const deleteResponse: APIResponse<undefined> =
+    const deleteResponse: BentleyAPIResponse<undefined> =
       await iTwinsAccessClient.deleteItwin(accessToken, iTwinId);
 
     // Assert
@@ -837,7 +837,7 @@ describe("iTwinsClient", () => {
       await iTwinsAccessClient.createITwin(accessToken, newiTwin);
     const iTwinResponse2 =
       await iTwinsAccessClient.createITwin(accessToken, newiTwin);
-    const deleteResponse: APIResponse<undefined> =
+    const deleteResponse: BentleyAPIResponse<undefined> =
       await iTwinsAccessClient.deleteItwin(
         accessToken,
         iTwinResponse.data!.iTwin.id!
