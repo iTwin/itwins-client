@@ -1,6 +1,6 @@
 {
   "type": "major",
-  "comment": "Complete API redesign with breaking changes\n\nMAJOR CHANGES:\n- ITwinsAccessClient renamed to ITwinsClient\n- All method names updated (removed 'Async' suffix)\n- Enums converted to string union types\n- Response structure changes with new data wrappers\n- Type system improvements with ITwinMinimal/ITwinRepresentation split\n- New repository resources, exports, and image management APIs\n- HAL specification compliance with _links navigation\n- Added new enum values ArcGIS and UrlTemplate to RepositorySubClass and removed MapServer\n- Created TypeScript configs with single responsibility\n- Switched testing framework to Vitest\n- Upgraded to modern TypeScript and ESLint packages\n- Added test debugging capabilities and launch configurations\n\nSee MIGRATION-GUIDE-v1-to-v2.md for detailed migration instructions and examples.",
+  "comment": "Complete API redesign with breaking changes\n\nMAJOR CHANGES:\n- ITwinsAccessClient renamed to ITwinsClient\n- All method names updated (removed 'Async' suffix)\n- Enums converted to string union types\n- Response structure changes with new data wrappers\n- Type system improvements with ITwinMinimal/ITwinRepresentation split\n- New repository resources, exports, and image management APIs\n- HAL specification compliance with _links navigation\n\nSee MIGRATION-GUIDE-v1-to-v2.md for detailed migration instructions and examples.",
   "packageName": "@itwin/itwins-client",
   "email": "caleb.german@bentley.com",
   "dependentChangeType": "patch"
