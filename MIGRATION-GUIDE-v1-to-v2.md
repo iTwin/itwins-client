@@ -298,7 +298,8 @@ import type {
   GetRepositoryResourceMinimalResponse,
   GetRepositoryResourceRepresentationResponse,
   GetMultiRepositoryResourceMinimalResponse,
-  GetMultiRepositoryResourceRepresentationResponse
+  GetMultiRepositoryResourceRepresentationResponse,
+  NewRepositoryConfig
 } from '@itwin/itwins-client';
 ```
 
@@ -412,9 +413,20 @@ await client.getRepository(token, iTwinId, repositoryId);
 
 // Update existing repositories (new)
 await client.updateRepository(token, iTwinId, repositoryId, updates);
+
+// Create repositories with enhanced type safety (improved in v2.x.x)
+const newRepository: NewRepositoryConfig = {
+  class: "GeographicInformationSystem",
+  subClass: "WebMapService",
+  uri: "https://example.com/mapserver",
+  displayName: "My Map Service"
+};
+await client.createRepository(token, iTwinId, newRepository);
 ```
 
 **Source**: [`src/iTwinsClient.ts`](src/iTwinsClient.ts) - Repository management methods
+
+**Note**: The `createRepository` method now uses `NewRepositoryConfig` type which provides better type safety by restricting class and subClass combinations to only those supported for repository creation.
 
 ## Critical Migration Steps
 
@@ -567,6 +579,29 @@ const response = await client.getRepositories(token, iTwinId, {
   class: "GeographicInformationSystem"
 });
 const repositories = response.data.repositories; // Wrapped in repositories property
+```
+
+### Repository Creation with Enhanced Type Safety
+
+```typescript
+// v1.x.x - Basic Repository interface
+const newRepository: Repository = {
+  class: RepositoryClass.GeographicInformationSystem,
+  subClass: RepositorySubClass.WebMapService,
+  uri: "https://example.com/mapserver"
+};
+await client.createRepository(token, iTwinId, newRepository);
+
+// v2.x.x - NewRepositoryConfig with restricted types
+import type { NewRepositoryConfig } from '@itwin/itwins-client';
+
+const newRepository: NewRepositoryConfig = {
+  class: "GeographicInformationSystem", // Only creatable classes allowed
+  subClass: "WebMapService", // Only creatable subClasses allowed
+  uri: "https://example.com/mapserver",
+  displayName: "My Map Service" // Optional but recommended
+};
+await client.createRepository(token, iTwinId, newRepository);
 ```
 
 This migration guide should help you successfully upgrade from iTwins Client v1.x.x to v2.x.x. The new version provides significantly enhanced functionality while maintaining the core patterns you're familiar with.
