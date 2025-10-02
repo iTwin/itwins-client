@@ -30,6 +30,7 @@ import type {
   GetRepositoryResourceMinimalResponse,
   GetRepositoryResourceRepresentationResponse,
   MultiRepositoriesResponse,
+  NewRepositoryConfig,
   PostRepositoryResourceResponse,
   Repository,
   SingleRepositoryResponse,
@@ -246,7 +247,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
   public abstract createRepository(
     accessToken: AccessToken,
     iTwinId: string,
-    repository: Omit<Repository, "id">
+    repository: NewRepositoryConfig
   ): Promise<BentleyAPIResponse<SingleRepositoryResponse>>;
 
   /** Delete the specified repository from an iTwin */

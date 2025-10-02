@@ -52,7 +52,8 @@ export interface RepositoryOptions {
 }
 
 /**
- * Repository classification types for different data sources
+ * Repository classification types for different data sources.
+ * Includes all repository classes including auto generated classes.
  * @beta
  */
 export type RepositoryClass =
@@ -63,8 +64,11 @@ export type RepositoryClass =
   | "RealityData"
   | "GeographicInformationSystem"
   | "Construction"
-  | "Performance"
-  | "Subsurface";
+  | "Subsurface"
+  | "GeospatialFeatures"
+  | "CesiumCuratedContent"
+  | "PdfPlansets"
+  | "IndexedMedia";
 
 /**
  * Repository sub-classification types for specific data source implementations.
@@ -76,7 +80,15 @@ export type RepositorySubClass =
   | "WebMapTileService"
   | "ArcGIS"
   | "UrlTemplate"
-  | "EvoWorkspace";
+  | "EvoWorkspace"
+  | "Performance";
+
+/**
+ * Repository classes that support creating new repositories.
+ * @beta
+ */
+export type CreatableRepositoryClass = Extract<RepositoryClass, "GeographicInformationSystem" | "Construction" | "Subsurface">;
+
 
 /**
  * Response interface for single repository operations (create, get, update)
@@ -173,3 +185,14 @@ export interface GetMultiRepositoryResourceRepresentationResponse {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   _links: Links;
 }
+
+/**
+ * Configuration interface for creating new repositories.
+ * Extends the base Repository interface while restricting class and subClass to supported combinations
+ * and omitting the id and classes that are auto-generated during creation.
+ * @beta
+ */
+export interface NewRepositoryConfig
+  extends Omit<Repository, "class" | "id"> {
+    class: CreatableRepositoryClass;
+  }

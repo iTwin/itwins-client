@@ -37,6 +37,7 @@ import type {
   GetRepositoryResourceMinimalResponse,
   GetRepositoryResourceRepresentationResponse,
   MultiRepositoriesResponse,
+  NewRepositoryConfig,
   PostRepositoryResourceResponse,
   Repository,
   SingleRepositoryResponse,
@@ -250,7 +251,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
   public async createRepository(
     accessToken: AccessToken,
     iTwinId: string,
-    repository: Omit<Repository, "id">
+    repository: NewRepositoryConfig
   ): Promise<BentleyAPIResponse<SingleRepositoryResponse>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories`;
     return this.sendGenericAPIRequest(accessToken, "POST", url, repository);
