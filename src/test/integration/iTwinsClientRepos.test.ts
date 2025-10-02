@@ -7,7 +7,7 @@ import type { AccessToken } from "@itwin/core-bentley";
 import type { ItwinCreate  } from "../../types/ITwin";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
-import { NewRepositoryConfig, Repository } from "../../types/Repository";
+import { NewRepositoryConfig } from "../../types/Repository";
 import { TestConfig } from "../TestConfig";
 
 describe("iTwins Client - Repository Integration Tests", () => {
