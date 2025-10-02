@@ -7,7 +7,7 @@ import type { AccessToken } from "@itwin/core-bentley";
 import type { ItwinCreate  } from "../../types/ITwin";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
-import { Repository } from "../../types/Repository";
+import { NewRepositoryConfig, Repository } from "../../types/Repository";
 import { TestConfig } from "../TestConfig";
 
 describe("iTwins Client - Repository Integration Tests", () => {
@@ -44,7 +44,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
   it("should get a 404 not found when trying to create a repository with an iTwin that doesn't exist", async () => {
     // Arrange
     const someRandomId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
-    const newRepository: Repository = {
+    const newRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -82,7 +82,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-    const newRepository: Repository = {
+    const newRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -141,7 +141,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-    const newRepository: Repository = {
+    const newRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "",
@@ -238,7 +238,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
 
     const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-    const newRepository: Repository = {
+    const newRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -355,7 +355,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin!.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -451,7 +451,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin!.id!;
 
-    const wmsRepository: Repository = {
+    const wmsRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -532,7 +532,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin!.id!;
 
-    const urlTemplateRepository: Repository = {
+    const urlTemplateRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "UrlTemplate",
       uri: "http://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
@@ -683,7 +683,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-    const newRepository: Repository = {
+    const newRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapTileService",
       uri: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/WMTS",
@@ -753,7 +753,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin!.id!;
 
-    const repositoryWithAuth: Repository = {
+    const repositoryWithAuth: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "UrlTemplate",
       uri: "http://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
@@ -853,7 +853,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const iTwinId = iTwinResponse.data?.iTwin!.id!;
     const someRandomRepositoryId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
 
-    const updateData: Repository = {
+    const updateData: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://updated-example.com/wms",
@@ -890,7 +890,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const someRandomiTwinId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
     const someRandomRepositoryId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
 
-    const updateData: Repository = {
+    const updateData: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://updated-example.com/wms",
@@ -932,7 +932,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-    const newRepository: Repository = {
+    const newRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -950,7 +950,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       const repositoryId = createResponse.data?.repository!.id!;
 
       // Prepare invalid update data (empty URI)
-      const invalidUpdateData: Repository = {
+      const invalidUpdateData: NewRepositoryConfig = {
         class: "GeographicInformationSystem",
         subClass: "WebMapService",
         uri: "",
@@ -1007,14 +1007,14 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin!.id!;
 
-    const originalRepository: Repository = {
+    const originalRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://original-example.com/wms",
       displayName: "Original Repository Name",
     };
 
-    const updatedRepository: Repository = {
+    const updatedRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://updated-example.com/wmts",
@@ -1099,7 +1099,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const originalRepository: Repository = {
+    const originalRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "UrlTemplate",
       uri: "http://original-basemaps.com/light_all/{z}/{x}/{y}.png",
@@ -1118,7 +1118,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       },
     };
 
-    const updatedRepository: Repository = {
+    const updatedRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "UrlTemplate",
       uri: "http://updated-basemaps.com/dark_all/{z}/{x}/{y}.png",
@@ -1215,7 +1215,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const originalRepository: Repository = {
+    const originalRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "ArcGIS",
       uri: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
@@ -1223,7 +1223,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     };
 
     // Only update displayName and URI, keep class and subClass the same
-    const partialUpdateRepository: Repository = {
+    const partialUpdateRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "ArcGIS",
       uri: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer",
@@ -1299,7 +1299,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -1377,7 +1377,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -1451,7 +1451,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -1526,7 +1526,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -1695,7 +1695,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -1790,7 +1790,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -1882,7 +1882,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -2022,7 +2022,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -2147,7 +2147,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -2279,7 +2279,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -2378,7 +2378,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -2474,7 +2474,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -2643,7 +2643,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     );
     const iTwinId = iTwinResponse.data?.iTwin?.id!;
 
-    const gisRepository: Repository = {
+    const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
       uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
