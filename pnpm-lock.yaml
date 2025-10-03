@@ -6,6 +6,7 @@ settings:
 
 overrides:
   brace-expansion: ^1.1.12
+  '@playwright/test': 1.48.2
 
 importers:
 
@@ -32,6 +33,9 @@ importers:
       '@itwin/oidc-signin-tool':
         specifier: ^5.0.1
         version: 5.0.1(@itwin/core-bentley@5.2.0)
+      '@playwright/test':
+        specifier: 1.48.2
+        version: 1.48.2
       '@types/node':
         specifier: 20.19.16
         version: 20.19.16
