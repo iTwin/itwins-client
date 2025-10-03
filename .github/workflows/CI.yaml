@@ -39,9 +39,7 @@ jobs:
     - name: Run Test
       run: pnpm run test
       env:
-        IMJS_AUTH_AUTHORITY: ${{ secrets.IMJS_AUTH_AUTHORITY }}
         IMJS_URL_PREFIX: ${{ secrets.IMJS_URL_PREFIX }}
-        IMJS_OIDC_AUTHING_BROWSER_TEST_AUTHORITY: ${{ secrets.IMJS_OIDC_AUTHING_BROWSER_TEST_AUTHORITY }}
         IMJS_OIDC_BROWSER_TEST_CLIENT_ID: ${{ secrets.IMJS_OIDC_BROWSER_TEST_CLIENT_ID }}
         IMJS_OIDC_BROWSER_TEST_REDIRECT_URI: ${{ secrets.IMJS_OIDC_BROWSER_TEST_REDIRECT_URI }}
         IMJS_OIDC_BROWSER_TEST_SCOPES: ${{ secrets.IMJS_OIDC_BROWSER_TEST_SCOPES }}
@@ -50,7 +48,6 @@ jobs:
         IMJS_ITWIN_TEST_USER_PASSWORD: ${{ secrets.IMJS_ITWIN_TEST_USER_PASSWORD }}
         IMJS_TEST_ASSET_ID: ${{ secrets.IMJS_TEST_ASSET_ID }}
         IMJS_TEST_PROJECT_ID: ${{ secrets.IMJS_TEST_PROJECT_ID }}
-        IMJS_TEST_IMODEL_ID: ${{ secrets.IMJS_TEST_IMODEL_ID }}
 
     - name: Run Audit
       run: pnpm audit --audit-level high
