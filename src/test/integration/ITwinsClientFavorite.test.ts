@@ -15,7 +15,7 @@ describe("iTwinsClient Favorites Functionality", () => {
 
   beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
-  }, 60000);
+  }, 120000);
 
   it("should get a list of favorited project iTwins", async () => {
     // Act
