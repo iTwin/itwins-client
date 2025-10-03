@@ -44,7 +44,7 @@
     "test:debug": "vitest --reporter=verbose --no-coverage",
     "typecheck": "tsc --noEmit"
   },
-    "publishConfig": {
+  "publishConfig": {
     "access": "public"
   },
   "keywords": [
@@ -72,6 +72,7 @@
     "@itwin/core-bentley": "^5.1.8",
     "@itwin/eslint-plugin": "^5.2.1",
     "@itwin/oidc-signin-tool": "^5.0.1",
+    "@playwright/test": "^1.55.1",
     "@types/node": "20.19.16",
     "@typescript-eslint/eslint-plugin": "^8.44.0",
     "@typescript-eslint/parser": "^8.44.0",
