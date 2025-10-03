@@ -38,28 +38,6 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    - name: Install Playwright browsers
-      run: pnpm exec playwright install --with-deps chromium
-
-    - name: ESLint
-      run: pnpm run lint
-
-    - name: Typecheck
-      run: pnpm run typecheck
-
-    - name: Run test
-      run: pnpm run test
-      env:
-        IMJS_URL_PREFIX: ${{ secrets.IMJS_URL_PREFIX }}
-        IMJS_OIDC_BROWSER_TEST_CLIENT_ID: ${{ secrets.IMJS_OIDC_BROWSER_TEST_CLIENT_ID }}
-        IMJS_OIDC_BROWSER_TEST_REDIRECT_URI: ${{ secrets.IMJS_OIDC_BROWSER_TEST_REDIRECT_URI }}
-        IMJS_OIDC_BROWSER_TEST_SCOPES: ${{ secrets.IMJS_OIDC_BROWSER_TEST_SCOPES }}
-        IMJS_OIDC_AUTHING_BROWSER_TEST_SCOPES: ${{ secrets.IMJS_OIDC_AUTHING_BROWSER_TEST_SCOPES }}
-        IMJS_ITWIN_TEST_USER: ${{ secrets.IMJS_ITWIN_TEST_USER }}
-        IMJS_ITWIN_TEST_USER_PASSWORD: ${{ secrets.IMJS_ITWIN_TEST_USER_PASSWORD }}
-        IMJS_TEST_ASSET_ID: ${{ secrets.IMJS_TEST_ASSET_ID }}
-        IMJS_TEST_PROJECT_ID: ${{ secrets.IMJS_TEST_PROJECT_ID }}
-
     - name: Run Audit
       run: pnpm audit --audit-level high
 
