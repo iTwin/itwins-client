@@ -23,7 +23,7 @@ describe("iTwinsClient Recently Used Functionality", () => {
 
   beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
-  }, 60000);
+  }, 120000);
 
   it("should get a list of recently used iTwins", async () => {
     // Act

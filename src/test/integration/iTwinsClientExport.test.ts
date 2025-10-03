@@ -15,7 +15,7 @@ describe("iTwinsClient Export Functionality", () => {
 
   beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
-  }, 60000);
+  }, 120000);
 
   // only have one success case,
   // A user can only have one Queued or InProgress export job at a time.

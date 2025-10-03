@@ -32,16 +32,19 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf lib",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "check": "changeset status",
     "lint": "eslint -f visualstudio \"./src/**/*.ts\" 1>&2",
     "lint:fix": "pnpm run lint --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:debug": "vitest --reporter=verbose --no-coverage",
-    "change": "beachball change",
-    "check": "beachball check",
-    "version-bump": "beachball bump",
-    "publish-package": "beachball publish --yes"
+    "typecheck": "tsc --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "keywords": [
     "Bentley",
@@ -61,16 +64,18 @@
     "url": "https://github.com/iTwin/itwins-client"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.11",
+    "@changesets/types": "6.0.0",
     "@eslint/eslintrc": "^3.3.1",
     "@itwin/build-tools": "^5.1.8",
     "@itwin/core-bentley": "^5.1.8",
     "@itwin/eslint-plugin": "^5.2.1",
     "@itwin/oidc-signin-tool": "^5.0.1",
+    "@playwright/test": "1.48.2",
     "@types/node": "20.19.16",
     "@typescript-eslint/eslint-plugin": "^8.44.0",
     "@typescript-eslint/parser": "^8.44.0",
     "@vitest/ui": "^3.2.4",
-    "beachball": "^2.51.0",
     "dotenv": "^10.0.0",
     "dotenv-expand": "^5.1.0",
     "eslint": "^9.11.1",

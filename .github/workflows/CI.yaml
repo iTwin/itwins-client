@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+
+      - name: Install pnpm@10.12.4
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.12.4
+          run_install: false
+
+      - name: Use Node.js 20.12.1
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.12.1
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: ESLint
+        run: pnpm run lint --max-warnings 0
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Run Audit
+        run: pnpm audit --audit-level high
+
+      - name: Build components
+        run: pnpm run build
+
+      - name: Check if changeset is present
+        if: github.actor != 'imodeljs-admin'
+        run: |
+          # There are issues with changesets in github workflows, so we need to force pull the main branch
+          # Fix for issue https://github.com/changesets/changesets/issues/517#issuecomment-884778604
+          git pull -f origin main:main
+          pnpm changeset status --since=main
+
+      - name: Install Playwright browsers, for test user sign-in
+        # Playwright, for test user sign-in
+        # import { TestUtility } from "@itwin/oidc-signin-tool"; in test setup
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run Test
+        run: pnpm run test
+        env:
+          IMJS_URL_PREFIX: ${{ secrets.IMJS_URL_PREFIX }}
+          IMJS_OIDC_BROWSER_TEST_CLIENT_ID: ${{ secrets.IMJS_OIDC_BROWSER_TEST_CLIENT_ID }}
+          IMJS_OIDC_BROWSER_TEST_REDIRECT_URI: ${{ secrets.IMJS_OIDC_BROWSER_TEST_REDIRECT_URI }}
+          IMJS_OIDC_BROWSER_TEST_SCOPES: ${{ secrets.IMJS_OIDC_BROWSER_TEST_SCOPES }}
+          IMJS_OIDC_AUTHING_BROWSER_TEST_SCOPES: ${{ secrets.IMJS_OIDC_AUTHING_BROWSER_TEST_SCOPES }}
+          IMJS_ITWIN_TEST_USER: ${{ secrets.IMJS_ITWIN_TEST_USER }}
+          IMJS_ITWIN_TEST_USER_PASSWORD: ${{ secrets.IMJS_ITWIN_TEST_USER_PASSWORD }}
+          IMJS_TEST_ASSET_ID: ${{ secrets.IMJS_TEST_ASSET_ID }}
+          IMJS_TEST_PROJECT_ID: ${{ secrets.IMJS_TEST_PROJECT_ID }}
