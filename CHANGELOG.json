@@ -1,0 +1,40 @@
+{
+  "name": "@itwin/itwins-client",
+  "entries": [
+    {
+      "date": "Fri, 03 Oct 2025 14:29:28 GMT",
+      "version": "2.0.0",
+      "tag": "@itwin/itwins-client_v2.0.0",
+      "comments": {
+        "minor": [
+          {
+            "author": "caleb.german@bentley.com",
+            "package": "@itwin/itwins-client",
+            "commit": "fc631bdf145f6b7dba63254fb507ee1a8caa6f30",
+            "comment": "feat: replace axios with fetch and refactor base client"
+          },
+          {
+            "author": "caleb.german@bentley.com",
+            "package": "@itwin/itwins-client",
+            "commit": "539f769d2dc410acaca9c44652ec0cfbdfa759e4",
+            "comment": "Enhance repository creation with NewRepositoryConfig interface and update related methods. Can no longer try to create repos with auto generated values."
+          }
+        ],
+        "major": [
+          {
+            "author": "caleb.german@bentley.com",
+            "package": "@itwin/itwins-client",
+            "commit": "e0c9d3a803de62747c0841be6cbdad927297c955",
+            "comment": "Added new enum values ArcGIS and UrlTemplate to RepositorySubClass and removed MapServer. Created ts configs that only have one responsibility. Switched testing framework to vite. Fixed broken test. Upgraded package to use modern ts and eslint packages. Added the ability to debug tests. Added launch config and recommend plugins."
+          },
+          {
+            "author": "caleb.german@bentley.com",
+            "package": "@itwin/itwins-client",
+            "commit": "9a0cfc6c8042af24a7d01469c0d0d443f72061bb",
+            "comment": "Complete API redesign with breaking changes\n\nMAJOR CHANGES:\n- ITwinsAccessClient renamed to ITwinsClient\n- All method names updated (removed 'Async' suffix)\n- Enums converted to string union types\n- Response structure changes with new data wrappers\n- Type system improvements with ITwinMinimal/ITwinRepresentation split\n- New repository resources, exports, and image management APIs\n- HAL specification compliance with _links navigation\n\nSee MIGRATION-GUIDE-v1-to-v2.md for detailed migration instructions and examples."
+          }
+        ]
+      }
+    }
+  ]
+}
