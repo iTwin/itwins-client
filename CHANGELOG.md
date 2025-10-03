@@ -1,14 +1,10 @@
 # Change Log - @itwin/itwins-client
 
-<!-- This log was last generated on Fri, 03 Oct 2025 14:29:28 GMT and should not be manually modified. -->
-
-<!-- Start content -->
-
 ## 2.0.0
 
-Fri, 03 Oct 2025 14:29:28 GMT
+### Major Changes
 
-### Major changes
+#### [2.0.0](https://www.npmjs.com/package/@itwin/itwins-client/v/2.0.0) - 2025-10-03
 
 - Added new enum values ArcGIS and UrlTemplate to RepositorySubClass and removed MapServer. Created ts configs that only have one responsibility. Switched testing framework to vite. Fixed broken test. Upgraded package to use modern ts and eslint packages. Added the ability to debug tests. Added launch config and recommend plugins. ([commit](https://github.com/iTwin/itwins-client/commit/e0c9d3a803de62747c0841be6cbdad927297c955))
 - Complete API redesign with breaking changes
