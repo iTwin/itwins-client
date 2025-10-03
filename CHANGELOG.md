@@ -1,5 +1,34 @@
 # Change Log - @itwin/itwins-client
 
+<!-- This log was last generated on Fri, 03 Oct 2025 14:29:28 GMT and should not be manually modified. -->
+
+<!-- Start content -->
+
+## 2.0.0
+
+Fri, 03 Oct 2025 14:29:28 GMT
+
+### Major changes
+
+- Added new enum values ArcGIS and UrlTemplate to RepositorySubClass and removed MapServer. Created ts configs that only have one responsibility. Switched testing framework to vite. Fixed broken test. Upgraded package to use modern ts and eslint packages. Added the ability to debug tests. Added launch config and recommend plugins. ([commit](https://github.com/iTwin/itwins-client/commit/e0c9d3a803de62747c0841be6cbdad927297c955))
+- Complete API redesign with breaking changes
+
+MAJOR CHANGES:
+- ITwinsAccessClient renamed to ITwinsClient
+- All method names updated (removed 'Async' suffix)
+- Enums converted to string union types
+- Response structure changes with new data wrappers
+- Type system improvements with ITwinMinimal/ITwinRepresentation split
+- New repository resources, exports, and image management APIs
+- HAL specification compliance with _links navigation
+
+See MIGRATION-GUIDE-v1-to-v2.md for detailed migration instructions and examples. ([commit](https://github.com/iTwin/itwins-client/commit/9a0cfc6c8042af24a7d01469c0d0d443f72061bb))
+
+### Minor changes
+
+- feat: replace axios with fetch and refactor base client ([commit](https://github.com/iTwin/itwins-client/commit/fc631bdf145f6b7dba63254fb507ee1a8caa6f30))
+- Enhance repository creation with NewRepositoryConfig interface and update related methods. Can no longer try to create repos with auto generated values. ([commit](https://github.com/iTwin/itwins-client/commit/539f769d2dc410acaca9c44652ec0cfbdfa759e4))
+
 ## 1.6.1
 
 ### Patch Changes
