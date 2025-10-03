@@ -13,25 +13,22 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Fetch all history for all branches and tags
+        fetch-depth: 0
 
-    - name: Install pnpm@10.12.4
-      uses: pnpm/action-setup@v2
-      with:
-        version: 10.12.4
-        run_install: false
-
-    - name: Use Node.js 20.12.1
+    - name: Use Node.js 22.x
       uses: actions/setup-node@v4
       with:
-        node-version: 20.12.1
-        cache: "pnpm"
+        node-version: 22.x  # Match ADO exactly
+        # Remove cache: "pnpm" since we're using corepack
+
+    - name: Enable Corepack
+      run: corepack enable
+
+    - name: Setup pnpm
+      run: corepack prepare pnpm@10.12.4 --activate
 
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-
-    - name: Install Playwright browsers
-      run: pnpm exec playwright install --with-deps chromium
+      run: pnpm install
 
     - name: ESLint
       run: pnpm run lint --max-warnings 0
@@ -61,7 +58,5 @@ jobs:
     - name: Check if changeset is present
       if: github.actor != 'imodeljs-admin'
       run: |
-        # There are issues with changesets in github workflows, so we need to force pull the main branch
-        # Fix for issue https://github.com/changesets/changesets/issues/517#issuecomment-884778604
         git pull -f origin main:main
         pnpm changeset status --since=main
