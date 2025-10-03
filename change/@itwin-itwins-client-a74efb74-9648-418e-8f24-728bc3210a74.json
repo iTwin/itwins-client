@@ -1,7 +1,0 @@
-{
-  "type": "minor",
-  "comment": "Enhance repository creation with NewRepositoryConfig interface and update related methods. Can no longer try to create repos with auto generated values.",
-  "packageName": "@itwin/itwins-client",
-  "email": "caleb.german@bentley.com",
-  "dependentChangeType": "patch"
-}
