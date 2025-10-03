@@ -7,6 +7,6 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "minor",
-  "ignore": ["test-app-frontend", "test-app-backend"],
+  "ignore": [],
   "bumpVersionsWithWorkspaceProtocolOnly":true
 }
