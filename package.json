@@ -34,7 +34,6 @@
     "clean": "rimraf lib",
     "changeset": "changeset",
     "changeset:version": "changeset version",
-    "changeset:publish": "changeset publish",
     "check": "changeset status",
     "lint": "eslint -f visualstudio \"./src/**/*.ts\" 1>&2",
     "lint:fix": "pnpm run lint --fix",
@@ -89,8 +88,7 @@
   },
   "pnpm": {
     "overrides": {
-      "brace-expansion": "^1.1.12",
-      "@playwright/test": "1.48.2"
+      "brace-expansion": "^1.1.12"
     }
   }
 }
