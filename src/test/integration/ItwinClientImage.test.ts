@@ -18,7 +18,7 @@ describe("iTwinsClient Image Functionality", () => {
 
   beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
-  }, 60000);
+  }, 120000);
 
   it("should return 404 when trying to upload image to non-existent iTwin", async () => {
     // Arrange - Use a random GUID that doesn't exist

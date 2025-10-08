@@ -26,7 +26,7 @@ describe("iTwinsClient", () => {
 
   beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
-  }, 60000);
+  }, 120000);
 
   it("should get a list of project iTwins with custom url", async () => {
     // Act
