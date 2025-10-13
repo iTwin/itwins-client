@@ -11,19 +11,21 @@ import type { Links } from "./links";
  */
 export interface Repository {
   /** Unique identifier for the repository */
-  id?: string;
+  id: string;
   /** Main classification of the repository */
   class: RepositoryClass;
   /** Sub-classification providing more specific categorization */
   subClass: RepositorySubClass;
   /** Human-readable name for the repository */
-  displayName?: string;
+  displayName: string;
   /** The URI or endpoint URL for accessing the repository data */
   uri: string;
   /** Authentication configuration for accessing the repository */
   authentication?: RepositoryAuthentication;
   /** Repository-specific options and configuration parameters */
   options?: RepositoryOptions;
+  /** Optional capabilities supported by the repository */
+  capabilities?: RepositoryCapabilities;
 }
 
 /**
@@ -49,6 +51,19 @@ export interface RepositoryOptions {
   queryParameters?: Record<string, string>;
   /** Additional subclass-specific properties */
   [key: string]: unknown;
+}
+
+/**
+ * Repository capabilities defining supported operations and available endpoints.
+ * Indicates what additional functionality is available for this repository.
+ * @beta
+ */
+export interface RepositoryCapabilities {
+  /** Resource management capabilities, available for certain repository classes */
+  resources?: {
+    /** A uri containing the endpoint that will return the list of resources in the repository. */
+    uri: string;
+  };
 }
 
 /**
@@ -193,6 +208,7 @@ export interface GetMultiRepositoryResourceRepresentationResponse {
  * @beta
  */
 export interface NewRepositoryConfig
-  extends Omit<Repository, "class" | "id"> {
+  extends Omit<Repository, "class" | "id" | "displayName" | "capabilities"> {
+    displayName?: string;
     class: CreatableRepositoryClass;
   }
