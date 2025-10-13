@@ -323,7 +323,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     accessToken: AccessToken,
     iTwinId: string,
     repositoryId: string,
-    repository: Omit<Repository, "id" | "class" | "subClass">
+    repository: Partial<Omit<Repository, "id" | "class" | "subClass" | "capabilities">>
   ): Promise<BentleyAPIResponse<SingleRepositoryResponse>> {
     const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}`;
     return this.sendGenericAPIRequest(accessToken, "PATCH", url, repository);

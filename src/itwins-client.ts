@@ -13,13 +13,13 @@
  */
 
 // Main client exports
-export * from "./iTwinsClient";
+export * from "./iTwinsClient.js";
 
 // Type exports
-export * from "./types/CommonApiTypes";
-export * from "./types/ITwin";
-export * from "./types/Repository";
-export * from "./types/ITwinExport";
-export * from "./types/ITwinImage";
-export * from "./types/ITwinsQueryArgs";
-export * from "./types/links";
+export * from "./types/CommonApiTypes.js";
+export * from "./types/ITwin.js";
+export * from "./types/Repository.js";
+export * from "./types/ITwinExport.js";
+export * from "./types/ITwinImage.js";
+export * from "./types/ITwinsQueryArgs.js";
+export * from "./types/links.js";

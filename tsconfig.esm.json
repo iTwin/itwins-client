@@ -1,10 +1,12 @@
 {
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "module": "es2020",
-    "target": "es2020",
+    "module": "ES2022",
+    "target": "ES2022",
     "outDir": "./lib/esm",
     "moduleResolution": "bundler",
-    "incremental": false
+    "incremental": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   }
 }

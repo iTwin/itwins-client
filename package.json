@@ -2,7 +2,6 @@
   "name": "@itwin/itwins-client",
   "version": "2.0.0",
   "description": "iTwins client for the iTwin platform",
-  "type": "module",
   "main": "./lib/cjs/itwins-client.js",
   "module": "./lib/esm/itwins-client.js",
   "types": "./lib/cjs/itwins-client.d.ts",
@@ -83,7 +82,7 @@
     "source-map-loader": "^1.1.3",
     "typedoc": "^0.28.13",
     "typescript": "~5.9.2",
-    "vite": "^7.1.5",
+    "vite": "^5.4.10",
     "vitest": "^3.2.4"
   },
   "pnpm": {
