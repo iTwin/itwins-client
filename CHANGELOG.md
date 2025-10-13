@@ -1,5 +1,23 @@
 # Change Log - @itwin/itwins-client
 
+## 2.1.0
+
+### Minor Changes
+
+#### [2.1.0](https://www.npmjs.com/package/@itwin/itwins-client/v/2.1.0) - 2025-10-13
+
+feat: update repository interface and capabilities, and fix esm module compatibility with nodeNext
+
+\- Modified the Repository interface to make 'id' and 'displayName' required fields.
+
+\- Added 'capabilities' field to the Repository interface to define supported operations.
+
+\- Updated NewRepositoryConfig to reflect changes in the Repository interface.
+
+\- Changed exports in itwins-client.ts to include .js extensions for compatibility.
+
+\- Updated TypeScript configuration to target ES2022 and enable synthetic default imports.
+
 ## 2.0.0
 
 ### Major Changes
@@ -10,13 +28,14 @@
 - Complete API redesign with breaking changes
 
 MAJOR CHANGES:
+
 - ITwinsAccessClient renamed to ITwinsClient
 - All method names updated (removed 'Async' suffix)
 - Enums converted to string union types
 - Response structure changes with new data wrappers
 - Type system improvements with ITwinMinimal/ITwinRepresentation split
 - New repository resources, exports, and image management APIs
-- HAL specification compliance with _links navigation
+- HAL specification compliance with \_links navigation
 
 See MIGRATION-GUIDE-v1-to-v2.md for detailed migration instructions and examples. ([commit](https://github.com/iTwin/itwins-client/commit/9a0cfc6c8042af24a7d01469c0d0d443f72061bb))
 
