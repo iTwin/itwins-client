@@ -29,6 +29,7 @@ import type {
 import type { ITwinImageResponse } from "./types/ITwinImage.js";
 import type {
   ITwinQueryScope,
+  ITwinsGetQueryArg,
   ITwinsQueryArg,
 } from "./types/ITwinsQueryArgs.js";
 import type {
@@ -99,6 +100,17 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param accessToken The client access token string
    * @param arg Optional query arguments, for paging, searching, and filtering
    * @returns Array of iTwins, may be empty, if no favorites
+   * @example
+   * ```typescript
+   * // Returns MultiITwinMinimalResponse
+   * const minimal = await client.getFavoritesITwins(token, { resultMode: "minimal" });
+   *
+   * // Returns MultiITwinRepresentationResponse
+   * const detailed = await client.getFavoritesITwins(token, { resultMode: "representation" });
+   *
+   * // Defaults to minimal when no resultMode specified
+   * const defaultResult = await client.getFavoritesITwins(token);
+   * ```
    */
   public async getFavoritesITwins<T extends ITwinsQueryArg = ITwinsQueryArg>(
     accessToken: AccessToken,
@@ -220,6 +232,17 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param accessToken The client access token string
    * @param arg Optional query arguments, for paging, searching, and filtering (including status and includeInactive)
    * @returns Promise that resolves with an array of recently used iTwins (maximum 25), ordered by most recent first
+   * @example
+   * ```typescript
+   * // Returns MultiITwinMinimalResponse
+   * const minimal = await client.getRecentUsedITwins(token, { resultMode: "minimal" });
+   *
+   * // Returns MultiITwinRepresentationResponse
+   * const detailed = await client.getRecentUsedITwins(token, { resultMode: "representation" });
+   *
+   * // Defaults to minimal when no resultMode specified
+   * const defaultResult = await client.getRecentUsedITwins(token);
+   * ```
    */
   public async getRecentUsedITwins<T extends ITwinsQueryArg = ITwinsQueryArg>(
     accessToken: AccessToken,
@@ -366,6 +389,17 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param resourceId - The unique id of the repository resource to retrieve
    * @param resultMode - Optional result mode controlling the level of detail returned (minimal or representation)
    * @returns Promise that resolves with the repository resource details in the requested format
+   * @example
+   * ```typescript
+   * // Returns GetRepositoryResourceMinimalResponse
+   * const minimal = await client.getRepositoryResource(token, "iTwinId", "repoId", "resourceId", "minimal");
+   *
+   * // Returns GetRepositoryResourceRepresentationResponse
+   * const detailed = await client.getRepositoryResource(token, "iTwinId", "repoId", "resourceId", "representation");
+   *
+   * // Defaults to minimal when no resultMode specified
+   * const defaultResult = await client.getRepositoryResource(token, "iTwinId", "repoId", "resourceId");
+   * ```
    * @beta
    */
   public async getRepositoryResource<T extends ResultMode = "minimal">(
@@ -398,6 +432,17 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param args - Optional query parameters for search, pagination (skip, top)
    * @param resultMode - Optional result mode controlling the level of detail returned (minimal or representation)
    * @returns Promise that resolves with an array of repository resources in the requested format
+   * @example
+   * ```typescript
+   * // Returns GetMultiRepositoryResourceMinimalResponse
+   * const minimal = await client.getRepositoryResources(token, "iTwinId", "repoId", undefined, "minimal");
+   *
+   * // Returns GetMultiRepositoryResourceRepresentationResponse
+   * const detailed = await client.getRepositoryResources(token, "iTwinId", "repoId", { search: "test" }, "representation");
+   *
+   * // Defaults to minimal when no resultMode specified
+   * const defaultResult = await client.getRepositoryResources(token, "iTwinId", "repoId");
+   * ```
    * @beta
    */
   public async getRepositoryResources<T extends ResultMode = "minimal">(
@@ -432,6 +477,17 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param iTwinId The id of the iTwin
    * @param resultMode (Optional) iTwin result mode: minimal or representation
    * @returns Promise that resolves with the iTwin details
+   * @example
+   * ```typescript
+   * // Returns ITwinMinimalResponse
+   * const minimal = await client.getITwin(token, "id", "minimal");
+   *
+   * // Returns ITwinRepresentationResponse
+   * const detailed = await client.getITwin(token, "id", "representation");
+   *
+   * // Defaults to minimal when no resultMode specified
+   * const defaultResult = await client.getITwin(token, "id");
+   * ```
    */
   public async getITwin<T extends ResultMode = "minimal">(
     accessToken: AccessToken,
@@ -455,8 +511,19 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param accessToken The client access token string
    * @param arg Optional query arguments for paging, searching, filtering, ordering, and field selection
    * @returns Promise that resolves with an array of iTwins, may be empty
+   * @example
+   * ```typescript
+   * // Returns MultiITwinMinimalResponse
+   * const minimal = await client.getITwins(token, { resultMode: "minimal", search: "test" });
+   *
+   * // Returns MultiITwinRepresentationResponse
+   * const detailed = await client.getITwins(token, { resultMode: "representation", filter: "type eq 'Project'" });
+   *
+   * // Defaults to minimal when no resultMode specified
+   * const defaultResult = await client.getITwins(token);
+   * ```
    */
-  public async getITwins<T extends ITwinsQueryArg & Pick<ODataQueryParams, "filter" | "orderby" | "select"> = ITwinsQueryArg & Pick<ODataQueryParams, "filter" | "orderby" | "select">>(
+  public async getITwins<T extends ITwinsGetQueryArg = ITwinsGetQueryArg>(
     accessToken: AccessToken,
     arg?: T
   ): Promise<
@@ -537,6 +604,17 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param iTwinId The id of the iTwin
    * @param resultMode (Optional) Result mode: minimal or representation
    * @returns Promise that resolves with the account details
+   * @example
+   * ```typescript
+   * // Returns ITwinMinimalResponse
+   * const minimal = await client.getITwinAccount(token, "id", "minimal");
+   *
+   * // Returns ITwinRepresentationResponse
+   * const detailed = await client.getITwinAccount(token, "id", "representation");
+   *
+   * // Defaults to minimal when no resultMode specified
+   * const defaultResult = await client.getITwinAccount(token, "id");
+   * ```
    */
   public async getITwinAccount<T extends ResultMode = "minimal">(
     accessToken: AccessToken,

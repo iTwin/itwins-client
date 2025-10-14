@@ -23,7 +23,7 @@ import type {
   ITwinExportSingleResponse,
 } from "./types/ITwinExport";
 import type { ITwinImageResponse } from "./types/ITwinImage";
-import type { ITwinsQueryArg } from "./types/ITwinsQueryArgs";
+import type { ITwinsGetQueryArg, ITwinsQueryArg } from "./types/ITwinsQueryArgs";
 import type {
   GetMultiRepositoryResourceMinimalResponse,
   GetMultiRepositoryResourceRepresentationResponse,
@@ -332,7 +332,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
   ): Promise<BentleyAPIResponse<undefined>>;
 
   /** Get iTwins */
-  public abstract getITwins<T extends ITwinsQueryArg & Pick<ODataQueryParams, "filter" | "orderby" | "select"> = ITwinsQueryArg & Pick<ODataQueryParams, "filter" | "orderby" | "select">>(
+  public abstract getITwins<T extends ITwinsGetQueryArg = ITwinsGetQueryArg>(
     accessToken: AccessToken,
     arg?: T
   ): Promise<

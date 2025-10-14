@@ -36,6 +36,8 @@ export interface ITwinsQueryArgsApi
   queryScope?: ITwinQueryScope;
 }
 
+export type ITwinsGetQueryArg = ITwinsQueryArg & Pick<ODataQueryParams, "filter" | "orderby" | "select">;
+
 /**
  * Optional query scope. MemberOfITwin is the default. This is used to expand the scope of the query to all iTwins you have access to, not just ones that you are a member of, which only applies to organization administrators.
  */
