@@ -100,16 +100,18 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param arg Optional query arguments, for paging, searching, and filtering
    * @returns Array of iTwins, may be empty, if no favorites
    */
-  public async getFavoritesITwins(
+  public async getFavoritesITwins<T extends ITwinsQueryArg = ITwinsQueryArg>(
     accessToken: AccessToken,
-    arg?: ITwinsQueryArg
+    arg?: T
   ): Promise<
-    BentleyAPIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+    BentleyAPIResponse<T["resultMode"] extends "representation"
+      ? MultiITwinRepresentationResponse
+      : MultiITwinMinimalResponse>
   > {
     const headers = this.getHeaders(arg);
     const url = `${this._baseUrl}/favorites/?${this.getQueryStringArg(
       ITwinsClient.iTwinsQueryParamMapping,
-      arg
+      arg ?? {}
     )}`;
 
     return this.sendGenericAPIRequest(
@@ -219,17 +221,19 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param arg Optional query arguments, for paging, searching, and filtering (including status and includeInactive)
    * @returns Promise that resolves with an array of recently used iTwins (maximum 25), ordered by most recent first
    */
-  public async getRecentUsedITwins(
+  public async getRecentUsedITwins<T extends ITwinsQueryArg = ITwinsQueryArg>(
     accessToken: AccessToken,
-    arg?: ITwinsQueryArg
+    arg?: T
   ): Promise<
-    BentleyAPIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+    BentleyAPIResponse<T["resultMode"] extends "representation"
+      ? MultiITwinRepresentationResponse
+      : MultiITwinMinimalResponse>
   > {
     const headers = this.getHeaders(arg);
     let url = `${this._baseUrl}/recents`;
     const query = this.getQueryStringArg(
       ITwinsClient.iTwinsQueryParamMapping,
-      arg
+      arg ?? {}
     );
     if (query !== "") url += `?${query}`;
     return this.sendGenericAPIRequest(
@@ -364,17 +368,16 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @returns Promise that resolves with the repository resource details in the requested format
    * @beta
    */
-  public async getRepositoryResource(
+  public async getRepositoryResource<T extends ResultMode = "minimal">(
     accessToken: AccessToken,
     iTwinId: string,
     repositoryId: string,
     resourceId: string,
-    resultMode?: ResultMode
+    resultMode?: T
   ): Promise<
-    BentleyAPIResponse<
-      | GetRepositoryResourceRepresentationResponse
-      | GetRepositoryResourceMinimalResponse
-    >
+    BentleyAPIResponse<T extends "representation"
+      ? GetRepositoryResourceRepresentationResponse
+      : GetRepositoryResourceMinimalResponse>
   > {
     const headers = this.getResultModeHeaders(resultMode);
     const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}/resources/${resourceId}`;
@@ -397,17 +400,16 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @returns Promise that resolves with an array of repository resources in the requested format
    * @beta
    */
-  public async getRepositoryResources(
+  public async getRepositoryResources<T extends ResultMode = "minimal">(
     accessToken: AccessToken,
     iTwinId: string,
     repositoryId: string,
     args?: Pick<ODataQueryParams, "search" | "skip" | "top">,
-    resultMode?: ResultMode
+    resultMode?: T
   ): Promise<
-    BentleyAPIResponse<
-      | GetMultiRepositoryResourceMinimalResponse
-      | GetMultiRepositoryResourceRepresentationResponse
-    >
+    BentleyAPIResponse<T extends "representation"
+      ? GetMultiRepositoryResourceRepresentationResponse
+      : GetMultiRepositoryResourceMinimalResponse>
   > {
     const headers = this.getResultModeHeaders(resultMode);
     const url = `${
@@ -431,11 +433,13 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param resultMode (Optional) iTwin result mode: minimal or representation
    * @returns Promise that resolves with the iTwin details
    */
-  public async getITwin(
+  public async getITwin<T extends ResultMode = "minimal">(
     accessToken: AccessToken,
     iTwinId: string,
-    resultMode?: ResultMode
-  ): Promise<BentleyAPIResponse<ITwinMinimalResponse | ITwinRepresentationResponse>> {
+    resultMode?: T
+  ): Promise<BentleyAPIResponse<T extends "representation"
+    ? ITwinRepresentationResponse
+    : ITwinMinimalResponse>> {
     const headers = this.getResultModeHeaders(resultMode);
     const url = `${this._baseUrl}/${iTwinId}`;
     return this.sendGenericAPIRequest(
@@ -452,17 +456,18 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param arg Optional query arguments for paging, searching, filtering, ordering, and field selection
    * @returns Promise that resolves with an array of iTwins, may be empty
    */
-  public async getITwins(
+  public async getITwins<T extends ITwinsQueryArg & Pick<ODataQueryParams, "filter" | "orderby" | "select"> = ITwinsQueryArg & Pick<ODataQueryParams, "filter" | "orderby" | "select">>(
     accessToken: AccessToken,
-    arg?: ITwinsQueryArg &
-      Pick<ODataQueryParams, "filter" | "orderby" | "select">
+    arg?: T
   ): Promise<
-    BentleyAPIResponse<MultiITwinMinimalResponse | MultiITwinRepresentationResponse>
+    BentleyAPIResponse<T["resultMode"] extends "representation"
+      ? MultiITwinRepresentationResponse
+      : MultiITwinMinimalResponse>
   > {
     const headers = this.getHeaders(arg);
     const url = `${this._baseUrl}/?${this.getQueryStringArg(
       ITwinsClient.ITwinsGetQueryParamMapping,
-      arg
+      arg ?? {}
     )}`;
 
     return this.sendGenericAPIRequest(
@@ -533,11 +538,13 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * @param resultMode (Optional) Result mode: minimal or representation
    * @returns Promise that resolves with the account details
    */
-  public async getITwinAccount(
+  public async getITwinAccount<T extends ResultMode = "minimal">(
     accessToken: AccessToken,
     iTwinId: string,
-    resultMode?: ResultMode
-  ): Promise<BentleyAPIResponse<ITwinMinimalResponse>> {
+    resultMode?: T
+  ): Promise<BentleyAPIResponse<T extends "representation"
+    ? ITwinRepresentationResponse
+    : ITwinMinimalResponse>> {
     const headers = this.getResultModeHeaders(resultMode);
     const url = `${this._baseUrl}/${iTwinId}/account`;
     return this.sendGenericAPIRequest(

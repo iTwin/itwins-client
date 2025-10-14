@@ -57,11 +57,15 @@ describe("iTwinsClient Recently Used Functionality", () => {
       expect(recentsResponse.data!.iTwins.length).toBeLessThanOrEqual(5);
 
       // Verify representation mode returns additional properties
-      recentsResponse.data!.iTwins.forEach((iTwin: ITwinMinimal) => {
+      recentsResponse.data!.iTwins.forEach((iTwin) => {
         expect(iTwin.id).toBeDefined();
         expect(iTwin.displayName).toBeDefined();
         expect(iTwin.class).toBeDefined();
         expect(iTwin.subClass).toBeDefined();
+        expect(iTwin.type).toBeDefined();
+        expect(iTwin.status).toBeDefined();
+        expect(iTwin.ianaTimeZone).toBeDefined();
+        expect(iTwin.dataCenterLocation).toBeDefined();
       });
     }
   });

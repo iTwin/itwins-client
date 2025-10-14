@@ -2333,7 +2333,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(getResourcesResponse.data!.resources.length).toBeGreaterThan(0);
 
       // In representation mode with pagination, _links should be present
-      const representationResponse = getResourcesResponse.data! as any;
+      const representationResponse = getResourcesResponse.data!;
       expect(representationResponse._links).toBeDefined();
       expect(representationResponse._links.self).toBeDefined();
       expect(representationResponse._links.self.href).toBeDefined();
