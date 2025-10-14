@@ -36,6 +36,12 @@ export interface ITwinsQueryArgsApi
   queryScope?: ITwinQueryScope;
 }
 
+/**
+ * Extended query arguments for iTwins GET operations with additional OData query capabilities.
+ *
+ * Combines the base iTwins query arguments with advanced OData filtering, ordering, and field selection.
+ * Used specifically for the `getITwins` method to support complex queries.
+ */
 export type ITwinsGetQueryArg = ITwinsQueryArg & Pick<ODataQueryParams, "filter" | "orderby" | "select">;
 
 /**
