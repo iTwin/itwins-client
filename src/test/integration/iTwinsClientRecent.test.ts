@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import type { AccessToken } from "@itwin/core-bentley";
 import { BentleyAPIResponse } from "src/types/CommonApiTypes";
-import type { ITwinMinimal, ITwinRepresentation } from "src/types/ITwin";
+import type { ITwinRepresentation } from "src/types/ITwin";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
 import { TestConfig } from "../TestConfig";
