@@ -397,7 +397,7 @@ describe("iTwinsClient", () => {
     expect(iTwinsResponse.data?._links).toBeDefined();
     expect(iTwinsResponse.data?._links?.self).toBeDefined();
 
-    iTwins.forEach((actualiTwin: ITwinRepresentation) => {
+    iTwins.forEach((actualiTwin) => {
       expect(actualiTwin.parentId).toBeTypeOf("string");
       expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
       expect(actualiTwin.createdDateTime).toBeTypeOf("string");
@@ -439,7 +439,7 @@ describe("iTwinsClient", () => {
     expect(iTwins).not.toHaveLength(0);
     expect(iTwinsResponse.data?._links).toBeDefined();
     expect(iTwinsResponse.data?._links?.self).toBeDefined();
-    iTwins.forEach((actualiTwin: ITwinRepresentation) => {
+    iTwins.forEach((actualiTwin) => {
       expect(actualiTwin.status).toBe("Active");
       expect(actualiTwin.subClass).toBe("Project");
     });
@@ -501,7 +501,7 @@ describe("iTwinsClient", () => {
     expect(iTwins).not.toHaveLength(0);
     expect(iTwinsResponse.data?._links).toBeDefined();
     expect(iTwinsResponse.data?._links?.self).toBeDefined();
-    iTwins.forEach((actualiTwin: ITwinMinimal) => {
+    iTwins.forEach((actualiTwin) => {
       // Selected fields should be present
       expect(actualiTwin.id).toBeDefined();
       expect(actualiTwin.displayName).toBeDefined();
@@ -529,7 +529,7 @@ describe("iTwinsClient", () => {
     expect(iTwinsResponse.data?._links).toBeDefined();
     expect(iTwinsResponse.data?._links?.self).toBeDefined();
 
-    iTwins.forEach((actualiTwin: ITwinRepresentation) => {
+    iTwins.forEach((actualiTwin) => {
       expect(actualiTwin.status).toBe("Active");
       expect(actualiTwin.subClass).toBe("Project");
       expect(actualiTwin.id).toBeDefined();
@@ -557,7 +557,7 @@ describe("iTwinsClient", () => {
     expect(iTwins).not.toHaveLength(0);
     expect(iTwinsResponse.data?._links).toBeDefined();
     expect(iTwinsResponse.data?._links?.self).toBeDefined();
-    iTwins.forEach((actualiTwin: ITwinRepresentation) => {
+    iTwins.forEach((actualiTwin) => {
       expect(["Active", "Trial"]).toContain(actualiTwin.status);
       expect(actualiTwin.subClass).toBe("Project");
     });
@@ -588,7 +588,7 @@ describe("iTwinsClient", () => {
     expect(iTwinsResponse.data?._links).toBeDefined();
     expect(iTwinsResponse.data?._links?.self).toBeDefined();
 
-    iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinRepresentation) => {
+    iTwinsResponse.data!.iTwins.forEach((actualiTwin) => {
       expect(actualiTwin.parentId).toBeTypeOf("string");
       expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
       expect(actualiTwin.createdDateTime).toBeTypeOf("string");

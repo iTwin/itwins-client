@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import type { AccessToken } from "@itwin/core-bentley";
 import { BentleyAPIResponse } from "src/types/CommonApiTypes";
-import type { ITwinMinimal, ITwinRepresentation } from "src/types/ITwin";
+import type { ITwinRepresentation } from "src/types/ITwin";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
 import { TestConfig } from "../TestConfig";
@@ -57,11 +57,15 @@ describe("iTwinsClient Recently Used Functionality", () => {
       expect(recentsResponse.data!.iTwins.length).toBeLessThanOrEqual(5);
 
       // Verify representation mode returns additional properties
-      recentsResponse.data!.iTwins.forEach((iTwin: ITwinMinimal) => {
+      recentsResponse.data!.iTwins.forEach((iTwin) => {
         expect(iTwin.id).toBeDefined();
         expect(iTwin.displayName).toBeDefined();
         expect(iTwin.class).toBeDefined();
         expect(iTwin.subClass).toBeDefined();
+        expect(iTwin.type).toBeDefined();
+        expect(iTwin.status).toBeDefined();
+        expect(iTwin.ianaTimeZone).toBeDefined();
+        expect(iTwin.dataCenterLocation).toBeDefined();
       });
     }
   });
