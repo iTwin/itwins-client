@@ -1,5 +1,43 @@
 # Change Log - @itwin/itwins-client
 
+## 2.2.0
+
+### Minor Changes
+
+#### [2.2.0](https://www.npmjs.com/package/@itwin/itwins-client/v/2.2.0) - 2025-10-15
+
+Enhanced type safety with conditional return types
+
+Added conditional return types to methods that support both minimal and representation responses. Return types now automatically infer based on the `resultMode` parameter, providing better IntelliSense and compile-time type checking.
+
+\*\*Enhanced Methods:\*\*
+
+\- `getFavoritesITwins`
+
+\- `getRecentUsedITwins`
+
+\- `getITwins`
+
+\- `getITwin`
+
+\- `getRepositoryResource`
+
+\- `getRepositoryResources`
+
+\- `getITwinAccount`
+
+\*\*Before:\*\*
+
+```typescript
+const result = await client.getITwin(token, "id", "representation");
+
+// Type: BentleyAPIResponse<ITwinMinimalResponse | ITwinRepresentationResponse>
+
+const result = await client.getITwin(token, "id", "representation");
+
+// Type: BentleyAPIResponse<ITwinRepresentationResponse>
+```
+
 ## 2.1.0
 
 ### Minor Changes
