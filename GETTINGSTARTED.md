@@ -33,3 +33,5 @@ pnpm test
 Please add a test user to both a `project` level Itwin and an `asset` level Itwin. For more information on Itwin's, please read through our [API Docs](https://developer.bentley.com/apis/itwins/overview/).
 
 The test user must have the role of `Project Administrator` or `ITwin Owner` on each Itwin for the test to function correctly.
+
+For creating ITwins the test user would need `Connect Services Admin` role in IMS or have `itwins_create_permission` on the Account iTwin.
