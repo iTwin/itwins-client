@@ -30,6 +30,6 @@ pnpm test
 
 ## Test User Setup And Itwin Setup
 
-Please add a test user to both a `project` level Itwin and an `asset` level  Itwin. For more information on Itwin's, please read through our [API Docs](https://developer.bentley.com/apis/itwins/overview/).
+Please add a test user to both a `project` level Itwin and an `asset` level Itwin. For more information on Itwin's, please read through our [API Docs](https://developer.bentley.com/apis/itwins/overview/).
 
 The test user must have the role of `Project Administrator` or `ITwin Owner` on each Itwin for the test to function correctly.
