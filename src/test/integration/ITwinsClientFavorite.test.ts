@@ -6,7 +6,7 @@ import type { AccessToken } from "@itwin/core-bentley";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
 import type { BentleyAPIResponse } from "../../types/CommonApiTypes";
-import type { ItwinCreate, ITwinRepresentation } from "../../types/ITwin";
+import type { ItwinCreate } from "../../types/ITwin";
 import { TestConfig } from "../TestConfig";
 
 describe("iTwinsClient Favorites Functionality", () => {
