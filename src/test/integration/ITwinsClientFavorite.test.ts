@@ -18,98 +18,327 @@ describe("iTwinsClient Favorites Functionality", () => {
   }, 120000);
 
   it("should get a list of favorited project iTwins", async () => {
-    // Act
-    const iTwinsResponse =
-      await iTwinsAccessClient.getFavoritesITwins(accessToken, {
-        subClass: "Project",
-      });
+    /* CREATE THE ITWIN */
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM Project iTwin Test ${new Date().toISOString()}`,
+      number: `APIM Project iTwin Number ${new Date().toISOString()}`,
+      type: "Portfolio",
+      subClass: "Project",
+      class: "Endeavor",
+      dataCenterLocation: "East US",
+      ianaTimeZone: "America/New_York",
+      status: "Trial",
+    };
 
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
-    iTwinsResponse.data?.iTwins!.forEach((actualiTwin: ITwinRepresentation) => {
-      expect(actualiTwin.class).toBe("Endeavor");
-      expect(actualiTwin.subClass).toBe("Project");
-    });
+    // Act
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
+    const iTwinId = createResponse.data?.iTwin?.id;
+
+    try {
+      // Assert
+      expect(createResponse.status).toBe(201);
+      expect(createResponse.data?.iTwin?.displayName).toBe(newiTwin.displayName);
+      expect(createResponse.data?.iTwin?.class).toBe(newiTwin.class);
+      expect(createResponse.data?.iTwin?.subClass).toBe(newiTwin.subClass);
+
+      /* ADD ITWIN TO FAVORITES */
+      const addFavoriteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.addITwinToFavorites(accessToken, iTwinId);
+
+      expect(addFavoriteResponse.status).toBe(204);
+
+      /* VERIFY ITWIN IS IN FAVORITES */
+      const iTwinsResponse =
+        await iTwinsAccessClient.getFavoritesITwins(accessToken, {
+          subClass: "Project",
+        });
+
+      // Assert
+      expect(iTwinsResponse.status).toBe(200);
+      expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+      const createdTwin = iTwinsResponse.data?.iTwins!.find(twin => twin.id === iTwinId);
+      expect(createdTwin).toBeDefined();
+      expect(createdTwin?.class).toBe("Endeavor");
+      expect(createdTwin?.subClass).toBe("Project");
+    } finally {
+      // Clean up - Remove from favorites and delete the test iTwin
+      await iTwinsAccessClient.removeITwinFromFavorites(accessToken, iTwinId!);
+      const deleteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.deleteItwin(accessToken, iTwinId!);
+      expect(deleteResponse.status).toBe(204);
+    }
   });
 
   it("should get a list of favorited asset iTwins", async () => {
-    // Act
-    const iTwinsResponse =
-      await iTwinsAccessClient.getFavoritesITwins(accessToken, {
-        subClass: "Asset",
-      });
+    /* CREATE THE ITWIN */
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM Asset iTwin Test ${new Date().toISOString()}`,
+      number: `APIM Asset iTwin Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      ianaTimeZone: "America/New_York",
+      status: "Trial",
+    };
 
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
-    iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinRepresentation) => {
-      expect(actualiTwin.class).toBe("Thing");
-      expect(actualiTwin.subClass).toBe("Asset");
-    });
+    // Act
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
+    const iTwinId = createResponse.data?.iTwin?.id;
+
+    try {
+      // Assert
+      expect(createResponse.status).toBe(201);
+      expect(createResponse.data?.iTwin?.displayName).toBe(newiTwin.displayName);
+      expect(createResponse.data?.iTwin?.class).toBe(newiTwin.class);
+      expect(createResponse.data?.iTwin?.subClass).toBe(newiTwin.subClass);
+
+      /* ADD ITWIN TO FAVORITES */
+      const addFavoriteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.addITwinToFavorites(accessToken, iTwinId);
+
+      expect(addFavoriteResponse.status).toBe(204);
+
+      /* VERIFY ITWIN IS IN FAVORITES */
+      const iTwinsResponse =
+        await iTwinsAccessClient.getFavoritesITwins(accessToken, {
+          subClass: "Asset",
+        });
+
+      // Assert
+      expect(iTwinsResponse.status).toBe(200);
+      expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+      const createdTwin = iTwinsResponse.data!.iTwins.find(twin => twin.id === iTwinId);
+      expect(createdTwin).toBeDefined();
+      expect(createdTwin?.class).toBe("Thing");
+      expect(createdTwin?.subClass).toBe("Asset");
+    } finally {
+      // Clean up - Remove from favorites and delete the test iTwin
+      await iTwinsAccessClient.removeITwinFromFavorites(accessToken, iTwinId!);
+      const deleteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.deleteItwin(accessToken, iTwinId!);
+      expect(deleteResponse.status).toBe(204);
+    }
   });
 
   it("should get a list of favorited project iTwins without subClass query", async () => {
-    // Act
-    const iTwinsResponse =
-      await iTwinsAccessClient.getFavoritesITwins(accessToken);
+    /* CREATE THE ITWIN */
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM iTwin No SubClass Test ${new Date().toISOString()}`,
+      number: `APIM iTwin No SubClass Number ${new Date().toISOString()}`,
+      type: "Portfolio",
+      subClass: "Project",
+      class: "Endeavor",
+      dataCenterLocation: "East US",
+      ianaTimeZone: "America/New_York",
+      status: "Trial",
+    };
 
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    // Act
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
+    const iTwinId = createResponse.data?.iTwin?.id;
+
+    try {
+      // Assert
+      expect(createResponse.status).toBe(201);
+      expect(createResponse.data?.iTwin?.displayName).toBe(newiTwin.displayName);
+      expect(createResponse.data?.iTwin?.class).toBe(newiTwin.class);
+      expect(createResponse.data?.iTwin?.subClass).toBe(newiTwin.subClass);
+
+      /* ADD ITWIN TO FAVORITES */
+      const addFavoriteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.addITwinToFavorites(accessToken, iTwinId);
+
+      expect(addFavoriteResponse.status).toBe(204);
+
+      /* VERIFY ITWIN IS IN FAVORITES */
+      const iTwinsResponse =
+        await iTwinsAccessClient.getFavoritesITwins(accessToken);
+
+      // Assert
+      expect(iTwinsResponse.status).toBe(200);
+      expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+      const createdTwin = iTwinsResponse.data?.iTwins!.find(twin => twin.id === iTwinId);
+      expect(createdTwin).toBeDefined();
+    } finally {
+      // Clean up - Remove from favorites and delete the test iTwin
+      await iTwinsAccessClient.removeITwinFromFavorites(accessToken, iTwinId!);
+      const deleteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.deleteItwin(accessToken, iTwinId!);
+      expect(deleteResponse.status).toBe(204);
+    }
   });
 
   it("should get more properties of favorited project iTwins in representation result mode", async () => {
+    /* CREATE THE ITWIN */
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM Representation Mode Test ${new Date().toISOString()}`,
+      number: `APIM Representation Mode Number ${new Date().toISOString()}`,
+      type: "Portfolio",
+      subClass: "Project",
+      class: "Endeavor",
+      dataCenterLocation: "East US",
+      ianaTimeZone: "America/New_York",
+      status: "Trial",
+    };
+
     // Act
-    const iTwinsResponse =
-      await iTwinsAccessClient.getFavoritesITwins(accessToken, {
-        subClass: "Project",
-        resultMode: "representation",
-      });
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
+    const iTwinId = createResponse.data?.iTwin?.id;
 
-    // Assert
-    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+    try {
+      // Assert
+      expect(createResponse.status).toBe(201);
+      expect(createResponse.data?.iTwin?.displayName).toBe(newiTwin.displayName);
+      expect(createResponse.data?.iTwin?.class).toBe(newiTwin.class);
+      expect(createResponse.data?.iTwin?.subClass).toBe(newiTwin.subClass);
 
-    iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinRepresentation) => {
-      expect(actualiTwin.parentId).toBeTypeOf("string");
-      expect(actualiTwin.iTwinAccountId).toBeTypeOf("string");
-      expect(actualiTwin.createdDateTime).toBeTypeOf("string");
-      expect(actualiTwin.createdBy).toBeTypeOf("string");
-    });
+      /* ADD ITWIN TO FAVORITES */
+      const addFavoriteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.addITwinToFavorites(accessToken, iTwinId);
+
+      expect(addFavoriteResponse.status).toBe(204);
+
+      /* VERIFY ITWIN IS IN FAVORITES WITH REPRESENTATION MODE */
+      const iTwinsResponse =
+        await iTwinsAccessClient.getFavoritesITwins(accessToken, {
+          subClass: "Project",
+          resultMode: "representation",
+        });
+
+      // Assert
+      expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+      const createdTwin = iTwinsResponse.data!.iTwins.find(twin => twin.id === iTwinId);
+      expect(createdTwin).toBeDefined();
+      expect(createdTwin?.parentId).toBeTypeOf("string");
+      expect(createdTwin?.iTwinAccountId).toBeTypeOf("string");
+      expect(createdTwin?.createdDateTime).toBeTypeOf("string");
+      expect(createdTwin?.createdBy).toBeTypeOf("string");
+    } finally {
+      // Clean up - Remove from favorites and delete the test iTwin
+      await iTwinsAccessClient.removeITwinFromFavorites(accessToken, iTwinId!);
+      const deleteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.deleteItwin(accessToken, iTwinId!);
+      expect(deleteResponse.status).toBe(204);
+    }
   });
 
   it("should get a list of favorited project iTwins using all query scope", async () => {
-    // Act
-    const iTwinsResponse =
-      await iTwinsAccessClient.getFavoritesITwins(accessToken, {
-        queryScope: "all",
-        subClass: "Project",
-      });
+    /* CREATE THE ITWIN */
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM All Query Scope Test ${new Date().toISOString()}`,
+      number: `APIM All Query Scope Number ${new Date().toISOString()}`,
+      type: "Portfolio",
+      subClass: "Project",
+      class: "Endeavor",
+      dataCenterLocation: "East US",
+      ianaTimeZone: "America/New_York",
+      status: "Trial",
+    };
 
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
-    iTwinsResponse.data!.iTwins.forEach((actualiTwin: ITwinRepresentation) => {
-      expect(actualiTwin.class).toBe("Endeavor");
-      expect(actualiTwin.subClass).toBe("Project");
-    });
+    // Act
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
+    const iTwinId = createResponse.data?.iTwin?.id;
+
+    try {
+      // Assert
+      expect(createResponse.status).toBe(201);
+      expect(createResponse.data?.iTwin?.displayName).toBe(newiTwin.displayName);
+      expect(createResponse.data?.iTwin?.class).toBe(newiTwin.class);
+      expect(createResponse.data?.iTwin?.subClass).toBe(newiTwin.subClass);
+
+      /* ADD ITWIN TO FAVORITES */
+      const addFavoriteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.addITwinToFavorites(accessToken, iTwinId);
+
+      expect(addFavoriteResponse.status).toBe(204);
+
+      /* VERIFY ITWIN IS IN FAVORITES WITH ALL QUERY SCOPE */
+      const iTwinsResponse =
+        await iTwinsAccessClient.getFavoritesITwins(accessToken, {
+          queryScope: "all",
+          subClass: "Project",
+        });
+
+      // Assert
+      expect(iTwinsResponse.status).toBe(200);
+      expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+      const createdTwin = iTwinsResponse.data!.iTwins.find(twin => twin.id === iTwinId);
+      expect(createdTwin).toBeDefined();
+      expect(createdTwin?.class).toBe("Endeavor");
+      expect(createdTwin?.subClass).toBe("Project");
+    } finally {
+      // Clean up - Remove from favorites and delete the test iTwin
+      await iTwinsAccessClient.removeITwinFromFavorites(accessToken, iTwinId!);
+      const deleteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.deleteItwin(accessToken, iTwinId!);
+      expect(deleteResponse.status).toBe(204);
+    }
   });
 
-  it("should get a list of favorited project iTwins using all query scope", async () => {
-    // Act
-    const iTwinsResponse =
-      await iTwinsAccessClient.getFavoritesITwins(accessToken, {
-        queryScope: "all",
-        subClass: "Project",
-      });
+  it("should get a list of favorited project iTwins using all query scope (second test)", async () => {
+    /* CREATE THE ITWIN */
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM All Query Scope Test 2 ${new Date().toISOString()}`,
+      number: `APIM All Query Scope Number 2 ${new Date().toISOString()}`,
+      type: "Portfolio",
+      subClass: "Project",
+      class: "Endeavor",
+      dataCenterLocation: "East US",
+      ianaTimeZone: "America/New_York",
+      status: "Trial",
+    };
 
-    // Assert
-    expect(iTwinsResponse.status).toBe(200);
-    expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
-    iTwinsResponse.data?.iTwins!.forEach((actualiTwin: ITwinRepresentation) => {
-      expect(actualiTwin.class).toBe("Endeavor");
-      expect(actualiTwin.subClass).toBe("Project");
-    });
+    // Act
+    const createResponse =
+      await iTwinsAccessClient.createITwin(accessToken, newiTwin);
+    const iTwinId = createResponse.data?.iTwin?.id;
+
+    try {
+      // Assert
+      expect(createResponse.status).toBe(201);
+      expect(createResponse.data?.iTwin?.displayName).toBe(newiTwin.displayName);
+      expect(createResponse.data?.iTwin?.class).toBe(newiTwin.class);
+      expect(createResponse.data?.iTwin?.subClass).toBe(newiTwin.subClass);
+
+      /* ADD ITWIN TO FAVORITES */
+      const addFavoriteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.addITwinToFavorites(accessToken, iTwinId);
+
+      expect(addFavoriteResponse.status).toBe(204);
+
+      /* VERIFY ITWIN IS IN FAVORITES WITH ALL QUERY SCOPE */
+      const iTwinsResponse =
+        await iTwinsAccessClient.getFavoritesITwins(accessToken, {
+          queryScope: "all",
+          subClass: "Project",
+        });
+
+      // Assert
+      expect(iTwinsResponse.status).toBe(200);
+      expect(iTwinsResponse.data?.iTwins).not.toHaveLength(0);
+      const createdTwin = iTwinsResponse.data?.iTwins!.find(twin => twin.id === iTwinId);
+      expect(createdTwin).toBeDefined();
+      expect(createdTwin?.class).toBe("Endeavor");
+      expect(createdTwin?.subClass).toBe("Project");
+    } finally {
+      // Clean up - Remove from favorites and delete the test iTwin
+      await iTwinsAccessClient.removeITwinFromFavorites(accessToken, iTwinId!);
+      const deleteResponse: BentleyAPIResponse<undefined> =
+        await iTwinsAccessClient.deleteItwin(accessToken, iTwinId!);
+      expect(deleteResponse.status).toBe(204);
+    }
   });
 
   it("should return 422 when top query option exceeds maximum allowed value", async () => {
