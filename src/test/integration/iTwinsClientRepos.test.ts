@@ -2693,4 +2693,248 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(iTwinDeleteResponse.data).toBeUndefined();
     }
   });
+
+  it("should successfully delete a repository resource", async () => {
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
+
+    const gisRepository: NewRepositoryConfig = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Resource Deletion",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      const repositoryResource = {
+        id: "test_resource_to_delete",
+        displayName: "Test Resource for Deletion",
+      };
+
+      // Create a repository resource
+      const createResourceResponse =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          repositoryResource
+        );
+      expect(createResourceResponse.status).toBe(201);
+      const resourceId = createResourceResponse.data?.resource!.id!;
+
+      // Verify resource exists
+      const getResourceResponse =
+        await iTwinsAccessClient.getRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          resourceId
+        );
+      expect(getResourceResponse.status).toBe(200);
+      expect(getResourceResponse.data?.resource).toBeDefined();
+
+      // Act - Delete the repository resource
+      const deleteResourceResponse =
+        await iTwinsAccessClient.deleteRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          resourceId
+        );
+
+      // Assert - Delete response
+      expect(deleteResourceResponse.status).toBe(204);
+      expect(deleteResourceResponse.data).toBeUndefined();
+
+      // Verify resource is deleted by trying to get it
+      const verifyDeleteResponse =
+        await iTwinsAccessClient.getRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          resourceId
+        );
+      expect(verifyDeleteResponse.status).toBe(404);
+      expect(verifyDeleteResponse.error?.code).toBe("iTwinRepositoryResourceNotFound");
+
+      // Cleanup repository
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to delete a repository resource that doesn't exist", async () => {
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
+
+    const gisRepository: NewRepositoryConfig = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      const someRandomResourceId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+      // Act - Try to delete a non-existent repository resource
+      const deleteResourceResponse =
+        await iTwinsAccessClient.deleteRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          someRandomResourceId
+        );
+
+      // Assert
+      expect(deleteResourceResponse.status).toBe(404);
+      expect(deleteResourceResponse.data).toBeUndefined();
+      expect(deleteResourceResponse.error).not.toBeUndefined();
+      expect(deleteResourceResponse.error!.code).toBe("iTwinRepositoryResourceNotFound");
+
+      // Cleanup repository
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to delete a repository resource from a repository that doesn't exist", async () => {
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
+
+    const someRandomRepositoryId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomResourceId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+    try {
+      // Act - Try to delete a repository resource from a non-existent repository
+      const deleteResourceResponse =
+        await iTwinsAccessClient.deleteRepositoryResource(
+          accessToken,
+          iTwinId,
+          someRandomRepositoryId,
+          someRandomResourceId
+        );
+
+      // Assert
+      expect(deleteResourceResponse.status).toBe(404);
+      expect(deleteResourceResponse.data).toBeUndefined();
+      expect(deleteResourceResponse.error).not.toBeUndefined();
+      expect(deleteResourceResponse.error!.code).toBe("iTwinRepositoryResourceNotFound");
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to delete a repository resource from an iTwin that doesn't exist", async () => {
+    // Arrange
+    const someRandomiTwinId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomRepositoryId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomResourceId = "bbf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+    // Act - Try to delete a repository resource from a non-existent iTwin
+    const deleteResourceResponse =
+      await iTwinsAccessClient.deleteRepositoryResource(
+        accessToken,
+        someRandomiTwinId,
+        someRandomRepositoryId,
+        someRandomResourceId
+      );
+
+    // Assert
+    expect(deleteResourceResponse.status).toBe(404);
+    expect(deleteResourceResponse.data).toBeUndefined();
+    expect(deleteResourceResponse.error).not.toBeUndefined();
+    expect(deleteResourceResponse.error!.code).toBe("iTwinRepositoryNotFound");
+  });
 });

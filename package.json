@@ -69,7 +69,7 @@
     "@itwin/build-tools": "^5.1.8",
     "@itwin/core-bentley": "^5.1.8",
     "@itwin/eslint-plugin": "^5.2.1",
-    "@itwin/oidc-signin-tool": "^5.0.1",
+    "@itwin/oidc-signin-tool": "^5.0.2",
     "@playwright/test": "1.48.2",
     "@types/node": "20.19.16",
     "@typescript-eslint/eslint-plugin": "^8.44.0",
@@ -87,7 +87,8 @@
   },
   "pnpm": {
     "overrides": {
-      "brace-expansion": "^1.1.12"
+      "brace-expansion": "^1.1.12",
+      "playwright": "^1.55.1"
     }
   }
 }
