@@ -1,5 +1,13 @@
 # Change Log - @itwin/itwins-client
 
+## 2.3.0
+
+### Minor Changes
+
+#### [2.3.0](https://www.npmjs.com/package/@itwin/itwins-client/v/2.3.0) - 2025-11-05
+
+API Method: Added deleteRepositoryResource() method to iTwinsClient class for deleting repository resources
+
 ## 2.2.0
 
 ### Minor Changes
