@@ -382,6 +382,30 @@ export class ITwinsClient extends BaseITwinsApiClient {
   }
 
   /**
+   * Delete a repository resource
+   * @param accessToken - The client access token string for authorization
+   * @param iTwinId - The id of the iTwin that contains the repository
+   * @param repositoryId - The id of the GeographicInformationSystem repository to add the resource to
+   * @param resourceId - The id repository resource to delete
+   * @returns Promise that resolves when the iTwin is successfully deleted
+   *
+   * @beta
+   */
+  public async deleteRepositoryResource(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    resourceId: string
+  ): Promise<BentleyAPIResponse<undefined>> {
+    const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}/resources/${resourceId}`;
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "DELETE",
+      url
+    );
+  }
+
+  /**
    * Get a specific repository resource by ID
    * @param accessToken - The client access token string for authorization
    * @param iTwinId - The id of the iTwin that contains the repository
