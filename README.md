@@ -11,7 +11,6 @@ A comprehensive TypeScript library for Bentley Systems' iTwins API, providing ty
 - [Basic Usage](#basic-usage)
 - [Documentation](#documentation)
 - [API Reference](#api-reference)
-- [Development](#️development)
 - [Contributing](#contributing)
 - [License](#license)
 
