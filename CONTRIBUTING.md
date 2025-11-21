@@ -1,70 +1,259 @@
-# Contributing
+# Contributing to iTwins Client
 
-This project accepts contributions from other teams at Bentley.
+We welcome contributions to the iTwins Client library! This guide will help you get started with contributing code, reporting issues, and understanding our development workflow.
 
 ## Table of Contents
 
-- [Creating Issues and Enhancements](#creating-issues-and-enhancements)
-    - [Writing Good Bug Reports and Feature Requests](#writing-good-bug-reports-and-feature-requests)
-    - [Final Checklist](#final-checklist)
-- [Pull Requests](#pull-requests)
-    - [Submitting Pull Requests](#submitting-pull-requests)
+- [Reporting Issues](#reporting-issues)
+- [Feature Requests](#feature-requests)
+- [Development Setup](#development-setup)
+- [Pull Request Process](#pull-request-process)
+- [Changesets & Versioning](#changesets--versioning)
+- [Code Standards](#code-standards)
 - [File Headers](#file-headers)
-- [Editor Config](#editor-config)
-    - [VS Code](#vs-code)
-    - [Visual Studio](#visual-studio)
 
-## Creating Issues and Enhancements
+## Reporting Issues
 
-Have you identified a reproducible problem in this code? Have a feature requests? Please enter a Bug or Product Backlog Item, but first make sure that you search the work items to make sure that it has not been entered yet. If you find your issue already exists, make relevant comments.
+Before creating a new issue, please search existing issues to avoid duplicates.
 
-All work in this repository and every pull request must have a linked work item.
+### What to Include
 
-### Writing Good Bug Reports and Feature Requests
+Please provide the following information:
 
-File a single issue per problem and feature request. Do not enumerate multiple bugs or feature requests in the same issue.
+- **Version**: Which version of `@itwin/itwins-client` you're using
+- **Environment**: Node.js version, operating system, browser (if applicable)
+- **Steps to Reproduce**: Clear, numbered steps that reproduce the issue
+- **Expected Behavior**: What you expected to happen
+- **Actual Behavior**: What actually happened
+- **Code Sample**: Minimal code that demonstrates the issue
+- **Error Messages**: Full error messages and stack traces
 
-Do not add your issue as a comment to an existing issue unless it's for the identical input. Many issues look similar, but have different causes.
+### Issue Template
 
-The more information you can provide, the more likely someone will be successful at reproducing the issue and finding a fix.
+```markdown
+## Description
+Brief description of the issue
 
-Please include the following with each issue:
+## Version Information
+- `@itwin/itwins-client` version: x.x.x
+- Node.js version: x.x.x
+- Operating System: Windows/macOS/Linux
 
-* Version of the code
-* Your operating system
-* Reproducible steps (1... 2... 3...) that cause the issue
-* What you expected to see, versus what you actually saw
-* Images, animations, or a link to a video showing the issue occurring
-* A code snippet that demonstrates the issue or a link to a code repository the developers can easily pull down to recreate the issue locally
+## Steps to Reproduce
+1. ...
+2. ...
+3. ...
 
-### Final Checklist
+## Expected Behavior
+What should happen
 
-Please remember to do the following:
+## Actual Behavior
+What actually happens
 
-* [ ] Search work items to ensure your report is a new issue
-* [ ] Simplify your code around the issue to better isolate the problem
+## Code Sample
+```typescript
+// Minimal code that reproduces the issue
+```
 
-## Pull Requests
+## Error Messages
 
-We follow a [feature branch and pull request workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow) to ensure that all code changes in this repository are code reviewed and all tests pass. This means that there will be a number of reviewers that formally review and sign off for changes. Reviewers should check for redundancy, optimization, stylization, and standardization in each changeset. While we will try to keep this repository as collaborative and open-source as possible, it must also be reliable.
+```text
+Paste any error messages here
+```
 
-Every change must be tested with proper unit tests. Integration tests are highly encouraged in libraries with critical workflows to ensure end-to-end consistency.
+## Feature Requests
 
-### Submitting Pull Requests
+We welcome feature requests! Please:
 
-- **DO** ensure you have added unit tests for your changes.
-- **DO** run all unit tests before you submit your pull request.
-- **DO** link the pull request to a Work Item.
-- **DO** ensure submissions pass all Continuous Integration and are merge conflict free.
-- **DO** follow the [.editorconfig](http://editorconfig.org/) settings for each directory.
-- **DON'T** submit large code formatting changes without discussing with the team first.
-- **DON'T** surprise us with big pull requests. Instead, file an issue and start a discussion so we can agree on a direction before you invest a large amount of time.
-- **DON'T** fix merge conflicts using a merge commit. Prefer `git rebase`.
-- **DON'T** mix independent, unrelated changes in one PR.
+1. **Check existing issues** for similar requests
+2. **Describe the use case** - what problem does this solve?
+3. **Provide examples** of how the API should work
+4. **Consider backwards compatibility** and breaking changes
 
-If you are unfamiliar with creating pull requests, please read [PULL_REQUESTS.md](PULL_REQUESTS.md).
+## Development Setup
 
-These two blogs posts on contributing code to open source projects are good too: [Open Source Contribution Etiquette](http://tirania.org/blog/archive/2010/Dec-31.html) by Miguel de Icaza and [Don’t “Push” Your Pull Requests](https://www.igvita.com/2011/12/19/dont-push-your-pull-requests/) by Ilya Grigorik.
+### Prerequisites
+
+- Node.js 18+
+- pnpm package manager
+- Git
+
+### Getting Started
+
+```bash
+# Clone the repository
+git clone https://github.com/iTwin/itwins-client.git
+cd itwins-client
+
+# Install dependencies
+pnpm install
+
+# Build the project
+pnpm build
+
+# Run tests
+pnpm test
+```
+
+For detailed setup instructions, see [GETTINGSTARTED.md](./GETTINGSTARTED.md).
+
+## Pull Request Process
+
+We follow a feature branch workflow with comprehensive code review.
+
+### Before You Start
+
+1. **Create an issue** to discuss significant changes
+2. **Check existing PRs** to avoid duplicate work
+3. **Review our coding standards** below
+
+### Creating a Pull Request
+
+1. **Fork and clone** the repository
+2. **Create a feature branch** from `main`
+3. **Make your changes** following our coding standards
+4. **Add tests** for new functionality
+5. **Update documentation** if needed
+6. **Add a changeset** (see below)
+7. **Submit a pull request**
+
+### Pull Request Checklist
+
+- [ ] ✅ **Tests pass**: All existing and new tests pass
+- [ ] 🧪 **Tests added**: New functionality includes comprehensive tests
+- [ ] 📝 **Changeset added**: Version bump and changelog entry created
+- [ ] 📚 **Documentation updated**: README, examples, or API docs updated if needed
+- [ ] 🎯 **Single concern**: PR addresses one feature or bug
+- [ ] 🔗 **Linked to issue**: PR references related GitHub issue
+- [ ] 🚀 **No breaking changes**: Or clearly documented with migration path
+
+### Review Process
+
+- All PRs require review from maintainers
+- Automated tests must pass
+- Code quality and standards are verified
+- Documentation completeness is checked
+
+## Changesets & Versioning
+
+This project uses [Changesets](https://github.com/changesets/changesets) to manage package versioning and changelog generation. **Every PR that affects the public API or user experience must include a changeset.**
+
+### When to Add a Changeset
+
+Add a changeset for:
+
+- ✅ **New features** - API additions, new methods, new options
+- ✅ **Bug fixes** - Fixes that affect user experience
+- ✅ **Breaking changes** - API removals, signature changes, behavior changes
+- ✅ **Performance improvements** - Notable performance enhancements
+
+### When to Use `--empty`
+
+Use `pnpm changeset --empty` for:
+
+- 🚫 **Documentation only** - README updates, code comments, examples
+- 🚫 **Internal refactoring** - Code reorganization without API changes
+- 🚫 **Build/tooling changes** - CI updates, dev dependencies, build scripts
+- 🚫 **Tests only** - Adding tests without changing implementation
+
+### Creating a Changeset
+
+```bash
+# Add a changeset for your changes
+pnpm changeset
+
+# For documentation-only changes
+pnpm changeset --empty
+```
+
+Follow the prompts to:
+
+1. **Select affected packages** (usually just `@itwin/itwins-client`)
+2. **Choose version bump type**:
+   - **patch** (1.0.x) - Bug fixes, minor improvements
+   - **minor** (1.x.0) - New features, backwards compatible
+   - **major** (x.0.0) - Breaking changes
+3. **Write a clear summary** of the change
+
+### Changeset Examples
+
+#### New Feature (Minor)
+
+```bash
+$ pnpm changeset
+🦋  What kind of change is this for @itwin/itwins-client? › minor
+🦋  Please enter a summary for this change (this will be in the changelog).
+🦋    (submit empty line to open external editor)
+🦋  Summary › Add support for iTwin export filtering by date range
+
+🦋  === Summary of changesets ===
+🦋  minor:  @itwin/itwins-client
+🦋
+🦋      Add support for iTwin export filtering by date range
+🦋
+🦋  Is this correct? › Yes
+```
+
+#### Bug Fix (Patch)
+
+```bash
+$ pnpm changeset
+🦋  What kind of change is this for @itwin/itwins-client? › patch
+🦋  Summary › Fix repository deletion not handling 404 responses gracefully
+```
+
+#### Breaking Change (Major)
+
+```bash
+$ pnpm changeset
+🦋  What kind of change is this for @itwin/itwins-client? › major
+🦋  Summary › Remove deprecated createItwin method, use createITwin instead
+```
+
+#### Documentation Only (Empty)
+
+```bash
+$ pnpm changeset --empty
+🦋  Summary › Update README with new authentication examples
+```
+
+### Changeset File Format
+
+Changesets create files in `.changeset/` directory:
+
+```markdown
+---
+"@itwin/itwins-client": minor
+---
+
+Add support for iTwin export filtering by date range
+
+New optional parameters `startDate` and `endDate` allow filtering exports by creation time:
+
+```typescript
+const exports = await client.getITwinExports(accessToken, iTwinId, {
+  startDate: "2024-01-01",
+  endDate: "2024-12-31"
+});
+```
+
+This enhancement improves performance for large iTwins with many historical exports.
+
+### Release Process
+
+1. **Changesets accumulate** in `.changeset/` directory
+2. **Release PR created automatically** by Changesets GitHub Action
+3. **Review release PR** for version bumps and changelog accuracy
+4. **Merge release PR** to trigger automated publishing
+5. **New version published** to npm automatically
+
+## Code Standards
+
+This project maintains high code quality standards through:
+
+- **TypeScript**: Strict type checking enabled
+- **ESLint**: Code quality and style enforcement
+- **Prettier**: Consistent code formatting
 
 ## File Headers
 
@@ -76,15 +265,3 @@ The following file headers are used in this project. Please use it for new files
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 ```
-
-## Editor Config
-
-This project uses an `.editorconfig` file to maintain a consistent style standard (braces, tabs, etc.) across all files in the solution. For more information or to find extensions for code editors other than VS Code and Visual Studio, see the [EditorConfig](https://editorconfig.org/) website.
-
-### VS Code
-
-Download the [EditorConfig for VSCode](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig) to override your user/workspace settings with settings found in this repository's `.editorconfig` files.
-
-### Visual Studio
-
-Visual Studio 2017 and newer comes with EditorConfig support built in. Older versions of Visual Studio will need to install the [EditorConfig extension](https://marketplace.visualstudio.com/items?itemName=EditorConfigTeam.EditorConfig).
