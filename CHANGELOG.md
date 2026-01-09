@@ -1,5 +1,13 @@
 # Change Log - @itwin/itwins-client
 
+## 2.4.0
+
+### Minor Changes
+
+#### [2.4.0](https://www.npmjs.com/package/@itwin/itwins-client/v/2.4.0) - 2026-01-09
+
+Added new repo class "SensorData" to string union for repo classes
+
 ## 2.3.0
 
 ### Minor Changes
