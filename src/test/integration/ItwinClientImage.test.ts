@@ -22,7 +22,7 @@ describe("iTwinsClient Image Functionality", () => {
 
   beforeEach(async () => {
     // Add small delay between tests to respect API rate limits
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 100));
   });
 
   it("should return 404 when trying to upload image to non-existent iTwin", async () => {
