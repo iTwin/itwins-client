@@ -3,7 +3,7 @@
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 import type { AccessToken } from "@itwin/core-bentley";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
 import type { ITwinExportSingleResponse } from "../../types/ITwinExport";
 import { TestConfig } from "../TestConfig";
@@ -16,6 +16,11 @@ describe("iTwinsClient Export Functionality", () => {
   beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
   }, 120000);
+
+  beforeEach(async () => {
+    // Add small delay between tests to respect API rate limits
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  });
 
   // only have one success case,
   // A user can only have one Queued or InProgress export job at a time.

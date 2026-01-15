@@ -3,7 +3,7 @@
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 import type { AccessToken } from "@itwin/core-bentley";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
 import type { BentleyAPIResponse } from "../../types/CommonApiTypes";
 import type { ItwinCreate } from "../../types/ITwin";
@@ -16,6 +16,11 @@ describe("iTwinsClient Favorites Functionality", () => {
   beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
   }, 120000);
+
+  beforeEach(async () => {
+    // Add small delay between tests to respect API rate limits
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  });
 
   it("should get a list of favorited project iTwins", async () => {
     /* CREATE THE ITWIN */

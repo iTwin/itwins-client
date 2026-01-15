@@ -543,6 +543,198 @@ async function advancedQuery(): Promise<void> {
 }
 ```
 
+### Get Resource Graphics (Technical Preview ⚠️)
+
+> **⚠️ Technical Preview:** The Resource Graphics API is currently in Technical Preview status. Features and interfaces may change in future releases.
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  ResourceGraphicsResponse,
+  ResourceGraphics,
+  GraphicsAuthentication,
+} from "@itwin/itwins-client";
+
+/** Function that demonstrates retrieving and using graphics metadata for a repository resource. */
+async function getResourceGraphics(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+  const iTwinId = "your-itwin-id";
+  const repositoryId = "your-repository-id";
+  const resourceId = "your-resource-id";
+
+  // Retrieve graphics metadata for a repository resource
+  const graphicsResponse: BentleyAPIResponse<ResourceGraphicsResponse> =
+    await client.getResourceGraphics(
+      accessToken,
+      iTwinId,
+      repositoryId,
+      resourceId
+    );
+
+  // Check for errors
+  if (graphicsResponse.error) {
+    console.error("Error fetching graphics:", graphicsResponse.error.message);
+    return;
+  }
+
+  const graphics: ResourceGraphics[] = graphicsResponse.data!.graphics;
+
+  // Process each graphics resource
+  for (const graphic of graphics) {
+    console.log(`\nGraphics Type: ${graphic.type}`);
+    console.log(`URI: ${graphic.uri}`);
+
+    // Handle authentication based on type
+    if (graphic.authentication) {
+      const auth: GraphicsAuthentication = graphic.authentication;
+
+      switch (auth.type) {
+        case "Header":
+        case "QueryParameter":
+          // API Key authentication - add to headers or query parameters
+          console.log(`Authentication: ${auth.type}`);
+          console.log(`Key: ${auth.key}`);
+          // In practice, you would add this to your HTTP request:
+          // headers[auth.key] = auth.value; (for Header type)
+          // or append to URL: url += `?${auth.key}=${auth.value}` (for QueryParameter)
+          break;
+
+        case "Basic":
+          // Basic authentication - encode credentials
+          console.log(`Authentication: Basic`);
+          console.log(`Username: ${auth.username}`);
+          // In practice, encode and add to headers:
+          // const credentials = btoa(`${auth.username}:${auth.password}`);
+          // headers['Authorization'] = `Basic ${credentials}`;
+          break;
+
+        case "OAuth2AuthorizationCodePKCE":
+          // OAuth2 PKCE flow - use provided endpoints
+          console.log(`Authentication: OAuth2 Authorization Code with PKCE`);
+          console.log(`Client ID: ${auth.clientId}`);
+          console.log(`Authorization Endpoint: ${auth.authorizationEndpoint}`);
+          console.log(`Token Endpoint: ${auth.tokenEndpoint}`);
+          console.log(`Redirect URI: ${auth.redirectUri}`);
+          console.log(`Scopes: ${auth.scopes}`);
+          // In practice, implement OAuth2 PKCE flow using these endpoints
+          break;
+      }
+    }
+
+    // Handle CesiumJS provider configuration
+    if (graphic.provider) {
+      console.log(`\nCesiumJS Provider: ${graphic.provider.name}`);
+      const options = graphic.provider.options;
+      console.log(`Tiling Scheme: ${options.tilingScheme}`);
+      console.log(`Bounds: [${options.bounds.join(", ")}]`);
+      console.log(`Credit: ${options.credit}`);
+
+      // Example: Use with CesiumJS UrlTemplateImageryProvider
+      // const imageryProvider = new Cesium.UrlTemplateImageryProvider({
+      //   url: graphic.uri,
+      //   credit: options.credit,
+      //   rectangle: Cesium.Rectangle.fromDegrees(
+      //     options.bounds[0], // west
+      //     options.bounds[1], // south
+      //     options.bounds[2], // east
+      //     options.bounds[3]  // north
+      //   ),
+      // });
+    }
+  }
+}
+```
+
+### Complete Graphics Example with CesiumJS Integration
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  ResourceGraphicsResponse,
+  ResourceGraphics,
+} from "@itwin/itwins-client";
+
+/** Function that demonstrates full integration with CesiumJS for imagery. */
+async function integrateWithCesiumJS(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+  const iTwinId = "your-itwin-id";
+  const repositoryId = "your-repository-id";
+  const resourceId = "your-resource-id";
+
+  // Get graphics metadata
+  const response: BentleyAPIResponse<ResourceGraphicsResponse> =
+    await client.getResourceGraphics(
+      accessToken,
+      iTwinId,
+      repositoryId,
+      resourceId
+    );
+
+  if (response.error) {
+    console.error("Failed to fetch graphics:", response.error.message);
+    return;
+  }
+
+  const graphics: ResourceGraphics[] = response.data!.graphics;
+
+  // Find imagery graphics with CesiumJS provider configuration
+  const imageryGraphic = graphics.find(
+    (g) => g.type === "IMAGERY" && g.provider !== undefined
+  );
+
+  if (!imageryGraphic || !imageryGraphic.provider) {
+    console.log("No imagery with CesiumJS provider configuration found");
+    return;
+  }
+
+  // Prepare authentication headers if needed
+  const headers: Record<string, string> = {};
+  if (imageryGraphic.authentication) {
+    const auth = imageryGraphic.authentication;
+    if (auth.type === "Header") {
+      headers[auth.key] = auth.value;
+    } else if (auth.type === "Basic") {
+      const credentials = btoa(`${auth.username}:${auth.password}`);
+      headers["Authorization"] = `Basic ${credentials}`;
+    }
+  }
+
+  // Extract CesiumJS configuration
+  const provider = imageryGraphic.provider;
+  const bounds = provider.options.bounds;
+
+  console.log("CesiumJS Imagery Configuration:");
+  console.log(`URL Template: ${imageryGraphic.uri}`);
+  console.log(`Provider: ${provider.name}`);
+  console.log(`Tiling Scheme: ${provider.options.tilingScheme}`);
+  console.log(`Geographic Bounds: [${bounds.join(", ")}]`);
+  console.log(`Credit: ${provider.options.credit}`);
+
+  // Example: Create CesiumJS imagery provider
+  // const imageryProvider = new Cesium.UrlTemplateImageryProvider({
+  //   url: imageryGraphic.uri,
+  //   credit: provider.options.credit,
+  //   rectangle: Cesium.Rectangle.fromDegrees(
+  //     bounds[0], // west
+  //     bounds[1], // south
+  //     bounds[2], // east
+  //     bounds[3]  // north
+  //   ),
+  //   // Add authentication headers if needed
+  //   headers: headers,
+  // });
+  //
+  // // Add to Cesium viewer
+  // viewer.imageryLayers.addImageryProvider(imageryProvider);
+}
+```
+
 ## Export Operations
 
 ### Get All Exports for User

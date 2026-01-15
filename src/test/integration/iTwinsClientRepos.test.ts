@@ -2937,4 +2937,134 @@ describe("iTwins Client - Repository Integration Tests", () => {
     expect(deleteResourceResponse.error).not.toBeUndefined();
     expect(deleteResourceResponse.error!.code).toBe("iTwinRepositoryNotFound");
   });
+
+  it("should get a 404 not found when trying to get graphics for a non-existent resource", async () => {
+    // Arrange
+    const someRandomiTwinId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomRepositoryId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomResourceId = "bbf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+    // Act
+    const graphicsResponse = await iTwinsAccessClient.getResourceGraphics(
+      accessToken,
+      someRandomiTwinId,
+      someRandomRepositoryId,
+      someRandomResourceId
+    );
+
+    // Assert
+    expect(graphicsResponse.status).toBe(404);
+    expect(graphicsResponse.data).toBeUndefined();
+    expect(graphicsResponse.error).not.toBeUndefined();
+    expect(graphicsResponse.error!.code).toBe("iTwinNotFound");
+  });
+
+      // Positive test - Currently commented out because it requires a repository resource with graphics capability
+    // The graphics endpoint is only available for certain resource types (e.g., RealityData, CesiumCuratedContent)
+    // Uncomment this test when you have a test environment with a resource that supports graphics
+    // TODO, implement this test once we have a suitable repository resource available to create
+    //
+    // it("should successfully get graphics for a repository resource", async () => {
+    //   // Arrange
+    //   const newiTwin: ItwinCreate = {
+    //     displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+    //     number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+    //     type: "Bridge",
+    //     subClass: "Asset",
+    //     class: "Thing",
+    //     dataCenterLocation: "East US",
+    //     status: "Trial",
+    //   };
+    //   const iTwinResponse = await iTwinsAccessClient.createITwin(
+    //     accessToken,
+    //     newiTwin
+    //   );
+    //   const iTwinId = iTwinResponse.data?.iTwin?.id!;
+    //
+    //   // Note: You would need a repository type that actually supports graphics
+    //   // For example, a CesiumCuratedContent or RealityData repository
+    //   const gisRepository: NewRepositoryConfig = {
+    //     class: "GeographicInformationSystem",
+    //     subClass: "WebMapService",
+    //     uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+    //     displayName: "Test GIS Repository for Graphics",
+    //   };
+    //
+    //   try {
+    //     // Create repository
+    //     const createRepositoryResponse =
+    //       await iTwinsAccessClient.createRepository(
+    //         accessToken,
+    //         iTwinId,
+    //         gisRepository
+    //       );
+    //     expect(createRepositoryResponse.status).toBe(201);
+    //     const repositoryId = createRepositoryResponse.data?.repository!.id!;
+    //
+    //     // Create a repository resource
+    //     const repositoryResource = {
+    //       id: "graphics_test_resource",
+    //       displayName: "Graphics Test Resource",
+    //     };
+    //
+    //     const createResourceResponse =
+    //       await iTwinsAccessClient.createRepositoryResource(
+    //         accessToken,
+    //         iTwinId,
+    //         repositoryId,
+    //         repositoryResource
+    //       );
+    //     expect(createResourceResponse.status).toBe(201);
+    //     const resourceId = createResourceResponse.data?.resource!.id!;
+    //
+    //     // Act - Get graphics for the repository resource
+    //     const graphicsResponse = await iTwinsAccessClient.getResourceGraphics(
+    //       accessToken,
+    //       iTwinId,
+    //       repositoryId,
+    //       resourceId
+    //     );
+    //
+    //     // Assert
+    //     expect(graphicsResponse.status).toBe(200);
+    //     expect(graphicsResponse.data).not.toBeUndefined();
+    //     expect(graphicsResponse.data!.graphics).toBeInstanceOf(Array);
+    //     expect(graphicsResponse.data!.graphics.length).toBeGreaterThan(0);
+    //
+    //     // Verify first graphic has required properties
+    //     const graphic = graphicsResponse.data!.graphics[0];
+    //     expect(graphic.type).toBeDefined();
+    //     expect(graphic.uri).toBeDefined();
+    //     expect(graphic.uri).toMatch(/^https:\/\//);
+    //
+    //     // If authentication is present, verify it has the correct structure
+    //     if (graphic.authentication) {
+    //       expect(graphic.authentication.type).toBeDefined();
+    //       expect(["Header", "QueryParameter", "Basic", "OAuth2AuthorizationCodePKCE"]).toContain(graphic.authentication.type);
+    //     }
+    //
+    //     // If provider is present, verify it has the correct structure
+    //     if (graphic.provider) {
+    //       expect(graphic.provider.name).toBeDefined();
+    //       expect(graphic.provider.options).toBeDefined();
+    //     }
+    //
+    //     // Cleanup repository (this will also cleanup the resource)
+    //     const repositoryDeleteResponse =
+    //       await iTwinsAccessClient.deleteRepository(
+    //         accessToken,
+    //         iTwinId,
+    //         repositoryId
+    //       );
+    //     expect(repositoryDeleteResponse.status).toBe(204);
+    //   } finally {
+    //     // Cleanup
+    //     const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
+    //       accessToken,
+    //       iTwinId
+    //     );
+    //     expect(iTwinDeleteResponse.status).toBe(204);
+    //     expect(iTwinDeleteResponse.data).toBeUndefined();
+    //   }
+    // });
 });

@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import type { AccessToken } from "@itwin/core-bentley";;
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
 import type { BentleyAPIResponse } from "../../types/CommonApiTypes";
 import type { ItwinCreate, ITwinMinimal, ITwinRepresentation, ITwinRepresentationResponse, ITwinSubClass } from "../../types/ITwin";
@@ -27,6 +27,11 @@ describe("iTwinsClient", () => {
   beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
   }, 120000);
+
+  beforeEach(async () => {
+    // Add small delay between tests to respect API rate limits
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  });
 
   it("should get a list of project iTwins with custom url", async () => {
     // Act

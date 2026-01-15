@@ -8,7 +8,7 @@ import { readFileSync } from "fs";
 import { resolve } from "path";
 import type { BentleyAPIResponse } from "../../types/CommonApiTypes";
 import type { ITwinImageResponse } from "../../types/ITwinImage";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
 import { TestConfig } from "../TestConfig";
 
@@ -19,6 +19,11 @@ describe("iTwinsClient Image Functionality", () => {
   beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
   }, 120000);
+
+  beforeEach(async () => {
+    // Add small delay between tests to respect API rate limits
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  });
 
   it("should return 404 when trying to upload image to non-existent iTwin", async () => {
     // Arrange - Use a random GUID that doesn't exist

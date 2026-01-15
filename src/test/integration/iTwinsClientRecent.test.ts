@@ -6,7 +6,7 @@
 import type { AccessToken } from "@itwin/core-bentley";
 import { BentleyAPIResponse } from "src/types/CommonApiTypes";
 import type { ITwinRepresentation } from "src/types/ITwin";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
 import { TestConfig } from "../TestConfig";
 
@@ -24,6 +24,11 @@ describe("iTwinsClient Recently Used Functionality", () => {
   beforeAll(async () => {
     accessToken = await TestConfig.getAccessToken();
   }, 120000);
+
+  beforeEach(async () => {
+    // Add small delay between tests to respect API rate limits
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  });
 
   it("should get a list of recently used iTwins", async () => {
     // Act
