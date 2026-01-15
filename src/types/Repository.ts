@@ -82,6 +82,7 @@ export type RepositoryClass =
   | "Subsurface"
   | "GeospatialFeatures"
   | "CesiumCuratedContent"
+  | "SensorData"
   | "PdfPlansets"
   | "IndexedMedia";
 

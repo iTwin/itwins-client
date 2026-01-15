@@ -1,6 +1,6 @@
 {
   "name": "@itwin/itwins-client",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "iTwins client for the iTwin platform",
   "main": "./lib/cjs/itwins-client.js",
   "module": "./lib/esm/itwins-client.js",
@@ -89,7 +89,9 @@
     "overrides": {
       "brace-expansion": "^1.1.12",
       "playwright": "^1.55.1",
-      "glob": "^10.5.0"
+      "glob": "^10.5.0",
+      "jws": "^3.2.3",
+      "qs": "^6.14.1"
     }
   }
 }
