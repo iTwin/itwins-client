@@ -64,6 +64,11 @@ export interface RepositoryCapabilities {
     /** A uri containing the endpoint that will return the list of resources in the repository. */
     uri: string;
   };
+  /** Graphics capabilities, available for repositories that support visualization content */
+  graphics?: {
+    /** A uri containing the endpoint that will return graphics metadata for repository resources. */
+    uri: string;
+  };
 }
 
 /**
@@ -213,3 +218,133 @@ export interface NewRepositoryConfig
     displayName?: string;
     class: CreatableRepositoryClass;
   }
+
+/**
+ * Graphics content type specifying the format of visualization data.
+ * @beta
+ */
+export type GraphicsContentType =
+  | "3DTILES"
+  | "GLTF"
+  | "IMAGERY"
+  | "TERRAIN"
+  | "KML"
+  | "CZML"
+  | "GEOJSON"
+  | "OAPIF+GEOJSON"
+  | "POINT_CLOUD"
+  | "MESH"
+  | "VECTOR_TILES"
+  | "WMS";
+
+/**
+ * This value determines how to process the authentication information returned from the API.
+ * @beta
+ */
+export type ITwinRepositoryAuthenticationType =
+  | "Header"
+  | "QueryParameter"
+  | "Basic"
+  | "OAuth2AuthorizationCodePKCE";
+
+/**
+ * Contains the information needed to authenticate to the specified API using an api key.
+ * @beta
+ */
+export interface ApiKeyAuthentication {
+  /** Type of authentication mechanism */
+  type: "Header" | "QueryParameter";
+  /** The key to use for Header or QueryParameter auth types */
+  key: string;
+  /** The value to use for Header or QueryParameter auth types */
+  value: string;
+}
+
+/**
+ * Contains the information needed to authenticate to the specified API using Basic authentication.
+ * @beta
+ */
+export interface BasicAuthentication {
+  /** Type of authentication mechanism */
+  type: "Basic";
+  /** The username to use for Basic auth type */
+  username: string;
+  /** The password to use for Basic auth type */
+  password: string;
+}
+
+/**
+ * Contains the information needed to authenticate to the specified API using OAuth2 authentication.
+ * @beta
+ */
+export interface OAuth2AuthCodePKCEAuthentication {
+  /** Type of authentication mechanism */
+  type: "OAuth2AuthorizationCodePKCE";
+  /** The OAuth2 client identifier registered with the authorization server */
+  clientId: string;
+  /** A space-separated list of permissions (scopes) your app is requesting */
+  scopes: string;
+  /** The URL where the user is redirected to start the OAuth2 authorization process */
+  authorizationEndpoint: string;
+  /** The URL used to exchange the authorization code for access and refresh tokens */
+  tokenEndpoint: string;
+  /** The URI where the authorization server will redirect the user after authorization is complete */
+  redirectUri: string;
+}
+
+/**
+ * Authentication configuration for graphics resource access.
+ * Discriminated union based on the authentication type.
+ * @beta
+ */
+export type GraphicsAuthentication =
+  | ApiKeyAuthentication
+  | BasicAuthentication
+  | OAuth2AuthCodePKCEAuthentication;
+
+/**
+ * Configuration options for CesiumJS provider integration.
+ * @beta
+ */
+export interface GraphicsProviderOptions {
+  /** The tiling scheme used (e.g., 'WebMercatorTilingScheme'). */
+  tilingScheme: string;
+  /** Geographic bounds as [west, south, east, north] in degrees */
+  bounds: [number, number, number, number];
+  /** Attribution or credit for the imagery provider */
+  credit: string;
+}
+
+/**
+ * Graphics provider configuration combining content type and options.
+ * @beta
+ */
+export interface GraphicsProvider {
+  /** The name of the provider. Currently only UrlTemplateImageryProvider is supported. More will be added as needed. */
+  name: string;
+  /** Additional options for the provider */
+  options: GraphicsProviderOptions;
+}
+
+/**
+ * Graphics resource metadata including URIs and authentication.
+ * @beta
+ */
+export interface ResourceGraphics {
+  type: GraphicsContentType;
+  /** A uri containing the location of the graphics content. This value can be cached but be aware that it might change over time. Some might contain a SAS key that expires after some time. */
+  uri: string;
+  /** Some repositories require authentication. If authentication details are provided, inspect the authentication.type property to determine the required method. You may need to add an Api Key (header or query parameter), use basic authentication, or implement OAuth2 authorization code flow. */
+  authentication?: GraphicsAuthentication;
+  /** Optional CesiumJS provider configuration */
+  provider?: GraphicsProvider;
+}
+
+/**
+ * Response interface for retrieving resource graphics metadata.
+ * @beta
+ */
+export interface ResourceGraphicsResponse {
+  /** Graphics resource metadata and access configuration */
+  graphics: ResourceGraphics[];
+}

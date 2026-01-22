@@ -41,6 +41,7 @@ import type {
   NewRepositoryConfig,
   PostRepositoryResourceResponse,
   Repository,
+  ResourceGraphicsResponse,
   SingleRepositoryResponse,
 } from "./types/Repository";
 
@@ -405,8 +406,33 @@ export class ITwinsClient extends BaseITwinsApiClient {
     );
   }
 
+  /* eslint-disable @itwin/require-version-in-deprecation */
   /**
    * Get a specific repository resource by ID
+   * @deprecated 3.00 - Use getRepositoryResourceByUri to support federated repository architecture.
+   * Migration example:
+   * ```typescript
+   * // Old way (deprecated)
+   * const resource = await client.getRepositoryResource(
+   *   token,
+   *   iTwinId,
+   *   repositoryId,
+   *   resourceId,
+   *   "representation"
+   * );
+   *
+   * // New way (recommended)
+   * const repo = await client.getRepository(token, iTwinId, repositoryId);
+   * const resourcesUri = repo.data?.repository.capabilities?.resources?.uri;
+   * if (resourcesUri) {
+   *   const resource = await client.getRepositoryResourceByUri(
+   *     token,
+   *     `${resourcesUri}/${resourceId}`,
+   *     "representation"
+   *   );
+   * }
+   * ```
+   *
    * @param accessToken - The client access token string for authorization
    * @param iTwinId - The id of the iTwin that contains the repository
    * @param repositoryId - The id of the repository containing the resource
@@ -448,8 +474,34 @@ export class ITwinsClient extends BaseITwinsApiClient {
     );
   }
 
+  /* eslint-disable @itwin/require-version-in-deprecation */
   /**
    * Get multiple repository resources with optional filtering and pagination
+   * @deprecated 3.00 - Use getRepositoryResourcesByUri to support federated repository architecture.
+   * Migration example:
+   * ```typescript
+   * // Old way (deprecated)
+   * const resources = await client.getRepositoryResources(
+   *   token,
+   *   iTwinId,
+   *   repositoryId,
+   *   { search: "test", top: 10 },
+   *   "representation"
+   * );
+   *
+   * // New way (recommended)
+   * const repo = await client.getRepository(token, iTwinId, repositoryId);
+   * const resourcesUri = repo.data?.repository.capabilities?.resources?.uri;
+   * if (resourcesUri) {
+   *   const resources = await client.getRepositoryResourcesByUri(
+   *     token,
+   *     resourcesUri,
+   *     { search: "test", top: 10 },
+   *     "representation"
+   *   );
+   * }
+   * ```
+   *
    * @param accessToken - The client access token string for authorization
    * @param iTwinId - The id of the iTwin that contains the repository
    * @param repositoryId - The id of the repository containing the resources
@@ -494,6 +546,152 @@ export class ITwinsClient extends BaseITwinsApiClient {
       undefined,
       headers
     );
+  }
+
+  /**
+   * Get a list of resources from a repository using a capability URI
+   *
+   * This method enables direct calls to federated repository endpoints using URIs from
+   * repository capabilities.
+   *
+   * @param accessToken - The client access token string for authorization
+   * @param uri - The capability URI from repository.capabilities.resources.uri
+   * @param args - Optional OData query parameters for filtering and pagination
+   * @param resultMode - Optional result mode controlling the level of detail returned (minimal or representation)
+   * @returns Promise that resolves with the list of repository resources in the requested format
+   * @example
+   * ```typescript
+   * // Get repository with capabilities
+   * const repo = await client.getRepository(token, iTwinId, repositoryId);
+   *
+   * // Extract capability URI
+   * const resourcesUri = repo.data?.repository.capabilities?.resources?.uri;
+   *
+   * if (resourcesUri) {
+   *   // Returns GetMultiRepositoryResourceMinimalResponse
+   *   const minimal = await client.getRepositoryResourcesByUri(token, resourcesUri, undefined, "minimal");
+   *
+   *   // Returns GetMultiRepositoryResourceRepresentationResponse
+   *   const detailed = await client.getRepositoryResourcesByUri(token, resourcesUri, undefined, "representation");
+   *
+   *   // Defaults to minimal when no resultMode specified
+   *   const defaultResult = await client.getRepositoryResourcesByUri(token, resourcesUri);
+   * }
+   * ```
+   * @beta
+   */
+  public async getRepositoryResourcesByUri<T extends ResultMode = "minimal">(
+    accessToken: AccessToken,
+    uri: string,
+    args?: Pick<ODataQueryParams, "search" | "skip" | "top">,
+    resultMode?: T
+  ): Promise<
+    BentleyAPIResponse<T extends "representation"
+      ? GetMultiRepositoryResourceRepresentationResponse
+      : GetMultiRepositoryResourceMinimalResponse>
+  > {
+    const headers = this.getResultModeHeaders(resultMode);
+    const urlWithQuery = args
+      ? `${uri}?${this.getQueryStringArg(ITwinsClient.ODataParamMapping, args)}`
+      : uri;
+
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      urlWithQuery,
+      undefined,
+      headers
+    );
+  }
+
+  /**
+   * Get a specific resource from a repository using a capability URI
+   *
+   * This method enables direct calls to federated repository endpoints using URIs from
+   * repository capabilities.
+   *
+   * @param accessToken - The client access token string for authorization
+   * @param uri - The capability URI from repository.capabilities.resources.uri for a specific resource
+   * @param resultMode - Optional result mode controlling the level of detail returned (minimal or representation)
+   * @returns Promise that resolves with the repository resource details in the requested format
+   * @example
+   * ```typescript
+   * // Get repository with capabilities
+   * const repo = await client.getRepository(token, iTwinId, repositoryId);
+   *
+   * // Construct resource URI (typically from a previous query or known resource ID)
+   * const baseUri = repo.data?.repository.capabilities?.resources?.uri;
+   * const resourceUri = `${baseUri}/resourceId`;
+   *
+   * if (resourceUri) {
+   *   // Returns GetRepositoryResourceMinimalResponse
+   *   const minimal = await client.getRepositoryResourceByUri(token, resourceUri, "minimal");
+   *
+   *   // Returns GetRepositoryResourceRepresentationResponse
+   *   const detailed = await client.getRepositoryResourceByUri(token, resourceUri, "representation");
+   *
+   *   // Defaults to minimal when no resultMode specified
+   *   const defaultResult = await client.getRepositoryResourceByUri(token, resourceUri);
+   * }
+   * ```
+   * @beta
+   */
+  public async getRepositoryResourceByUri<T extends ResultMode = "minimal">(
+    accessToken: AccessToken,
+    uri: string,
+    resultMode?: T
+  ): Promise<
+    BentleyAPIResponse<T extends "representation"
+      ? GetRepositoryResourceRepresentationResponse
+      : GetRepositoryResourceMinimalResponse>
+  > {
+    const headers = this.getResultModeHeaders(resultMode);
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      uri,
+      undefined,
+      headers
+    );
+  }
+
+  /**
+   * Get graphics metadata for a repository resource using a capability URI
+   *
+   * This method enables direct calls to federated graphics endpoints using URIs from
+   * resource capabilities. Instead of constructing URLs from iTwinId, repositoryId, and
+   * resourceId, it accepts the URI directly from capabilities.graphics.uri.
+   *
+   * Note: This method requires that the resource supports graphics capabilities and that
+   * the access token has appropriate permissions for the target graphics service.
+   *
+   * @param accessToken - The client access token string for authorization
+   * @param uri - The capability URI from resource.capabilities.graphics.uri
+   * @returns Promise that resolves with the graphics metadata including authentication and provider information
+   * @example
+   * ```typescript
+   * // Get resource with graphics capability
+   * const resource = await client.getRepositoryResource(token, iTwinId, repositoryId, resourceId);
+   *
+   * // Extract graphics capability URI
+   * const graphicsUri = resource.data?.resource.capabilities?.graphics?.uri;
+   *
+   * if (graphicsUri) {
+   *   const graphics = await client.getResourceGraphicsByUri(token, graphicsUri);
+   *
+   *   if (graphics.data) {
+   *     console.log('Graphics content type:', graphics.data.graphics.contentType);
+   *     console.log('Graphics URI:', graphics.data.graphics.uri);
+   *   }
+   * }
+   * ```
+   * @beta
+   */
+  public async getResourceGraphicsByUri(
+    accessToken: AccessToken,
+    uri: string
+  ): Promise<BentleyAPIResponse<ResourceGraphicsResponse>> {
+    return this.sendGenericAPIRequest(accessToken, "GET", uri);
   }
 
   /** Get a specific iTwin by ID
