@@ -3,7 +3,6 @@
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-/* eslint-disable @typescript-eslint/no-deprecated */
 import type { AccessToken } from "@itwin/core-bentley";
 import type { ItwinCreate  } from "../../types/ITwin";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";

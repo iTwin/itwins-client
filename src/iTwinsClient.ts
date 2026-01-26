@@ -626,7 +626,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * and CesiumJS provider configuration when applicable. This method supports redirect-based routing to
    * federated graphics services.
    *
-   * For federated architecture support, consider using {@link getResourceGraphicsByUri} with the URI
+   * For federated architecture support, consider using getResourceGraphicsByUri with the URI
    * from resource.capabilities.graphics.uri instead.
    *
    * @param accessToken - The client access token string for authorization

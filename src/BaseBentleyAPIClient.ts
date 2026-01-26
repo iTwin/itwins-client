@@ -87,7 +87,7 @@ export abstract class BaseBentleyAPIClient {
             },
           };
         }
-        return this.handleRedirect<TResponse, TData>(
+        return await this.handleRedirect<TResponse, TData>(
           response,
           accessToken,
           method,
@@ -97,7 +97,7 @@ export abstract class BaseBentleyAPIClient {
       }
 
       // Process non-redirect response
-      return this.processResponse<TResponse>(response);
+      return await this.processResponse<TResponse>(response);
     } catch {
       return this.createInternalServerError();
     }
@@ -209,7 +209,7 @@ export abstract class BaseBentleyAPIClient {
 
       // Handle subsequent 302 redirects
       if (response.status === 302) {
-        return this.handleRedirect<TResponse, TData>(
+        return await this.handleRedirect<TResponse, TData>(
           response,
           accessToken,
           method,
@@ -220,7 +220,7 @@ export abstract class BaseBentleyAPIClient {
       }
 
       // Process final response
-      return this.processResponse<TResponse>(response);
+      return await this.processResponse<TResponse>(response);
     } catch {
       return this.createInternalServerError();
     }
