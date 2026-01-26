@@ -33,6 +33,7 @@ import type {
   NewRepositoryConfig,
   PostRepositoryResourceResponse,
   Repository,
+  ResourceGraphicsResponse,
   SingleRepositoryResponse,
 } from "./types/Repository";
 import type { ParameterMapping } from "./types/typeUtils";
@@ -282,7 +283,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     accessToken: AccessToken,
     iTwinId: string,
     repositoryId: string,
-    repository: Omit<Repository, "id" | "class" | "subClass">
+    repository: Partial<Omit<Repository, "id" | "class" | "subClass" | "capabilities">>
   ): Promise<BentleyAPIResponse<SingleRepositoryResponse>>;
 
   /** Create a repository resource for a repository of class GeographicInformationSystem */
@@ -292,6 +293,14 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     repositoryId: string,
     repositoryResource: Pick<Repository, "id" | "displayName">
   ): Promise<BentleyAPIResponse<PostRepositoryResourceResponse>>;
+
+  /** Delete a repository resource from a repository */
+  public abstract deleteRepositoryResource(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    resourceId: string
+  ): Promise<BentleyAPIResponse<undefined>>;
 
   /** Get a repository resource for a repository */
   public abstract getRepositoryResource<T extends ResultMode = "minimal">(
@@ -318,6 +327,43 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
       ? GetMultiRepositoryResourceRepresentationResponse
       : GetMultiRepositoryResourceMinimalResponse>
   >;
+
+  /** Get a list of resources from a repository using a capability URI */
+  public abstract getRepositoryResourcesByUri<T extends ResultMode = "minimal">(
+    accessToken: AccessToken,
+    uri: string,
+    args?: Pick<ODataQueryParams, "search" | "skip" | "top">,
+    resultMode?: T
+  ): Promise<
+    BentleyAPIResponse<T extends "representation"
+      ? GetMultiRepositoryResourceRepresentationResponse
+      : GetMultiRepositoryResourceMinimalResponse>
+  >;
+
+  /** Get a specific resource from a repository using a capability URI */
+  public abstract getRepositoryResourceByUri<T extends ResultMode = "minimal">(
+    accessToken: AccessToken,
+    uri: string,
+    resultMode?: T
+  ): Promise<
+    BentleyAPIResponse<T extends "representation"
+      ? GetRepositoryResourceRepresentationResponse
+      : GetRepositoryResourceMinimalResponse>
+  >;
+
+  /** Get graphics metadata for a repository resource using ID-based parameters */
+  public abstract getResourceGraphics(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    resourceId: string
+  ): Promise<BentleyAPIResponse<ResourceGraphicsResponse>>;
+
+  /** Get graphics metadata for a repository resource using a capability URI */
+  public abstract getResourceGraphicsByUri(
+    accessToken: AccessToken,
+    uri: string
+  ): Promise<BentleyAPIResponse<ResourceGraphicsResponse>>;
 
   /** Get image for iTwin  */
   public abstract getITwinImage(
