@@ -406,32 +406,11 @@ export class ITwinsClient extends BaseITwinsApiClient {
     );
   }
 
-  /* eslint-disable @itwin/require-version-in-deprecation */
   /**
    * Get a specific repository resource by ID
-   * @deprecated 3.00 - Use getRepositoryResourceByUri to support federated repository architecture.
-   * Migration example:
-   * ```typescript
-   * // Old way (deprecated)
-   * const resource = await client.getRepositoryResource(
-   *   token,
-   *   iTwinId,
-   *   repositoryId,
-   *   resourceId,
-   *   "representation"
-   * );
    *
-   * // New way (recommended)
-   * const repo = await client.getRepository(token, iTwinId, repositoryId);
-   * const resourcesUri = repo.data?.repository.capabilities?.resources?.uri;
-   * if (resourcesUri) {
-   *   const resource = await client.getRepositoryResourceByUri(
-   *     token,
-   *     `${resourcesUri}/${resourceId}`,
-   *     "representation"
-   *   );
-   * }
-   * ```
+   * Automatically follows 302 redirects to federated repository endpoints when the repository
+   * uses a federated architecture. Authentication headers are forwarded transparently.
    *
    * @param accessToken - The client access token string for authorization
    * @param iTwinId - The id of the iTwin that contains the repository
@@ -470,37 +449,16 @@ export class ITwinsClient extends BaseITwinsApiClient {
       "GET",
       url,
       undefined,
-      headers
+      headers,
+      true
     );
   }
 
-  /* eslint-disable @itwin/require-version-in-deprecation */
   /**
    * Get multiple repository resources with optional filtering and pagination
-   * @deprecated 3.00 - Use getRepositoryResourcesByUri to support federated repository architecture.
-   * Migration example:
-   * ```typescript
-   * // Old way (deprecated)
-   * const resources = await client.getRepositoryResources(
-   *   token,
-   *   iTwinId,
-   *   repositoryId,
-   *   { search: "test", top: 10 },
-   *   "representation"
-   * );
    *
-   * // New way (recommended)
-   * const repo = await client.getRepository(token, iTwinId, repositoryId);
-   * const resourcesUri = repo.data?.repository.capabilities?.resources?.uri;
-   * if (resourcesUri) {
-   *   const resources = await client.getRepositoryResourcesByUri(
-   *     token,
-   *     resourcesUri,
-   *     { search: "test", top: 10 },
-   *     "representation"
-   *   );
-   * }
-   * ```
+   * Automatically follows 302 redirects to federated repository endpoints when the repository
+   * uses a federated architecture. Authentication headers are forwarded transparently.
    *
    * @param accessToken - The client access token string for authorization
    * @param iTwinId - The id of the iTwin that contains the repository
@@ -544,7 +502,8 @@ export class ITwinsClient extends BaseITwinsApiClient {
       "GET",
       url,
       undefined,
-      headers
+      headers,
+      true
     );
   }
 
