@@ -3,7 +3,6 @@
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-deprecated */
 /* eslint-disable @typescript-eslint/dot-notation */
 import type { AccessToken } from "@itwin/core-bentley";
 import type { ItwinCreate } from "../../types/ITwin";
@@ -509,7 +508,7 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
   });
 
   describe("Backward Compatibility", () => {
-    it("should verify deprecated getRepositoryResource method still works", async () => {
+    it("should verify getRepositoryResource method still works", async () => {
       // Arrange
       const newiTwin: ItwinCreate = {
         displayName: `Compat Test iTwin ${new Date().toISOString()}`,
@@ -544,7 +543,7 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
           displayName: "Backward Compat Test Resource",
         });
 
-        // Act - Use deprecated method (should still work)
+        // Act
         const resourceResponse = await client.getRepositoryResource(
           accessToken,
           iTwinId,
@@ -552,7 +551,7 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
           resourceId
         );
 
-        // Assert - Deprecated method still functions correctly
+        // Assert
         expect(resourceResponse.status).toBe(200);
         expect(resourceResponse.data).toBeDefined();
         expect(resourceResponse.data?.resource.id).toBe(resourceId);
@@ -562,7 +561,7 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
       }
     });
 
-    it("should verify deprecated getRepositoryResources method still works", async () => {
+    it("should verify getRepositoryResources method still works", async () => {
       // Arrange
       const newiTwin: ItwinCreate = {
         displayName: `Compat Test iTwin ${new Date().toISOString()}`,
@@ -591,14 +590,14 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
         );
         const repositoryId = repoResponse.data!.repository.id!;
 
-        // Act - Use deprecated method (should still work)
+        // Act
         const resourcesResponse = await client.getRepositoryResources(
           accessToken,
           iTwinId,
           repositoryId
         );
 
-        // Assert - Deprecated method still functions correctly
+        // Assert
         expect(resourcesResponse.status).toBe(200);
         expect(resourcesResponse.data).toBeDefined();
         expect(Array.isArray(resourcesResponse.data?.resources)).toBe(true);
@@ -610,7 +609,7 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
   });
 
   describe("Migration Pattern", () => {
-    it("should demonstrate complete migration from deprecated to URI-based methods", async () => {
+    it("should demonstrate complete migration from old to URI-based methods", async () => {
       // Arrange
       const newiTwin: ItwinCreate = {
         displayName: `Migration Test iTwin ${new Date().toISOString()}`,
@@ -645,7 +644,7 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
           displayName: "Migration Test Resource",
         });
 
-        // Step 1: Old way (deprecated)
+        // Step 1:
         const oldWayResponse = await client.getRepositoryResource(
           accessToken,
           iTwinId,
@@ -717,7 +716,7 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
         );
         const repositoryId = repoResponse.data!.repository.id!;
 
-        // Step 1: Old way (deprecated)
+        // Step 1
         const oldWayResponse = await client.getRepositoryResources(
           accessToken,
           iTwinId,

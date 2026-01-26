@@ -559,7 +559,8 @@ export class ITwinsClient extends BaseITwinsApiClient {
       "GET",
       urlWithQuery,
       undefined,
-      headers
+      headers,
+      true
     );
   }
 
@@ -610,7 +611,8 @@ export class ITwinsClient extends BaseITwinsApiClient {
       "GET",
       uri,
       undefined,
-      headers
+      headers,
+      true
     );
   }
 
@@ -720,7 +722,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
     accessToken: AccessToken,
     uri: string
   ): Promise<BentleyAPIResponse<ResourceGraphicsResponse>> {
-    return this.sendGenericAPIRequest(accessToken, "GET", uri);
+    return this.sendGenericAPIRequest(accessToken, "GET", uri, undefined, undefined, true);
   }
 
   /** Get a specific iTwin by ID

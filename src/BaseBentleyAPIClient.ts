@@ -110,7 +110,7 @@ export abstract class BaseBentleyAPIClient {
    * @param accessToken - The client access token
    * @param method - The HTTP method
    * @param data - Optional request payload
-   * @param headers - Optional request headers
+   * @param headers - Optional request headers (will be forwarded to redirect)
    * @param redirectCount - Current redirect depth
    * @returns Promise that resolves to the final API response
    */
@@ -160,14 +160,13 @@ export abstract class BaseBentleyAPIClient {
       };
     }
 
-    // Extract authentication headers and follow redirect
-    const authHeaders = this.extractRedirectAuthHeaders(response);
+    // Forward original headers (including authentication) to redirect target
     return this.followRedirect<TResponse, TData>(
       accessToken,
       method,
       redirectUrl,
       data,
-      { ...headers, ...authHeaders },
+      headers,
       redirectCount + 1
     );
   }
@@ -180,7 +179,7 @@ export abstract class BaseBentleyAPIClient {
    * @param method - The HTTP method
    * @param url - The redirect target URL
    * @param data - Optional request payload
-   * @param headers - Merged request headers (original + extracted auth)
+   * @param headers - Original request headers (forwarded to redirect target)
    * @param redirectCount - Current redirect depth
    * @returns Promise that resolves to the final API response
    */
@@ -335,58 +334,6 @@ export abstract class BaseBentleyAPIClient {
     }
 
     return true;
-  }
-
-  /**
-   * Extracts authentication headers from a 302 redirect response.
-   *
-   * This method parses the response headers from a redirect and extracts common
-   * authentication headers that should be forwarded to the redirect target URL.
-   * This is essential for federated architecture where the redirect target may
-   * require the same authentication credentials.
-   *
-   * @param response - The fetch Response object from a 302 redirect
-   * @returns Record of authentication headers with lowercase keys, or empty object if none found
-   *
-   * @remarks
-   * Extracted headers include:
-   * - `authorization`: OAuth2 bearer tokens
-   * - `x-api-key`: API key authentication
-   * - `x-auth-token`: Custom authentication tokens
-   * - `api-key`: Alternative API key header format
-   *
-   * All header names are normalized to lowercase for consistency. This prevents
-   * header duplication and ensures compatibility across different server implementations.
-   *
-   * @example
-   * ```typescript
-   * const response = await fetch(url, { redirect: 'manual' });
-   * if (response.status === 302) {
-   *   const authHeaders = this.extractRedirectAuthHeaders(response);
-   *   // authHeaders might be: { authorization: 'Bearer token123', 'x-api-key': 'key456' }
-   * }
-   * ```
-   */
-  private extractRedirectAuthHeaders(response: Response): Record<string, string> {
-    const authHeaders: Record<string, string> = {};
-
-    // List of authentication header names to extract (case-insensitive)
-    const authHeaderNames = [
-      'authorization',
-      'x-api-key',
-      'x-auth-token',
-      'api-key'
-    ];
-
-    // Iterate through response headers and extract auth headers
-    response.headers.forEach((value, key) => {
-      const lowerKey = key.toLowerCase();
-      if (authHeaderNames.includes(lowerKey)) {
-        authHeaders[lowerKey] = value;
-      }
-    });
-
-    return authHeaders;
   }
 
   /**
