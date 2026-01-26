@@ -2942,4 +2942,248 @@ describe("iTwins Client - Repository Integration Tests", () => {
     expect(deleteResourceResponse.error).not.toBeUndefined();
     expect(deleteResourceResponse.error!.code).toBe("iTwinRepositoryNotFound");
   });
+
+  it("should handle resource graphics request (may return 404 if graphics capability unavailable)", async () => {
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
+
+    const gisRepository: NewRepositoryConfig = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository for Graphics",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      const repositoryResource = {
+        id: "test_graphics_resource",
+        displayName: "Test Graphics Resource",
+      };
+
+      // Create a repository resource
+      const createResourceResponse =
+        await iTwinsAccessClient.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          repositoryResource
+        );
+      expect(createResourceResponse.status).toBe(201);
+      const resourceId = createResourceResponse.data?.resource!.id!;
+
+      // Act - Get resource graphics (may not be available for all resources)
+      const graphicsResponse = await iTwinsAccessClient.getResourceGraphics(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        resourceId
+      );
+
+      // Assert - Accept either 200 (graphics available) or 404 (graphics not available)
+      expect([200, 404]).toContain(graphicsResponse.status);
+
+      if (graphicsResponse.status === 200) {
+        // If graphics are available, validate the response structure
+        expect(graphicsResponse.data?.graphics).toBeDefined();
+        expect(Array.isArray(graphicsResponse.data!.graphics)).toBe(true);
+
+        // If graphics array is not empty, validate the structure
+        if (graphicsResponse.data!.graphics.length > 0) {
+          const graphic = graphicsResponse.data!.graphics[0];
+          expect(graphic.uri).toBeDefined();
+          expect(typeof graphic.uri).toBe("string");
+          expect(graphic.type).toBeDefined();
+
+          // Validate authentication if present
+          if (graphic.authentication) {
+            expect(graphic.authentication.type).toBeDefined();
+            // Authentication type should be one of the supported types
+            expect(["apiKey", "basic", "oauth2AuthCodePKCE"]).toContain(
+              graphic.authentication.type
+            );
+          }
+        }
+      } else {
+        // If graphics are not available (404), verify error structure
+        expect(graphicsResponse.data).toBeUndefined();
+        expect(graphicsResponse.error).not.toBeUndefined();
+        // Error code may vary depending on API implementation
+        expect(graphicsResponse.error!.code).toBeDefined();
+      }
+
+      // Cleanup repository (this will also cleanup the resource)
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to get graphics for a resource that doesn't exist", async () => {
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
+
+    const gisRepository: NewRepositoryConfig = {
+      class: "GeographicInformationSystem",
+      subClass: "WebMapService",
+      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      displayName: "Test GIS Repository",
+    };
+
+    try {
+      // Create a GIS repository first
+      const createRepositoryResponse =
+        await iTwinsAccessClient.createRepository(
+          accessToken,
+          iTwinId,
+          gisRepository
+        );
+      expect(createRepositoryResponse.status).toBe(201);
+      const repositoryId = createRepositoryResponse.data?.repository!.id!;
+
+      const someRandomResourceId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+      // Act - Try to get graphics for a non-existent resource
+      const graphicsResponse = await iTwinsAccessClient.getResourceGraphics(
+        accessToken,
+        iTwinId,
+        repositoryId,
+        someRandomResourceId
+      );
+
+      // Assert
+      expect(graphicsResponse.status).toBe(404);
+      expect(graphicsResponse.data).toBeUndefined();
+      expect(graphicsResponse.error).not.toBeUndefined();
+
+      // Cleanup repository
+      const repositoryDeleteResponse =
+        await iTwinsAccessClient.deleteRepository(
+          accessToken,
+          iTwinId,
+          repositoryId
+        );
+      expect(repositoryDeleteResponse.status).toBe(204);
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to get graphics from a repository that doesn't exist", async () => {
+    // Arrange
+    const newiTwin: ItwinCreate = {
+      displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
+      number: `APIM iTwin Test Number ${new Date().toISOString()}`,
+      type: "Bridge",
+      subClass: "Asset",
+      class: "Thing",
+      dataCenterLocation: "East US",
+      status: "Trial",
+    };
+    const iTwinResponse = await iTwinsAccessClient.createITwin(
+      accessToken,
+      newiTwin
+    );
+    const iTwinId = iTwinResponse.data?.iTwin?.id!;
+
+    const someRandomRepositoryId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomResourceId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+    try {
+      // Act - Try to get graphics from a non-existent repository
+      const graphicsResponse = await iTwinsAccessClient.getResourceGraphics(
+        accessToken,
+        iTwinId,
+        someRandomRepositoryId,
+        someRandomResourceId
+      );
+
+      // Assert
+      expect(graphicsResponse.status).toBe(404);
+      expect(graphicsResponse.data).toBeUndefined();
+      expect(graphicsResponse.error).not.toBeUndefined();
+    } finally {
+      // Cleanup
+      const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
+        accessToken,
+        iTwinId
+      );
+      expect(iTwinDeleteResponse.status).toBe(204);
+      expect(iTwinDeleteResponse.data).toBeUndefined();
+    }
+  });
+
+  it("should get a 404 not found when trying to get graphics from an iTwin that doesn't exist", async () => {
+    // Arrange
+    const someRandomiTwinId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomRepositoryId = "aaf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+    const someRandomResourceId = "bbf3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+
+    // Act - Try to get graphics from a non-existent iTwin
+    const graphicsResponse = await iTwinsAccessClient.getResourceGraphics(
+      accessToken,
+      someRandomiTwinId,
+      someRandomRepositoryId,
+      someRandomResourceId
+    );
+
+    // Assert
+    expect(graphicsResponse.status).toBe(404);
+    expect(graphicsResponse.data).toBeUndefined();
+    expect(graphicsResponse.error).not.toBeUndefined();
+    expect(graphicsResponse.error!.code).toBe("iTwinNotFound");
+  });
 });

@@ -614,6 +614,76 @@ export class ITwinsClient extends BaseITwinsApiClient {
     );
   }
 
+
+  /**
+   * Retrieves graphics metadata for a specific repository resource using ID-based parameters.
+   *
+   *
+   * Returns graphics content URIs and authentication information needed to access visualization data
+   * for a resource. The response includes content type, access URI, optional authentication credentials,
+   * and CesiumJS provider configuration when applicable. This method supports redirect-based routing to
+   * federated graphics services.
+   *
+   * For federated architecture support, consider using {@link getResourceGraphicsByUri} with the URI
+   * from resource.capabilities.graphics.uri instead.
+   *
+   * @param accessToken - The client access token string for authorization
+   * @param iTwinId - The iTwin identifier
+   * @param repositoryId - The repository identifier
+   * @param resourceId - The resource identifier
+   * @returns Promise that resolves with graphics metadata including content type, URI, and authentication
+   * @example
+   * ```typescript
+   * // Get graphics for a specific resource
+   * const graphics = await client.getResourceGraphics(
+   *   token,
+   *   'itwin-id',
+   *   'imodels',
+   *   'imodel-resource-id'
+   * );
+   *
+   * if (graphics.data) {
+   *   graphics.data.graphics.forEach(graphic => {
+   *     console.log('Content type:', graphic.type);
+   *     console.log('Graphics URI:', graphic.uri);
+   *
+   *     // Handle authentication if present
+   *     if (graphic.authentication) {
+   *       switch (graphic.authentication.type) {
+   *         case 'Header':
+   *         case 'QueryParameter':
+   *           console.log('Auth key:', graphic.authentication.key);
+   *           break;
+   *         case 'Basic':
+   *           console.log('Username:', graphic.authentication.username);
+   *           break;
+   *         case 'OAuth2AuthorizationCodePKCE':
+   *           console.log('Client ID:', graphic.authentication.clientId);
+   *           break;
+   *       }
+   *     }
+   *   });
+   * }
+   * ```
+   * @beta
+   */
+  public async getResourceGraphics(
+    accessToken: AccessToken,
+    iTwinId: string,
+    repositoryId: string,
+    resourceId: string
+  ): Promise<BentleyAPIResponse<ResourceGraphicsResponse>> {
+    const url = `${this._baseUrl}/${iTwinId}/repositories/${repositoryId}/resources/${resourceId}/graphics`;
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      undefined,
+      true
+    );
+  }
+
   /**
    * Get graphics metadata for a repository resource using a capability URI
    *
