@@ -805,8 +805,10 @@ describe("iTwins Client - Repository Integration Tests", () => {
       // Verify authentication is returned
       expect(retrievedRepository.authentication).toBeDefined();
       expect(retrievedRepository.authentication!.type).toBe("Header");
-      expect(retrievedRepository.authentication!.key).toBe("X-Api-Key");
-      expect(retrievedRepository.authentication!.value).toBe("mySecretApiKey");
+      if (retrievedRepository.authentication && (retrievedRepository.authentication.type === "Header" || retrievedRepository.authentication.type === "QueryParameter")) {
+        expect(retrievedRepository.authentication.key).toBe("X-Api-Key");
+        expect(retrievedRepository.authentication.value).toBe("mySecretApiKey");
+      }
 
       // Verify options are returned
       expect(retrievedRepository.options).toBeDefined();
@@ -1169,8 +1171,10 @@ describe("iTwins Client - Repository Integration Tests", () => {
       // Verify updated authentication
       expect(updatedRepo.authentication).toBeDefined();
       expect(updatedRepo.authentication!.type).toBe("QueryParameter");
-      expect(updatedRepo.authentication!.key).toBe("apikey");
-      expect(updatedRepo.authentication!.value).toBe("newUpdatedApiKey");
+      if (updatedRepo.authentication && (updatedRepo.authentication.type === "Header" || updatedRepo.authentication.type === "QueryParameter")) {
+        expect(updatedRepo.authentication.key).toBe("apikey");
+        expect(updatedRepo.authentication.value).toBe("newUpdatedApiKey");
+      }
 
       // Verify updated options
       expect(updatedRepo.options).toBeDefined();

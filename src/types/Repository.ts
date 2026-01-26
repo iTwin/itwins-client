@@ -29,17 +29,13 @@ export interface Repository {
 }
 
 /**
- * Authentication configuration for repository access
+ * Authentication configuration for repository access.
+ * Supports multiple authentication mechanisms via discriminated union.
+ * Use the 'type' field to determine which authentication method to use.
+ * See GraphicsAuthentication for the same types used in graphics contexts.
  * @beta
  */
-export interface RepositoryAuthentication {
-  /** Type of authentication method to use */
-  type: "Header" | "QueryParameter";
-  /** The key/name for the authentication parameter */
-  key: string;
-  /** The value for the authentication parameter */
-  value: string;
-}
+export type RepositoryAuthentication = GraphicsAuthentication;
 
 /**
  * Repository-specific options and configuration parameters.
@@ -80,7 +76,6 @@ export type RepositoryClass =
   | "iModels"
   | "Storage"
   | "Forms"
-  | "Issues"
   | "RealityData"
   | "GeographicInformationSystem"
   | "Construction"
@@ -101,6 +96,7 @@ export type RepositorySubClass =
   | "WebMapTileService"
   | "ArcGIS"
   | "UrlTemplate"
+  | "OgcApiFeatures"
   | "EvoWorkspace"
   | "Performance";
 
