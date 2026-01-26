@@ -94,6 +94,7 @@ export type RepositoryClass =
 export type RepositorySubClass =
   | "WebMapService"
   | "WebMapTileService"
+  | "WebFeatureService"
   | "ArcGIS"
   | "UrlTemplate"
   | "OgcApiFeatures"
