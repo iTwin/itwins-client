@@ -3020,7 +3020,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
           if (graphic.authentication) {
             expect(graphic.authentication.type).toBeDefined();
             // Authentication type should be one of the supported types
-            expect(["apiKey", "basic", "oauth2AuthCodePKCE"]).toContain(
+            expect(["Header", "QueryParameter", "Basic"]).toContain(
               graphic.authentication.type
             );
           }

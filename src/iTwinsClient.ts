@@ -659,9 +659,6 @@ export class ITwinsClient extends BaseITwinsApiClient {
    *         case 'Basic':
    *           console.log('Username:', graphic.authentication.username);
    *           break;
-   *         case 'OAuth2AuthorizationCodePKCE':
-   *           console.log('Client ID:', graphic.authentication.clientId);
-   *           break;
    *       }
    *     }
    *   });

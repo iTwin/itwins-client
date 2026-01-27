@@ -241,8 +241,7 @@ export type GraphicsContentType =
 export type ITwinRepositoryAuthenticationType =
   | "Header"
   | "QueryParameter"
-  | "Basic"
-  | "OAuth2AuthorizationCodePKCE";
+  | "Basic";
 
 /**
  * Contains the information needed to authenticate to the specified API using an api key.
@@ -271,33 +270,13 @@ export interface BasicAuthentication {
 }
 
 /**
- * Contains the information needed to authenticate to the specified API using OAuth2 authentication.
- * @beta
- */
-export interface OAuth2AuthCodePKCEAuthentication {
-  /** Type of authentication mechanism */
-  type: "OAuth2AuthorizationCodePKCE";
-  /** The OAuth2 client identifier registered with the authorization server */
-  clientId: string;
-  /** A space-separated list of permissions (scopes) your app is requesting */
-  scopes: string;
-  /** The URL where the user is redirected to start the OAuth2 authorization process */
-  authorizationEndpoint: string;
-  /** The URL used to exchange the authorization code for access and refresh tokens */
-  tokenEndpoint: string;
-  /** The URI where the authorization server will redirect the user after authorization is complete */
-  redirectUri: string;
-}
-
-/**
  * Authentication configuration for graphics resource access.
  * Discriminated union based on the authentication type.
  * @beta
  */
 export type GraphicsAuthentication =
   | ApiKeyAuthentication
-  | BasicAuthentication
-  | OAuth2AuthCodePKCEAuthentication;
+  | BasicAuthentication;
 
 /**
  * Configuration options for CesiumJS provider integration.
@@ -331,7 +310,7 @@ export interface ResourceGraphics {
   type: GraphicsContentType;
   /** A uri containing the location of the graphics content. This value can be cached but be aware that it might change over time. Some might contain a SAS key that expires after some time. */
   uri: string;
-  /** Some repositories require authentication. If authentication details are provided, inspect the authentication.type property to determine the required method. You may need to add an Api Key (header or query parameter), use basic authentication, or implement OAuth2 authorization code flow. */
+  /** Some repositories require authentication. If authentication details are provided, inspect the authentication.type property to determine the required method. You may need to add an Api Key (header or query parameter) or use basic authentication. */
   authentication?: GraphicsAuthentication;
   /** Optional CesiumJS provider configuration */
   provider?: GraphicsProvider;
