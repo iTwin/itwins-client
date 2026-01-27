@@ -139,7 +139,7 @@ describe("CommonApiTypes - Type Definitions", () => {
       expect(error.details![1].target).toBe("displayName");
     });
 
-    it("should support deeply nested error details", () => {
+    it("should support multiple levels of error details", () => {
       const error: ApimError = {
         code: "ComplexError",
         message: "Complex validation failure",
@@ -147,34 +147,37 @@ describe("CommonApiTypes - Type Definitions", () => {
           {
             code: "NestedError",
             message: "Nested validation failed",
-            target: "repository",
-            details: [
-              {
-                code: "InvalidFormat",
-                message: "Format is invalid",
-                target: "repository.id"
-              }
-            ]
+            target: "repository"
+          },
+          {
+            code: "InvalidFormat",
+            message: "Format is invalid",
+            target: "repository.id"
           }
         ]
       };
 
-      expect(error.details![0].details).toBeDefined();
-      expect(error.details![0].details![0].target).toBe("repository.id");
+      expect(error.details).toHaveLength(2);
+      expect(error.details![0].code).toBe("NestedError");
+      expect(error.details![1].target).toBe("repository.id");
     });
 
-    it("should support error with inner error", () => {
+    it("should support error with additional context", () => {
       const error: ApimError = {
         code: "ServiceError",
         message: "Service encountered an error",
-        innererror: {
-          code: "DatabaseError",
-          message: "Database connection failed"
-        }
+        target: "database",
+        details: [
+          {
+            code: "DatabaseError",
+            message: "Database connection failed"
+          }
+        ]
       };
 
-      expect(error.innererror).toBeDefined();
-      expect(error.innererror!.code).toBe("DatabaseError");
+      expect(error.target).toBe("database");
+      expect(error.details).toHaveLength(1);
+      expect(error.details![0].code).toBe("DatabaseError");
     });
 
     it("should support common error codes", () => {
@@ -222,20 +225,14 @@ describe("CommonApiTypes - Type Definitions", () => {
       expect(detail.target).toBe("status");
     });
 
-    it("should support recursive error details", () => {
+    it("should support basic error detail structure", () => {
       const detail: ErrorDetail = {
         code: "ParentError",
-        message: "Parent error occurred",
-        details: [
-          {
-            code: "ChildError",
-            message: "Child error occurred"
-          }
-        ]
+        message: "Parent error occurred"
       };
 
-      expect(detail.details).toBeDefined();
-      expect(detail.details![0].code).toBe("ChildError");
+      expect(detail.code).toBe("ParentError");
+      expect(detail.message).toBe("Parent error occurred");
     });
   });
 
@@ -274,7 +271,7 @@ describe("CommonApiTypes - Type Definitions", () => {
   describe("Method Type", () => {
     it("should support all HTTP methods", () => {
       const methods = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const;
-      
+
       methods.forEach(method => {
         expect(method).toMatch(/^(GET|POST|PUT|PATCH|DELETE)$/);
       });

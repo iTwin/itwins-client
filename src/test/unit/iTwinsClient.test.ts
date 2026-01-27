@@ -55,7 +55,7 @@ describe("ITwinsClient - Header Generation", () => {
     it("should format header value correctly", () => {
       const minimalHeaders = client.testGetResultModeHeaders("minimal");
       const representationHeaders = client.testGetResultModeHeaders("representation");
-      
+
       expect(minimalHeaders.prefer).toBe("return=minimal");
       expect(representationHeaders.prefer).toBe("return=representation");
     });
@@ -68,13 +68,13 @@ describe("ITwinsClient - Header Generation", () => {
     });
 
     it("should return specified query scope", () => {
-      const headers = client.testGetQueryScopeHeaders("favoriteItwins");
-      expect(headers).toEqual({ "x-itwin-query-scope": "favoriteItwins" });
+      const headers = client.testGetQueryScopeHeaders("all");
+      expect(headers).toEqual({ "x-itwin-query-scope": "all" });
     });
 
     it("should handle different query scope values", () => {
-      const scopes = ["memberOfItwin", "favoriteItwins", "recentItwins", "invitedItwins"];
-      
+      const scopes = ["memberOfItwin", "all", "OrganizationAdmin"];
+
       scopes.forEach(scope => {
         const headers = client.testGetQueryScopeHeaders(scope);
         expect(headers["x-itwin-query-scope"]).toBe(scope);
@@ -95,7 +95,7 @@ describe("ITwinsClient - Header Generation", () => {
   describe("getHeaders - Combined Headers", () => {
     it("should combine query scope and result mode headers with defaults", () => {
       const headers = client.testGetHeaders();
-      
+
       expect(headers).toHaveProperty("x-itwin-query-scope");
       expect(headers).toHaveProperty("prefer");
       expect(headers["x-itwin-query-scope"]).toBe("memberOfItwin");
@@ -104,10 +104,10 @@ describe("ITwinsClient - Header Generation", () => {
 
     it("should use provided query scope", () => {
       const headers = client.testGetHeaders({
-        queryScope: "favoriteItwins"
+        queryScope: "all"
       });
-      
-      expect(headers["x-itwin-query-scope"]).toBe("favoriteItwins");
+
+      expect(headers["x-itwin-query-scope"]).toBe("all");
       expect(headers.prefer).toBe("return=minimal");
     });
 
@@ -115,31 +115,31 @@ describe("ITwinsClient - Header Generation", () => {
       const headers = client.testGetHeaders({
         resultMode: "representation"
       });
-      
+
       expect(headers["x-itwin-query-scope"]).toBe("memberOfItwin");
       expect(headers.prefer).toBe("return=representation");
     });
 
     it("should combine both custom values", () => {
       const headers = client.testGetHeaders({
-        queryScope: "recentItwins",
+        queryScope: "OrganizationAdmin",
         resultMode: "representation"
       });
-      
-      expect(headers["x-itwin-query-scope"]).toBe("recentItwins");
+
+      expect(headers["x-itwin-query-scope"]).toBe("OrganizationAdmin");
       expect(headers.prefer).toBe("return=representation");
     });
 
     it("should handle undefined arg gracefully", () => {
       const headers = client.testGetHeaders(undefined);
-      
+
       expect(headers["x-itwin-query-scope"]).toBe("memberOfItwin");
       expect(headers.prefer).toBe("return=minimal");
     });
 
     it("should handle empty object arg", () => {
       const headers = client.testGetHeaders({});
-      
+
       expect(headers["x-itwin-query-scope"]).toBe("memberOfItwin");
       expect(headers.prefer).toBe("return=minimal");
     });
@@ -151,7 +151,7 @@ describe("ITwinsClient - Header Generation", () => {
         search: "test",
         top: 10
       } as any);
-      
+
       // Should only have the header fields
       expect(Object.keys(headers).sort()).toEqual(["prefer", "x-itwin-query-scope"]);
     });
@@ -159,18 +159,17 @@ describe("ITwinsClient - Header Generation", () => {
     it("should return new object each time (not cached)", () => {
       const headers1 = client.testGetHeaders();
       const headers2 = client.testGetHeaders();
-      
+
       expect(headers1).toEqual(headers2);
       expect(headers1).not.toBe(headers2); // Different object instances
     });
 
     it("should work with all valid query scopes", () => {
-      const queryScopes = [
+      const queryScopes: Array<"memberOfItwin" | "all" | "OrganizationAdmin"> = [
         "memberOfItwin",
-        "favoriteItwins",
-        "recentItwins",
-        "invitedItwins"
-      ] as const;
+        "all",
+        "OrganizationAdmin"
+      ];
 
       queryScopes.forEach(scope => {
         const headers = client.testGetHeaders({ queryScope: scope });
@@ -190,7 +189,7 @@ describe("ITwinsClient - Header Generation", () => {
   describe("Header Integration", () => {
     it("should generate headers compatible with iTwin Platform API", () => {
       const headers = client.testGetHeaders({
-        queryScope: "favoriteItwins",
+        queryScope: "all",
         resultMode: "representation"
       });
 
@@ -199,23 +198,23 @@ describe("ITwinsClient - Header Generation", () => {
       expect(headers.prefer).toMatch(/^return=(minimal|representation)$/);
     });
 
-    it("should support headers for favorites query", () => {
+    it("should support headers for all iTwins query", () => {
       const headers = client.testGetHeaders({
-        queryScope: "favoriteItwins",
+        queryScope: "all",
         resultMode: "representation"
       });
 
-      expect(headers["x-itwin-query-scope"]).toBe("favoriteItwins");
+      expect(headers["x-itwin-query-scope"]).toBe("all");
       expect(headers.prefer).toBe("return=representation");
     });
 
-    it("should support headers for recents query", () => {
+    it("should support headers for organization admin query", () => {
       const headers = client.testGetHeaders({
-        queryScope: "recentItwins",
+        queryScope: "OrganizationAdmin",
         resultMode: "minimal"
       });
 
-      expect(headers["x-itwin-query-scope"]).toBe("recentItwins");
+      expect(headers["x-itwin-query-scope"]).toBe("OrganizationAdmin");
       expect(headers.prefer).toBe("return=minimal");
     });
 
@@ -234,19 +233,19 @@ describe("ITwinsClient - Header Generation", () => {
     it("should handle null-like values gracefully", () => {
       const headers1 = client.testGetHeaders(undefined);
       const headers2 = client.testGetHeaders({} as any);
-      
+
       expect(headers1).toEqual(headers2);
     });
 
     it("should not mutate input arguments", () => {
       const arg: ITwinsQueryArg = {
-        queryScope: "favoriteItwins",
+        queryScope: "all",
         resultMode: "representation"
       };
-      
+
       const argCopy = { ...arg };
       client.testGetHeaders(arg);
-      
+
       expect(arg).toEqual(argCopy);
     });
 

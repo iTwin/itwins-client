@@ -4,11 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 import { beforeEach, describe, expect, it } from "vitest";
 import { BaseITwinsApiClient } from "../../BaseITwinsApiClient";
+import { ITwinsClient } from "../../iTwinsClient";
 
 /**
  * Test subclass to expose protected methods for unit testing
  */
-class TestableBaseITwinsApiClient extends BaseITwinsApiClient {
+class TestableBaseITwinsApiClient extends ITwinsClient {
   public testGetQueryStringArg<T>(mapping: any, queryArg?: T): string {
     return (this as any).getQueryStringArg(mapping, queryArg);
   }
@@ -153,32 +154,32 @@ describe("BaseITwinsApiClient - Query Parameter Building", () => {
 
   describe("Base URL Configuration", () => {
     it("should use default production URL when not specified", () => {
-      const defaultClient = new BaseITwinsApiClient();
+      const defaultClient = new ITwinsClient();
       expect((defaultClient as any)._baseUrl).toBe("https://api.bentley.com/itwins");
     });
 
     it("should use dev environment when IMJS_URL_PREFIX is set", () => {
       globalThis.IMJS_URL_PREFIX = "dev-";
-      const devClient = new BaseITwinsApiClient();
+      const devClient = new ITwinsClient();
       expect((devClient as any)._baseUrl).toBe("https://dev-api.bentley.com/itwins");
       globalThis.IMJS_URL_PREFIX = undefined;
     });
 
     it("should use QA environment when IMJS_URL_PREFIX is set", () => {
       globalThis.IMJS_URL_PREFIX = "qa-";
-      const qaClient = new BaseITwinsApiClient();
+      const qaClient = new ITwinsClient();
       expect((qaClient as any)._baseUrl).toBe("https://qa-api.bentley.com/itwins");
       globalThis.IMJS_URL_PREFIX = undefined;
     });
 
     it("should use custom URL when provided in constructor", () => {
-      const customClient = new BaseITwinsApiClient("https://custom.api.com/itwins");
+      const customClient = new ITwinsClient("https://custom.api.com/itwins");
       expect((customClient as any)._baseUrl).toBe("https://custom.api.com/itwins");
     });
 
     it("should prefer constructor URL over global prefix", () => {
       globalThis.IMJS_URL_PREFIX = "dev-";
-      const customClient = new BaseITwinsApiClient("https://custom.api.com/itwins");
+      const customClient = new ITwinsClient("https://custom.api.com/itwins");
       expect((customClient as any)._baseUrl).toBe("https://custom.api.com/itwins");
       globalThis.IMJS_URL_PREFIX = undefined;
     });
