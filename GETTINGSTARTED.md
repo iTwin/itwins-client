@@ -133,6 +133,48 @@ const client = new ITwinsClient("https://your-custom-api.bentley.com/itwins");
 globalThis.IMJS_URL_PREFIX = process.env.IMJS_URL_PREFIX;
 ```
 
+### Redirect Configuration
+
+The iTwins Client supports configurable redirect limits for federated architecture scenarios where API endpoints may redirect to different services:
+
+```typescript
+// Set maximum redirect limit (default is 5)
+globalThis.IMJS_MAX_REDIRECTS = 10;
+
+// Or use environment variable
+globalThis.IMJS_MAX_REDIRECTS = parseInt(process.env.IMJS_MAX_REDIRECTS || "5");
+
+// Create client with custom max redirects via constructor
+const client = new ITwinsClient(10);
+```
+
+**Why Redirects?** In federated architecture, the iTwin Platform may redirect requests to specialized services (e.g., repository services on different domains). The client automatically follows these redirects while enforcing security validation.
+
+**Security Notes:**
+
+- Only HTTPS redirects to trusted Bentley domains (`*.api.bentley.com`) are allowed
+- Redirect loop protection prevents infinite redirect chains
+- Default limit of 5 redirects is suitable for most scenarios
+- Increase only if you encounter legitimate multi-hop redirect scenarios
+
+**Error Handling:**
+
+- **508 Loop Detected**: Redirect limit exceeded, possible redirect loop
+- **502 Bad Gateway**: Invalid redirect (missing Location header or untrusted domain)
+- **403 Forbidden**: Redirects not allowed for this endpoint
+
+```typescript
+const response = await client.getRepositoryResourceByUri(accessToken, iTwinId, resourceUri);
+
+if (response.error) {
+  if (response.status === 508) {
+    console.error("Too many redirects - possible redirect loop");
+  } else if (response.status === 502) {
+    console.error("Invalid redirect:", response.error.message);
+  }
+}
+```
+
 ## Development Setup
 
 If you're contributing to the iTwins Client or building from source:
@@ -282,4 +324,4 @@ Now that you have the basics working, explore these areas:
 
 ---
 
-*Ready to build amazing iTwin applications? Start with the [examples](./docs/EXAMPLES.md)
+*Ready to build amazing iTwin applications? Start with the [examples](./docs/EXAMPLES.md)*
