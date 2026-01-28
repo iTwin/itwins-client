@@ -644,7 +644,7 @@ class ExtendedTestableClient extends BaseBentleyAPIClient {
    */
   public async testProcessResponse<TResponse>(response: Response) {
     return (this as unknown as {
-      processResponse: <T>(response: Response) => Promise<any>;
+      processResponse: <_T>(response: Response) => Promise<any>;
     }).processResponse<TResponse>(response);
   }
 
@@ -660,11 +660,11 @@ class ExtendedTestableClient extends BaseBentleyAPIClient {
     redirectCount: number = 0
   ) {
     return (this as unknown as {
-      followRedirect: <T, D>(
+      followRedirect: <_T, _D>(
         response: Response,
         token: string,
         method: string,
-        data?: D,
+        data?: _D,
         headers?: Record<string, string>,
         count?: number
       ) => Promise<any>;
@@ -683,11 +683,11 @@ class ExtendedTestableClient extends BaseBentleyAPIClient {
     allowRedirects: boolean = false
   ) {
     return (this as unknown as {
-      sendGenericAPIRequest: <T, D>(
+      sendGenericAPIRequest: <_T, _D>(
         token: string,
         method: string,
         url: string,
-        data?: D,
+        data?: _D,
         headers?: Record<string, string>,
         allowRedirects?: boolean
       ) => Promise<any>;
