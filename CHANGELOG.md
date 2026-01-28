@@ -1,5 +1,29 @@
 # Change Log - @itwin/itwins-client
 
+## 2.5.0
+
+### Minor Changes
+
+#### [2.5.0](https://www.npmjs.com/package/@itwin/itwins-client/v/2.5.0) - 2026-01-28
+
+Added 3 New Methods To Itwins Client To Support Federated Architecture Support:
+
+- **`getRepositoryResourcesByUri()`** - Retrieve multiple resources with OData support
+
+- **`getRepositoryResourceByUri()`** - Retrieve single resource
+
+- **`getResourceGraphicsByUri()`** - Retrieve graphics metadata
+
+Added support for **redirects** in the following methods :
+
+- `getRepositoryResource()`
+
+- `getRepositoryResources()`
+
+- `getResourceGraphics()`
+
+- All URI-based methods
+
 ## 2.4.0
 
 ### Minor Changes
