@@ -551,3 +551,564 @@ describe("BaseBentleyAPIClient - checkRedirectValidity", () => {
     });
   });
 });
+
+describe("BaseBentleyAPIClient - createRequestOptions", () => {
+  let client: TestableBaseBentleyAPIClient;
+
+  beforeEach(() => {
+    client = new TestableBaseBentleyAPIClient();
+  });
+
+  /**
+   * Expose createRequestOptions for testing
+   */
+  function createRequestOptions<TData>(
+    accessToken: string,
+    method: string,
+    url: string,
+    data?: TData,
+    headers?: Record<string, string>
+  ) {
+    return (client as unknown as {
+      createRequestOptions: <T>(
+        token: string,
+        method: string,
+        url: string,
+        data?: T,
+        headers?: Record<string, string>
+      ) => any;
+    }).createRequestOptions(accessToken, method, url, data, headers);
+  }
+
+  describe("Blob Data Handling", () => {
+    it("should handle Blob data without JSON.stringify", () => {
+      const blobData = new Blob(["test content"], { type: "text/plain" });
+      const result = createRequestOptions(
+        "test-token",
+        "POST",
+        "https://api.bentley.com/upload",
+        blobData
+      );
+
+      expect(result.body).toBe(blobData);
+      expect(result.body).toBeInstanceOf(Blob);
+    });
+
+    it("should handle Blob with different content types", () => {
+      const blobData = new Blob(['{"key": "value"}'], { type: "application/json" });
+      const result = createRequestOptions(
+        "test-token",
+        "POST",
+        "https://api.bentley.com/upload",
+        blobData
+      );
+
+      expect(result.body).toBe(blobData);
+    });
+
+    it("should JSON.stringify non-Blob data", () => {
+      const jsonData = { key: "value" };
+      const result = createRequestOptions(
+        "test-token",
+        "POST",
+        "https://api.bentley.com/endpoint",
+        jsonData
+      );
+
+      expect(result.body).toBe(JSON.stringify(jsonData));
+      expect(typeof result.body).toBe("string");
+    });
+  });
+
+  describe("Required Parameter Validation", () => {
+    it("should throw error when access token is missing", () => {
+      expect(() =>
+        createRequestOptions("", "GET", "https://api.bentley.com/test")
+      ).toThrow("Access token is required");
+    });
+
+    it("should throw error when URL is missing", () => {
+      expect(() =>
+        createRequestOptions("test-token", "GET", "")
+      ).toThrow("URL is required");
+    });
+  });
+});
+
+/**
+ * Extended test subclass to expose processResponse for testing error scenarios
+ */
+class ExtendedTestableClient extends BaseBentleyAPIClient {
+  /**
+   * Expose processResponse for testing
+   */
+  public async testProcessResponse<TResponse>(response: Response) {
+    return (this as unknown as {
+      processResponse: <T>(response: Response) => Promise<any>;
+    }).processResponse<TResponse>(response);
+  }
+
+  /**
+   * Expose followRedirect for testing
+   */
+  public async testFollowRedirect<TResponse = unknown, TData = unknown>(
+    response: Response,
+    accessToken: string,
+    method: string,
+    data?: TData,
+    headers?: Record<string, string>,
+    redirectCount: number = 0
+  ) {
+    return (this as unknown as {
+      followRedirect: <T, D>(
+        response: Response,
+        token: string,
+        method: string,
+        data?: D,
+        headers?: Record<string, string>,
+        count?: number
+      ) => Promise<any>;
+    }).followRedirect<TResponse, TData>(response, accessToken, method, data, headers, redirectCount);
+  }
+
+  /**
+   * Expose sendGenericAPIRequest for testing
+   */
+  public async testSendGenericAPIRequest<TResponse = unknown, TData = unknown>(
+    accessToken: string,
+    method: string,
+    url: string,
+    data?: TData,
+    headers?: Record<string, string>,
+    allowRedirects: boolean = false
+  ) {
+    return (this as unknown as {
+      sendGenericAPIRequest: <T, D>(
+        token: string,
+        method: string,
+        url: string,
+        data?: D,
+        headers?: Record<string, string>,
+        allowRedirects?: boolean
+      ) => Promise<any>;
+    }).sendGenericAPIRequest<TResponse, TData>(
+      accessToken,
+      method,
+      url,
+      data,
+      headers,
+      allowRedirects
+    );
+  }
+}
+
+describe("BaseBentleyAPIClient - processResponse", () => {
+  let client: ExtendedTestableClient;
+
+  beforeEach(() => {
+    client = new ExtendedTestableClient();
+  });
+
+  /**
+   * Helper to create a mock Response with custom properties
+   */
+  function createResponse(
+    status: number,
+    ok: boolean,
+    body: any
+  ): Response {
+    return {
+      status,
+      ok,
+      json: async () => body,
+    } as Response;
+  }
+
+  describe("Error Response without valid error structure", () => {
+    it("should throw error when response is not OK and doesn't have valid error format", async () => {
+      // Response with invalid error structure (not matching { error: { code, message } })
+      const response = createResponse(400, false, { invalidFormat: "test" });
+
+      await expect(client.testProcessResponse(response)).rejects.toThrow(
+        "An error occurred while processing the request"
+      );
+    });
+
+    it("should throw error when error is a non-object primitive (number)", async () => {
+      const response = createResponse(500, false, { error: 123 });
+
+      await expect(client.testProcessResponse(response)).rejects.toThrow(
+        "An error occurred while processing the request"
+      );
+    });
+
+    it("should throw error when response has error property but missing code", async () => {
+      const response = createResponse(500, false, {
+        error: { message: "Error without code" }
+      });
+
+      await expect(client.testProcessResponse(response)).rejects.toThrow(
+        "An error occurred while processing the request"
+      );
+    });
+
+    it("should throw error when response has error property but missing message", async () => {
+      const response = createResponse(500, false, {
+        error: { code: "ErrorCode" }
+      });
+
+      await expect(client.testProcessResponse(response)).rejects.toThrow(
+        "An error occurred while processing the request"
+      );
+    });
+
+    it("should throw error when response is not OK with null body", async () => {
+      const response = createResponse(500, false, null);
+
+      await expect(client.testProcessResponse(response)).rejects.toThrow(
+        "An error occurred while processing the request"
+      );
+    });
+
+    it("should throw error when response is not OK with non-object body", async () => {
+      const response = createResponse(400, false, "Plain string error");
+
+      await expect(client.testProcessResponse(response)).rejects.toThrow(
+        "An error occurred while processing the request"
+      );
+    });
+  });
+
+  describe("Valid error responses", () => {
+    it("should return proper error structure for valid APIM error", async () => {
+      const response = createResponse(404, false, {
+        error: {
+          code: "NotFound",
+          message: "Resource not found"
+        }
+      });
+
+      const result = await client.testProcessResponse(response);
+
+      expect(result.status).toBe(404);
+      expect(result.error).toBeDefined();
+      expect(result.error!.code).toBe("NotFound");
+      expect(result.error!.message).toBe("Resource not found");
+    });
+  });
+
+  describe("Successful responses", () => {
+    it("should return data for successful response", async () => {
+      const response = createResponse(200, true, { id: "123", name: "Test" });
+
+      const result = await client.testProcessResponse(response);
+
+      expect(result.status).toBe(200);
+      expect(result.data).toEqual({ id: "123", name: "Test" });
+      expect(result.error).toBeUndefined();
+    });
+
+    it("should handle empty string as undefined", async () => {
+      const mockResponse = {
+        status: 200,
+        ok: true,
+        json: async () => ""
+      } as Response;
+
+      const result = await client.testProcessResponse(mockResponse);
+
+      expect(result.status).toBe(200);
+      expect(result.data).toBeUndefined();
+    });
+  });
+});
+
+describe("BaseBentleyAPIClient - sendGenericAPIRequest with redirects", () => {
+  let client: ExtendedTestableClient;
+  let fetchSpy: any;
+
+  beforeEach(() => {
+    client = new ExtendedTestableClient();
+    // Store original fetch
+    fetchSpy = globalThis.fetch;
+  });
+
+  afterEach(() => {
+    // Restore original fetch
+    globalThis.fetch = fetchSpy;
+  });
+
+  function mockFetch(responses: Response[]) {
+    let callCount = 0;
+    globalThis.fetch = async () => {
+      if (callCount >= responses.length) {
+        throw new Error("No more mock responses available");
+      }
+      const response = responses[callCount];
+      callCount++;
+      return response;
+    };
+  }
+
+  function createMockResponse(
+    status: number,
+    ok: boolean,
+    body: any,
+    locationHeader?: string
+  ): Response {
+    const headers = new Headers();
+    if (locationHeader) {
+      headers.set('location', locationHeader);
+    }
+
+    return {
+      status,
+      ok,
+      headers,
+      json: async () => body,
+    } as Response;
+  }
+
+  describe("Redirect rejection when not allowed", () => {
+    it("should return 403 error when redirect encountered but allowRedirects is false", async () => {
+      const redirectResponse = createMockResponse(
+        302,
+        false,
+        {},
+        "https://api.bentley.com/new-location"
+      );
+
+      mockFetch([redirectResponse]);
+
+      const result = await client.testSendGenericAPIRequest(
+        "test-token",
+        "GET",
+        "https://api.bentley.com/original",
+        undefined,
+        undefined,
+        false // allowRedirects = false
+      );
+
+      expect(result.status).toBe(403);
+      expect(result.error).toBeDefined();
+      expect(result.error!.code).toBe("RedirectsNotAllowed");
+      expect(result.error!.message).toContain("not allowed");
+    });
+
+    it("should return 403 when allowRedirects is not specified (defaults to false)", async () => {
+      const redirectResponse = createMockResponse(
+        302,
+        false,
+        {},
+        "https://api.bentley.com/redirect"
+      );
+
+      mockFetch([redirectResponse]);
+
+      const result = await client.testSendGenericAPIRequest(
+        "test-token",
+        "GET",
+        "https://api.bentley.com/test"
+      );
+
+      expect(result.status).toBe(403);
+      expect(result.error!.code).toBe("RedirectsNotAllowed");
+    });
+  });
+
+  describe("Following redirects when allowed", () => {
+    it("should follow a single redirect to final destination", async () => {
+      const redirectResponse = createMockResponse(
+        302,
+        false,
+        {},
+        "https://api.bentley.com/redirected"
+      );
+
+      const finalResponse = createMockResponse(
+        200,
+        true,
+        { id: "123", data: "success" },
+        undefined
+      );
+
+      mockFetch([redirectResponse, finalResponse]);
+
+      const result = await client.testSendGenericAPIRequest(
+        "test-token",
+        "GET",
+        "https://api.bentley.com/original",
+        undefined,
+        undefined,
+        true // allowRedirects = true
+      );
+
+      expect(result.status).toBe(200);
+      expect(result.data).toEqual({ id: "123", data: "success" });
+      expect(result.error).toBeUndefined();
+    });
+
+    it("should follow multiple sequential redirects", async () => {
+      const redirect1 = createMockResponse(
+        302,
+        false,
+        {},
+        "https://api.bentley.com/redirect1"
+      );
+
+      const redirect2 = createMockResponse(
+        302,
+        false,
+        {},
+        "https://api.bentley.com/redirect2"
+      );
+
+      const finalResponse = createMockResponse(
+        200,
+        true,
+        { result: "final" },
+        undefined
+      );
+
+      mockFetch([redirect1, redirect2, finalResponse]);
+
+      const result = await client.testSendGenericAPIRequest(
+        "test-token",
+        "GET",
+        "https://api.bentley.com/original",
+        undefined,
+        undefined,
+        true
+      );
+
+      expect(result.status).toBe(200);
+      expect(result.data).toEqual({ result: "final" });
+    });
+
+    // Note: Testing max redirect enforcement via full request chain would require
+    // complex mock setup. The checkRedirectValidity test suite above already
+    // thoroughly tests that 508 errors are returned when redirectCount >= maxRedirects.
+
+    it("should return error when redirect has missing Location header", async () => {
+      const badRedirect = createMockResponse(
+        302,
+        false,
+        {},
+        undefined // No location header
+      );
+
+      mockFetch([badRedirect]);
+
+      const result = await client.testSendGenericAPIRequest(
+        "test-token",
+        "GET",
+        "https://api.bentley.com/original",
+        undefined,
+        undefined,
+        true
+      );
+
+      expect(result.status).toBe(502);
+      expect(result.error!.code).toBe("InvalidRedirect");
+    });
+
+    it("should return error when redirect points to insecure URL", async () => {
+      const insecureRedirect = createMockResponse(
+        302,
+        false,
+        {},
+        "http://api.bentley.com/insecure" // HTTP instead of HTTPS
+      );
+
+      mockFetch([insecureRedirect]);
+
+      const result = await client.testSendGenericAPIRequest(
+        "test-token",
+        "GET",
+        "https://api.bentley.com/original",
+        undefined,
+        undefined,
+        true
+      );
+
+      expect(result.status).toBe(502);
+      expect(result.error!.code).toBe("InvalidRedirectUrl");
+      expect(result.error!.message).toContain("HTTPS required");
+    });
+
+    it("should return error when redirect points to untrusted domain", async () => {
+      const maliciousRedirect = createMockResponse(
+        302,
+        false,
+        {},
+        "https://evil.com/phishing"
+      );
+
+      mockFetch([maliciousRedirect]);
+
+      const result = await client.testSendGenericAPIRequest(
+        "test-token",
+        "GET",
+        "https://api.bentley.com/original",
+        undefined,
+        undefined,
+        true
+      );
+
+      expect(result.status).toBe(502);
+      expect(result.error!.code).toBe("InvalidRedirectUrl");
+      expect(result.error!.message).toContain("not a trusted Bentley domain");
+    });
+  });
+
+  describe("Error handling in redirects", () => {
+    it("should return 500 when fetch throws during redirect", async () => {
+      const redirectResponse = createMockResponse(
+        302,
+        false,
+        {},
+        "https://api.bentley.com/redirect"
+      );
+
+      let callCount = 0;
+      globalThis.fetch = async () => {
+        if (callCount === 0) {
+          callCount++;
+          return redirectResponse;
+        }
+        throw new Error("Network error");
+      };
+
+      const result = await client.testSendGenericAPIRequest(
+        "test-token",
+        "GET",
+        "https://api.bentley.com/original",
+        undefined,
+        undefined,
+        true
+      );
+
+      expect(result.status).toBe(500);
+      expect(result.error!.code).toBe("InternalServerError");
+    });
+
+    it("should return 500 when initial request throws", async () => {
+      globalThis.fetch = async () => {
+        throw new Error("Network failure");
+      };
+
+      const result = await client.testSendGenericAPIRequest(
+        "test-token",
+        "GET",
+        "https://api.bentley.com/test",
+        undefined,
+        undefined,
+        false
+      );
+
+      expect(result.status).toBe(500);
+      expect(result.error!.code).toBe("InternalServerError");
+      expect(result.error!.message).toContain("internal exception");
+    });
+  });
+});
