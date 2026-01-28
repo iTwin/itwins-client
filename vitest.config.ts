@@ -21,6 +21,30 @@ export default defineConfig({
       forks: {
         singleFork: true
       }
+    },
+    // Coverage configuration
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'json-summary'],
+      exclude: [
+        'node_modules/**',
+        'lib/**',
+        'coverage/**',
+        '**/*.test.ts',
+        '**/test/**',
+        'vitest.config.ts',
+        'eslint.config.mjs',
+        '**/*.d.ts',
+        'src/types/**/*.ts',
+        'src/itwins-client.ts',
+        '.changeset/**'
+      ],
+      thresholds: {
+        lines: 80,
+        branches: 80,
+        functions: 80,
+        statements: 80
+      }
     }
   },
   define: {

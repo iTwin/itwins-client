@@ -8,6 +8,7 @@ import type { TestUserCredentials } from "@itwin/oidc-signin-tool";
 
 // Set up global configuration for tests
 globalThis.IMJS_URL_PREFIX = process.env.IMJS_URL_PREFIX;
+globalThis.IMJS_MAX_REDIRECTS = process.env.IMJS_MAX_REDIRECTS ? parseInt(process.env.IMJS_MAX_REDIRECTS, 10) : undefined;
 
 /** Basic configuration used by all tests
  */

@@ -40,6 +40,38 @@ function isErrorResponse(data: unknown): data is { error: ApimError } {
  */
 export abstract class BaseBentleyAPIClient {
 
+
+  /**
+   * The max redirects for iTwins API endpoints.
+   * The max redirects can be customized via the constructor parameter or automatically
+   * modified based on the IMJS_MAX_REDIRECTS environment variable.
+   *
+   * @readonly
+   */
+  protected readonly _maxRedirects: number = 5;
+
+  /**
+   * Creates a new BaseClient instance for API operations
+   * @param maxRedirects - Optional custom max redirects, defaults to 5
+   *
+   * @example
+   * ```typescript
+   * // Use default max redirects
+   * const client = new BaseClient();
+   *
+   * // Use custom max redirects
+   * const client = new BaseClient(10);
+   * ```
+   */
+  public constructor(maxRedirects?: number) {
+    if (maxRedirects !== undefined) {
+      this._maxRedirects = maxRedirects;
+    } else {
+      this._maxRedirects = globalThis.IMJS_MAX_REDIRECTS ?? 5;
+    }
+  }
+
+
   /**
    * Sends a generic API request with type safety and response validation.
    * Handles authentication, error responses, and data extraction automatically.
@@ -57,7 +89,8 @@ export abstract class BaseBentleyAPIClient {
     method: Method,
     url: string,
     data?: TData,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
+    allowRedirects: boolean = false
   ): Promise<BentleyAPIResponse<TResponse>> {
     try {
       const requestOptions = this.createRequestOptions(
@@ -72,37 +105,268 @@ export abstract class BaseBentleyAPIClient {
         method: requestOptions.method,
         headers: requestOptions.headers,
         body: requestOptions.body,
+        redirect: 'manual',
       });
-      const responseData =
-        response.status !== 204 ? await response.json() : undefined;
 
-      if (!response.ok) {
-        if (isErrorResponse(responseData)) {
+      // Handle 302 redirects with auth header forwarding
+      if (response.status === 302) {
+        if (!allowRedirects) {
           return {
-            status: response.status,
-            error: responseData.error,
+            status: 403,
+            error: {
+              code: "RedirectsNotAllowed",
+              message: "Redirects are not allowed for this request.",
+            },
           };
         }
-        throw new Error("An error occurred while processing the request");
+        return await this.followRedirect<TResponse, TData>(
+          response,
+          accessToken,
+          method,
+          data,
+          headers
+        );
       }
-      return {
-        status: response.status,
-        data:
-          responseData === undefined || responseData === ""
-            ? undefined
-            : (responseData as TResponse),
-      };
+
+      // Process non-redirect response
+      return await this.processResponse<TResponse>(response);
     } catch {
-      // Return generic error for security - don't expose internal exception details
+      return this.createInternalServerError();
+    }
+  }
+
+  /**
+   * Handles 302 redirect responses by validating and following the redirect.
+   *
+   * @param response - The 302 redirect response
+   * @param accessToken - The client access token
+   * @param method - The HTTP method
+   * @param data - Optional request payload
+   * @param headers - Optional request headers (will be forwarded to redirect)
+   * @param redirectCount - Current redirect depth
+   * @returns Promise that resolves to the final API response
+   */
+  private async followRedirect<TResponse = unknown, TData = unknown>(
+    response: Response,
+    accessToken: AccessToken,
+    method: Method,
+    data: TData | undefined,
+    headers: Record<string, string> | undefined,
+    redirectCount: number = 0
+  ): Promise<BentleyAPIResponse<TResponse>> {
+
+    // Verify redirect is valid and safe to follow
+    const verificationResult = this.checkRedirectValidity(response, redirectCount);
+    if (verificationResult.error) {
+      return verificationResult.error;
+    }
+    const redirectUrl = verificationResult.redirectUrl;
+
+    try {
+      const requestOptions = this.createRequestOptions(
+        accessToken,
+        method,
+        redirectUrl,
+        data,
+        headers
+      );
+
+      const redirectResponse = await fetch(requestOptions.url, {
+        method: requestOptions.method,
+        headers: requestOptions.headers,
+        body: requestOptions.body,
+        redirect: 'manual',
+      });
+
+      // Handle subsequent 302 redirects
+      if (redirectResponse.status === 302) {
+        return await this.followRedirect<TResponse, TData>(
+          redirectResponse,
+          accessToken,
+          method,
+          data,
+          headers,
+          redirectCount + 1
+        );
+      }
+
+      // Process final response
+      return await this.processResponse<TResponse>(redirectResponse);
+    } catch {
+      return this.createInternalServerError();
+    }
+  }
+
+  /**
+   * Processes a non-redirect HTTP response.
+   *
+   * @param response - The HTTP response to process
+   * @returns Promise that resolves to a typed API response
+   */
+  private async processResponse<TResponse>(
+    response: Response
+  ): Promise<BentleyAPIResponse<TResponse>> {
+    const responseData =
+      response.status !== 204 ? await response.json() : undefined;
+
+    if (!response.ok) {
+      if (isErrorResponse(responseData)) {
+        return {
+          status: response.status,
+          error: responseData.error,
+        };
+      }
+      throw new Error("An error occurred while processing the request");
+    }
+
+    return {
+      status: response.status,
+      data:
+        responseData === undefined || responseData === ""
+          ? undefined
+          : (responseData as TResponse),
+    };
+  }
+
+  /**
+   * Creates a generic internal server error response.
+   *
+   * @returns A 500 error response for internal exceptions
+   */
+  private createInternalServerError(): BentleyAPIResponse<never> {
+    return {
+      status: 500,
+      error: {
+        code: "InternalServerError",
+        message:
+          "An internal exception happened while calling iTwins Service",
+      },
+    };
+  }
+
+
+  /**
+   * Verifies that a redirect response is valid and safe to follow.
+   * Performs three critical validations:
+   * 1. Checks redirect count to prevent infinite loops
+   * 2. Ensures Location header is present
+   * 3. Validates redirect URL for security
+   *
+   * @param response - The 302 redirect response to verify
+   * @param redirectCount - Current redirect depth
+   * @returns Verification result with either error or validated redirect URL
+   */
+  private checkRedirectValidity(
+    response: Response,
+    redirectCount: number
+  ): { error?: BentleyAPIResponse<never>; redirectUrl: string } {
+    // Check redirect limit to prevent infinite loops
+    if (redirectCount >= this._maxRedirects) {
       return {
-        status: 500,
         error: {
-          code: "InternalServerError",
-          message:
-            "An internal exception happened while calling iTwins Service",
+          status: 508,
+          error: {
+            code: "TooManyRedirects",
+            message: `Maximum redirect limit (${this._maxRedirects}) exceeded. Possible redirect loop detected.`,
+          },
         },
+        redirectUrl: "",
       };
     }
+
+    // Extract and validate redirect URL
+    const redirectUrl = response.headers.get('location');
+    if (!redirectUrl) {
+      return {
+        error: {
+          status: 502,
+          error: {
+            code: "InvalidRedirect",
+            message: "302 redirect response missing Location header",
+          },
+        },
+        redirectUrl: "",
+      };
+    }
+
+    // Validate redirect URL for security
+    try {
+      this.validateRedirectUrlSecurity(redirectUrl);
+    } catch (error) {
+      return {
+        error: {
+          status: 502,
+          error: {
+            code: "InvalidRedirectUrl",
+            message: error instanceof Error ? error.message : "Invalid redirect URL",
+          },
+        },
+        redirectUrl: "",
+      };
+    }
+
+    // All validations passed
+    return { redirectUrl };
+  }
+
+  /**
+   * Validates that a redirect URL is secure and targets a trusted APIM Bentley domain.
+   *
+   * This method enforces security requirements for following HTTP redirects:
+   * - URL must use HTTPS protocol (not HTTP)
+   * - Domain must be a Bentley-owned domain (*api.bentley.com)
+   *
+   * @param url - The redirect URL to validate
+   * @returns True if the URL is valid and safe to follow
+   * @throws Error if the URL is invalid, uses HTTP, or targets an untrusted domain
+   *
+   * @remarks
+   * This validation is critical for security when following 302 redirects in federated
+   * architecture scenarios. It prevents redirect attacks that could leak authentication
+   * credentials to malicious domains.
+   *
+   * @example
+   * ```typescript
+   * // Valid URLs
+   * this.validateRedirectUrl("https://api.bentley.com/resource");
+   * // Invalid URLs (will throw)
+   * this.validateRedirectUrl("https://evil-tuna.com/phishing/"); // Non-Bentley domain
+   * this.validateRedirectUrl("https://bentley.com.evil.com/fake"); // Domain spoofing attempt
+   * ```
+   */
+  private validateRedirectUrlSecurity(url: string): boolean {
+    let parsedUrl: URL;
+
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      throw new Error(`Invalid redirect URL: malformed URL "${url}"`);
+    }
+
+    // Require HTTPS protocol for security
+    if (parsedUrl.protocol !== "https:") {
+      throw new Error(
+        `Invalid redirect URL: HTTPS required, but URL uses "${parsedUrl.protocol}" protocol. URL: ${url}`
+      );
+    }
+
+    // Validate domain is a Bentley-owned domain (specific whitelist)
+    const hostname = parsedUrl.hostname.toLowerCase();
+    const allowedDomains = [
+      "api.bentley.com",
+    ];
+
+    const isBentleyDomain = allowedDomains.some(domain =>
+      hostname === domain || hostname.endsWith(`-${domain}`)
+    );
+
+    if (!isBentleyDomain) {
+      throw new Error(
+        `Invalid redirect URL: domain "${hostname}" is not a trusted Bentley domain. Only api.bentley.com and its subdomains are allowed.`
+      );
+    }
+
+    return true;
   }
 
   /**

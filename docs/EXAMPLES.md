@@ -543,6 +543,686 @@ async function advancedQuery(): Promise<void> {
 }
 ```
 
+## Repository URI-Based Operations (Federated Architecture)
+
+The URI-based repository methods enable direct calls to federated repository endpoints using URIs from repository capabilities. This supports distributed architecture where repository data may be hosted on different services.
+
+### Why Use URI-Based Methods?
+
+- **Federated Architecture**: Direct client-to-source communication without routing through central API
+- **Improved Performance**: Reduced latency by eliminating extra hops
+- **Future-Proof**: Supports evolving distributed infrastructure
+- **Backward Compatible**: Old methods still work, migrate at your own pace
+
+### Get Repository Resources Using Capability URI
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  SingleRepositoryResponse,
+  GetMultiRepositoryResourceMinimalResponse,
+} from "@itwin/itwins-client";
+
+/** Function that demonstrates using URI-based resource fetching. */
+async function getResourcesWithUri(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+  const iTwinId = "your-itwin-id";
+  const repositoryId = "your-repository-id";
+
+  // Step 1: Get repository with capabilities
+  const repoResponse: BentleyAPIResponse<SingleRepositoryResponse> =
+    await client.getRepository(accessToken, iTwinId, repositoryId);
+
+  if (repoResponse.error) {
+    console.error("Error fetching repository:", repoResponse.error.message);
+    return;
+  }
+
+  // Step 2: Extract capability URI
+  const resourcesUri = repoResponse.data?.repository.capabilities?.resources?.uri;
+
+  if (!resourcesUri) {
+    console.log("Repository does not support resources capability");
+    return;
+  }
+
+  // Step 3: Use URI-based method to fetch resources
+  const resourcesResponse: BentleyAPIResponse<GetMultiRepositoryResourceMinimalResponse> =
+    await client.getRepositoryResourcesByUri(accessToken, resourcesUri);
+
+  if (resourcesResponse.error) {
+    console.error("Error fetching resources:", resourcesResponse.error.message);
+    return;
+  }
+
+  // Step 4: Process resources
+  const resources = resourcesResponse.data!.resources;
+  console.log(`Found ${resources.length} resources`);
+
+  resources.forEach((resource) => {
+    console.log(`- ${resource.displayName || resource.id} (${resource.class})`);
+  });
+}
+```
+
+### Get Resources with Filtering and Pagination
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  GetMultiRepositoryResourceRepresentationResponse,
+} from "@itwin/itwins-client";
+
+/** Function that demonstrates URI-based resource fetching with OData parameters. */
+async function getFilteredResourcesWithUri(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+  const iTwinId = "your-itwin-id";
+  const repositoryId = "your-repository-id";
+
+  // Get repository capabilities
+  const repoResponse = await client.getRepository(accessToken, iTwinId, repositoryId);
+  const resourcesUri = repoResponse.data?.repository.capabilities?.resources?.uri;
+
+  if (!resourcesUri) {
+    console.log("Resources capability not available");
+    return;
+  }
+
+  // Fetch resources with search and pagination in representation mode
+  const resourcesResponse: BentleyAPIResponse<GetMultiRepositoryResourceRepresentationResponse> =
+    await client.getRepositoryResourcesByUri(
+      accessToken,
+      resourcesUri,
+      {
+        search: "map",  // Search for resources containing "map"
+        top: 10,        // Limit to 10 results
+        skip: 0         // Start from beginning
+      },
+      "representation"  // Get detailed resource information
+    );
+
+  if (resourcesResponse.error) {
+    console.error("Error:", resourcesResponse.error.message);
+    return;
+  }
+
+  const resources = resourcesResponse.data!.resources;
+  console.log(`Found ${resources.length} matching resources`);
+
+  resources.forEach((resource) => {
+    console.log(`Resource: ${resource.displayName || resource.id}`);
+    console.log(`  Type: ${resource.class} / ${resource.subClass || "N/A"}`);
+    if (resource.description) {
+      console.log(`  Description: ${resource.description}`);
+    }
+  });
+}
+```
+
+### Get Single Resource Using Capability URI
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  GetRepositoryResourceRepresentationResponse,
+} from "@itwin/itwins-client";
+
+/** Function that fetches a specific resource using its capability URI. */
+async function getResourceByUri(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+  const iTwinId = "your-itwin-id";
+  const repositoryId = "your-repository-id";
+  const resourceId = "your-resource-id";
+
+  // Get repository capabilities
+  const repoResponse = await client.getRepository(accessToken, iTwinId, repositoryId);
+  const resourcesUri = repoResponse.data?.repository.capabilities?.resources?.uri;
+
+  if (!resourcesUri) {
+    console.log("Resources capability not available");
+    return;
+  }
+
+  // Construct specific resource URI
+  const resourceUri = `${resourcesUri}/${resourceId}`;
+
+  // Fetch resource with full details
+  const resourceResponse: BentleyAPIResponse<GetRepositoryResourceRepresentationResponse> =
+    await client.getRepositoryResourceByUri(
+      accessToken,
+      resourceUri,
+      "representation"
+    );
+
+  if (resourceResponse.error) {
+    console.error("Error fetching resource:", resourceResponse.error.message);
+    return;
+  }
+
+  const resource = resourceResponse.data!.resource;
+  console.log(`Resource: ${resource.displayName || resource.id}`);
+  console.log(`Class: ${resource.class}`);
+
+  // Check for graphics capability
+  if (resource.capabilities?.graphics?.uri) {
+    console.log("Graphics available at:", resource.capabilities.graphics.uri);
+  }
+}
+```
+
+### Get Graphics Metadata Using Capability URI
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  GetRepositoryResourceRepresentationResponse,
+  ResourceGraphicsResponse,
+} from "@itwin/itwins-client";
+
+/** Function that demonstrates fetching graphics metadata for a resource. */
+async function getResourceGraphics(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+  const iTwinId = "your-itwin-id";
+  const repositoryId = "your-repository-id";
+  const resourceId = "your-resource-id";
+
+  // Get repository capabilities
+  const repoResponse = await client.getRepository(accessToken, iTwinId, repositoryId);
+  const resourcesUri = repoResponse.data?.repository.capabilities?.resources?.uri;
+
+  if (!resourcesUri) {
+    console.log("Resources capability not available");
+    return;
+  }
+
+  // Get resource with capabilities
+  const resourceUri = `${resourcesUri}/${resourceId}`;
+  const resourceResponse: BentleyAPIResponse<GetRepositoryResourceRepresentationResponse> =
+    await client.getRepositoryResourceByUri(accessToken, resourceUri, "representation");
+
+  if (resourceResponse.error) {
+    console.error("Error fetching resource:", resourceResponse.error.message);
+    return;
+  }
+
+  // Extract graphics capability URI
+  const graphicsUri = resourceResponse.data?.resource.capabilities?.graphics?.uri;
+
+  if (!graphicsUri) {
+    console.log("Resource does not have graphics capability");
+    return;
+  }
+
+  // Fetch graphics metadata
+  const graphicsResponse: BentleyAPIResponse<ResourceGraphicsResponse> =
+    await client.getResourceGraphicsByUri(accessToken, graphicsUri);
+
+  if (graphicsResponse.error) {
+    console.error("Error fetching graphics:", graphicsResponse.error.message);
+    return;
+  }
+
+  const graphics = graphicsResponse.data!.graphics;
+  console.log(`Graphics Content Type: ${graphics.contentType}`);
+  console.log(`Graphics URI: ${graphics.uri}`);
+
+  // Display authentication information
+  if (graphics.authentication) {
+    console.log(`Authentication Type: ${graphics.authentication.type}`);
+
+    switch (graphics.authentication.type) {
+      case "ApiKey-Authentication":
+        console.log(`  Header: ${graphics.authentication.header}`);
+        console.log(`  Query Parameter: ${graphics.authentication.query}`);
+        break;
+
+      case "OAuth2AuthCodePKCE-Authentication":
+        console.log(`  Authorization Endpoint: ${graphics.authentication.authorizationEndpoint}`);
+        console.log(`  Token Endpoint: ${graphics.authentication.tokenEndpoint}`);
+        console.log(`  Client ID: ${graphics.authentication.clientId}`);
+        break;
+
+      case "Basic-Authentication":
+        console.log("  Basic authentication required");
+        break;
+    }
+  }
+
+  // Display provider configuration (e.g., for CesiumJS)
+  if (graphics.provider) {
+    console.log(`Provider Type: ${graphics.provider.type}`);
+    if (graphics.provider.options) {
+      console.log("Provider Options:", JSON.stringify(graphics.provider.options, null, 2));
+    }
+  }
+}
+```
+
+### Migration Example: Old Method to New URI-Based Method
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+
+/** Function demonstrating migration from deprecated to URI-based methods. */
+async function migrationExample(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+  const iTwinId = "your-itwin-id";
+  const repositoryId = "your-repository-id";
+  const resourceId = "your-resource-id";
+
+  // ❌ OLD WAY (deprecated - will be removed in v3.0.0)
+  const oldResponse = await client.getRepositoryResource(
+    accessToken,
+    iTwinId,
+    repositoryId,
+    resourceId,
+    "representation"
+  );
+
+  if (oldResponse.data) {
+    console.log("Old method result:", oldResponse.data.resource.displayName);
+  }
+
+  // ✅ NEW WAY (recommended - supports federated architecture)
+  const repoResponse = await client.getRepository(accessToken, iTwinId, repositoryId);
+  const resourcesUri = repoResponse.data?.repository.capabilities?.resources?.uri;
+
+  if (resourcesUri) {
+    const resourceUri = `${resourcesUri}/${resourceId}`;
+    const newResponse = await client.getRepositoryResourceByUri(
+      accessToken,
+      resourceUri,
+      "representation"
+    );
+
+    if (newResponse.data) {
+      console.log("New method result:", newResponse.data.resource.displayName);
+    }
+  }
+
+  // Both methods return equivalent data, but the new method:
+  // - Supports federated/distributed architecture
+  // - Enables direct communication with source repositories
+  // - Improves performance by reducing network hops
+  // - Future-proofs your code for evolving infrastructure
+}
+```
+
+### Error Handling with URI-Based Methods
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+
+/** Function that demonstrates proper error handling with URI-based methods. */
+async function handleErrors(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+  const iTwinId = "your-itwin-id";
+  const repositoryId = "your-repository-id";
+
+  try {
+    // Get repository capabilities
+    const repoResponse = await client.getRepository(accessToken, iTwinId, repositoryId);
+
+    if (repoResponse.error) {
+      console.error(`Repository error [${repoResponse.error.code}]:`, repoResponse.error.message);
+      return;
+    }
+
+    const resourcesUri = repoResponse.data?.repository.capabilities?.resources?.uri;
+
+    // Check if capability is available
+    if (!resourcesUri) {
+      console.log("Repository does not support resources capability");
+      console.log("This repository class may not provide resource management");
+      return;
+    }
+
+    // Attempt to fetch resources
+    const resourcesResponse = await client.getRepositoryResourcesByUri(accessToken, resourcesUri);
+
+    if (resourcesResponse.error) {
+      // Handle specific error codes
+      switch (resourcesResponse.error.code) {
+        case "Unauthorized":
+          console.error("Access token does not have permission for this resource");
+          break;
+        case "NotFound":
+          console.error("Resource endpoint not found - capability URI may be invalid");
+          break;
+        case "InternalServerError":
+          console.error("Federated service encountered an error");
+          break;
+        default:
+          console.error(`Error [${resourcesResponse.error.code}]:`, resourcesResponse.error.message);
+      }
+      return;
+    }
+
+    // Success
+    const resources = resourcesResponse.data!.resources;
+    console.log(`Successfully fetched ${resources.length} resources`);
+
+  } catch (error) {
+    console.error("Unexpected error:", error);
+  }
+}
+```
+
+### Resource Graphics
+
+The iTwins API supports retrieving graphics metadata for repository resources. This metadata includes URLs to access graphical content (such as 3D tiles, imagery, terrain data) along with any required authentication details. Graphics can be retrieved using either ID-based parameters or a direct URI.
+
+#### Get Resource Graphics by ID
+
+Retrieve graphics metadata using iTwin ID, repository ID, and resource ID:
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  ResourceGraphicsResponse,
+} from "@itwin/itwins-client";
+
+/** Function that retrieves resource graphics metadata by ID. */
+async function getResourceGraphicsByIds(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+
+  const iTwinId = "your-itwin-id";
+  const repositoryId = "your-repository-id";
+  const resourceId = "your-resource-id";
+
+  const response: BentleyAPIResponse<ResourceGraphicsResponse> =
+    await client.getResourceGraphics(
+      accessToken,
+      iTwinId,
+      repositoryId,
+      resourceId
+    );
+
+  if (response.error) {
+    console.error("Error fetching graphics:", response.error.message);
+    // Graphics capability may not be available for all resources
+    if (response.status === 404) {
+      console.log("Graphics capability not available for this resource");
+    }
+    return;
+  }
+
+  const graphics = response.data!.graphics;
+  console.log(`Found ${graphics.length} graphics resources`);
+
+  graphics.forEach((graphic, index) => {
+    console.log(`\nGraphic ${index + 1}:`);
+    console.log(`  Type: ${graphic.type}`);
+    console.log(`  URI: ${graphic.uri}`);
+
+    // Handle authentication if present
+    if (graphic.authentication) {
+      console.log(`  Authentication Type: ${graphic.authentication.type}`);
+
+      switch (graphic.authentication.type) {
+        case "apiKey":
+          console.log(`    Header/Query: ${graphic.authentication.headerOrQueryParameter}`);
+          console.log(`    Value: ${graphic.authentication.value}`);
+          break;
+        case "basic":
+          console.log(`    Username: ${graphic.authentication.username}`);
+          // Password would be stored securely, not logged
+          break;
+        case "oauth2AuthCodePKCE":
+          console.log(`    Client ID: ${graphic.authentication.clientId}`);
+          console.log(`    Auth URL: ${graphic.authentication.authorizationUrl}`);
+          console.log(`    Token URL: ${graphic.authentication.tokenUrl}`);
+          console.log(`    Scopes: ${graphic.authentication.scopes?.join(", ")}`);
+          break;
+      }
+    }
+
+    // CesiumJS provider configuration if available
+    if (graphic.provider) {
+      console.log(`  Provider: ${graphic.provider.name}`);
+      console.log(`  Tiling Scheme: ${graphic.provider.options.tilingScheme}`);
+      console.log(`  Bounds: ${graphic.provider.options.bounds.join(", ")}`);
+      console.log(`  Credit: ${graphic.provider.options.credit}`);
+    }
+  });
+}
+```
+
+#### Get Resource Graphics by URI
+
+Alternatively, retrieve graphics metadata using a direct URI (obtained from repository resource capabilities):
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  ResourceGraphicsResponse,
+  GetRepositoryResourceRepresentationResponse,
+} from "@itwin/itwins-client";
+
+/** Function that retrieves resource graphics using capability URI. */
+async function getResourceGraphicsByUri(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+
+  // First, get the repository resource to find the graphics capability URI
+  const resourceResponse: BentleyAPIResponse<GetRepositoryResourceRepresentationResponse> =
+    await client.getRepositoryResource(
+      accessToken,
+      "your-itwin-id",
+      "your-repository-id",
+      "your-resource-id",
+      "representation"
+    );
+
+  if (resourceResponse.error) {
+    console.error("Error fetching resource:", resourceResponse.error.message);
+    return;
+  }
+
+  const resource = resourceResponse.data!.resource;
+
+  // Check if the resource has a graphics capability link
+  const graphicsLink = resource._links?.graphics?.href;
+
+  if (!graphicsLink) {
+    console.log("This resource does not support graphics capabilities");
+    return;
+  }
+
+  console.log(`Using graphics capability URI: ${graphicsLink}`);
+
+  // Use the URI to get graphics metadata
+  const graphicsResponse: BentleyAPIResponse<ResourceGraphicsResponse> =
+    await client.getResourceGraphicsByUri(accessToken, graphicsLink);
+
+  if (graphicsResponse.error) {
+    console.error("Error fetching graphics from URI:", graphicsResponse.error.message);
+    return;
+  }
+
+  const graphics = graphicsResponse.data!.graphics;
+  console.log(`Retrieved ${graphics.length} graphics from URI`);
+
+  // Process graphics metadata (same as ID-based approach)
+  graphics.forEach((graphic) => {
+    console.log(`Type: ${graphic.type}, URI: ${graphic.uri}`);
+  });
+}
+```
+
+#### Handling Different Authentication Types
+
+Graphics resources may require authentication. Here's how to handle each type:
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  ResourceGraphicsResponse,
+  ResourceGraphics,
+} from "@itwin/itwins-client";
+
+/** Function demonstrating how to handle different authentication types for graphics. */
+async function handleGraphicsAuthentication(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+
+  const response: BentleyAPIResponse<ResourceGraphicsResponse> =
+    await client.getResourceGraphics(
+      accessToken,
+      "your-itwin-id",
+      "your-repository-id",
+      "your-resource-id"
+    );
+
+  if (response.error) {
+    console.error("Error:", response.error.message);
+    return;
+  }
+
+  response.data!.graphics.forEach((graphic: ResourceGraphics) => {
+    if (!graphic.authentication) {
+      console.log(`No authentication required for: ${graphic.uri}`);
+      return;
+    }
+
+    switch (graphic.authentication.type) {
+      case "apiKey":
+        // Add API key as header or query parameter
+        const param = graphic.authentication.headerOrQueryParameter;
+        const value = graphic.authentication.value;
+
+        if (graphic.authentication.location === "header") {
+          console.log(`Add header: ${param}: ${value}`);
+          // fetch(graphic.uri, { headers: { [param]: value } });
+        } else {
+          console.log(`Add query parameter: ${param}=${value}`);
+          // const url = new URL(graphic.uri);
+          // url.searchParams.set(param, value);
+          // fetch(url.toString());
+        }
+        break;
+
+      case "basic":
+        // Use HTTP Basic Authentication
+        const username = graphic.authentication.username;
+        const password = graphic.authentication.password;
+        const credentials = btoa(`${username}:${password}`);
+        console.log(`Add Authorization header: Basic ${credentials}`);
+        // fetch(graphic.uri, {
+        //   headers: { 'Authorization': `Basic ${credentials}` }
+        // });
+        break;
+
+      case "oauth2AuthCodePKCE":
+        // Implement OAuth2 Authorization Code flow with PKCE
+        console.log("OAuth2 PKCE required:");
+        console.log(`  Client ID: ${graphic.authentication.clientId}`);
+        console.log(`  Auth URL: ${graphic.authentication.authorizationUrl}`);
+        console.log(`  Token URL: ${graphic.authentication.tokenUrl}`);
+        console.log(`  Scopes: ${graphic.authentication.scopes?.join(", ")}`);
+
+        // This requires a multi-step OAuth2 flow:
+        // 1. Generate PKCE code verifier and challenge
+        // 2. Redirect user to authorizationUrl with challenge
+        // 3. Handle callback with authorization code
+        // 4. Exchange code for access token at tokenUrl
+        // 5. Use access token to fetch graphics
+        break;
+    }
+  });
+}
+```
+
+#### Integration with CesiumJS
+
+When graphics include CesiumJS provider configuration, you can use it directly:
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  ResourceGraphicsResponse,
+} from "@itwin/itwins-client";
+
+/** Function demonstrating CesiumJS integration with graphics provider. */
+async function setupCesiumProvider(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+
+  const response: BentleyAPIResponse<ResourceGraphicsResponse> =
+    await client.getResourceGraphics(
+      accessToken,
+      "your-itwin-id",
+      "your-repository-id",
+      "your-resource-id"
+    );
+
+  if (response.error || !response.data?.graphics) {
+    console.error("Could not retrieve graphics");
+    return;
+  }
+
+  // Find graphics with CesiumJS provider configuration
+  const cesiumGraphic = response.data.graphics.find((g) => g.provider);
+
+  if (!cesiumGraphic || !cesiumGraphic.provider) {
+    console.log("No CesiumJS provider configuration available");
+    return;
+  }
+
+  const provider = cesiumGraphic.provider;
+  console.log("CesiumJS Provider Configuration:");
+  console.log(`  Name: ${provider.name}`);
+  console.log(`  Tiling Scheme: ${provider.options.tilingScheme}`);
+  console.log(`  Bounds [W, S, E, N]: ${provider.options.bounds.join(", ")}`);
+  console.log(`  Credit: ${provider.options.credit}`);
+
+  // Example: Create Cesium imagery provider
+  // This is pseudocode - actual implementation depends on your Cesium setup
+  /*
+  import { UrlTemplateImageryProvider, Rectangle } from 'cesium';
+
+  const imageryProvider = new UrlTemplateImageryProvider({
+    url: cesiumGraphic.uri,
+    rectangle: Rectangle.fromDegrees(
+      provider.options.bounds[0],  // west
+      provider.options.bounds[1],  // south
+      provider.options.bounds[2],  // east
+      provider.options.bounds[3]   // north
+    ),
+    credit: provider.options.credit,
+    // Add authentication headers if needed
+  });
+
+  viewer.imageryLayers.addImageryProvider(imageryProvider);
+  */
+}
+```
+
 ## Export Operations
 
 ### Get All Exports for User

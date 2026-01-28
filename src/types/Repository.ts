@@ -29,17 +29,13 @@ export interface Repository {
 }
 
 /**
- * Authentication configuration for repository access
+ * Authentication configuration for repository access.
+ * Supports multiple authentication mechanisms via discriminated union.
+ * Use the 'type' field to determine which authentication method to use.
+ * See GraphicsAuthentication for the same types used in graphics contexts.
  * @beta
  */
-export interface RepositoryAuthentication {
-  /** Type of authentication method to use */
-  type: "Header" | "QueryParameter";
-  /** The key/name for the authentication parameter */
-  key: string;
-  /** The value for the authentication parameter */
-  value: string;
-}
+export type RepositoryAuthentication = GraphicsAuthentication;
 
 /**
  * Repository-specific options and configuration parameters.
@@ -64,6 +60,11 @@ export interface RepositoryCapabilities {
     /** A uri containing the endpoint that will return the list of resources in the repository. */
     uri: string;
   };
+  /** Graphics capabilities, available for repositories that support visualization content */
+  graphics?: {
+    /** A uri containing the endpoint that will return graphics metadata for repository resources. */
+    uri: string;
+  };
 }
 
 /**
@@ -75,7 +76,6 @@ export type RepositoryClass =
   | "iModels"
   | "Storage"
   | "Forms"
-  | "Issues"
   | "RealityData"
   | "GeographicInformationSystem"
   | "Construction"
@@ -94,8 +94,10 @@ export type RepositoryClass =
 export type RepositorySubClass =
   | "WebMapService"
   | "WebMapTileService"
+  | "WebFeatureService"
   | "ArcGIS"
   | "UrlTemplate"
+  | "OgcApiFeatures"
   | "EvoWorkspace"
   | "Performance";
 
@@ -213,3 +215,112 @@ export interface NewRepositoryConfig
     displayName?: string;
     class: CreatableRepositoryClass;
   }
+
+/**
+ * Graphics content type specifying the format of visualization data.
+ * @beta
+ */
+export type GraphicsContentType =
+  | "3DTILES"
+  | "GLTF"
+  | "IMAGERY"
+  | "TERRAIN"
+  | "KML"
+  | "CZML"
+  | "GEOJSON"
+  | "OAPIF+GEOJSON"
+  | "POINT_CLOUD"
+  | "MESH"
+  | "VECTOR_TILES"
+  | "WMS";
+
+/**
+ * This value determines how to process the authentication information returned from the API.
+ * @beta
+ */
+export type ITwinRepositoryAuthenticationType =
+  | "Header"
+  | "QueryParameter"
+  | "Basic";
+
+/**
+ * Contains the information needed to authenticate to the specified API using an api key.
+ * @beta
+ */
+export interface ApiKeyAuthentication {
+  /** Type of authentication mechanism */
+  type: "Header" | "QueryParameter";
+  /** The key to use for Header or QueryParameter auth types */
+  key: string;
+  /** The value to use for Header or QueryParameter auth types */
+  value: string;
+}
+
+/**
+ * Contains the information needed to authenticate to the specified API using Basic authentication.
+ * @beta
+ */
+export interface BasicAuthentication {
+  /** Type of authentication mechanism */
+  type: "Basic";
+  /** The username to use for Basic auth type */
+  username: string;
+  /** The password to use for Basic auth type */
+  password: string;
+}
+
+/**
+ * Authentication configuration for graphics resource access.
+ * Discriminated union based on the authentication type.
+ * @beta
+ */
+export type GraphicsAuthentication =
+  | ApiKeyAuthentication
+  | BasicAuthentication;
+
+/**
+ * Configuration options for CesiumJS provider integration.
+ * @beta
+ */
+export interface GraphicsProviderOptions {
+  /** The tiling scheme used (e.g., 'WebMercatorTilingScheme'). */
+  tilingScheme: string;
+  /** Geographic bounds as [west, south, east, north] in degrees */
+  bounds: [number, number, number, number];
+  /** Attribution or credit for the imagery provider */
+  credit: string;
+}
+
+/**
+ * Graphics provider configuration combining content type and options.
+ * @beta
+ */
+export interface GraphicsProvider {
+  /** The name of the provider. Currently only UrlTemplateImageryProvider is supported. More will be added as needed. */
+  name: string;
+  /** Additional options for the provider */
+  options: GraphicsProviderOptions;
+}
+
+/**
+ * Graphics resource metadata including URIs and authentication.
+ * @beta
+ */
+export interface ResourceGraphics {
+  type: GraphicsContentType;
+  /** A uri containing the location of the graphics content. This value can be cached but be aware that it might change over time. Some might contain a SAS key that expires after some time. */
+  uri: string;
+  /** Some repositories require authentication. If authentication details are provided, inspect the authentication.type property to determine the required method. You may need to add an Api Key (header or query parameter) or use basic authentication. */
+  authentication?: GraphicsAuthentication;
+  /** Optional CesiumJS provider configuration */
+  provider?: GraphicsProvider;
+}
+
+/**
+ * Response interface for retrieving resource graphics metadata.
+ * @beta
+ */
+export interface ResourceGraphicsResponse {
+  /** Graphics resource metadata and access configuration */
+  graphics: ResourceGraphics[];
+}

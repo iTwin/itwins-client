@@ -12,5 +12,8 @@ pnpm-debug.log
 # pack output
 *.tgz
 
+# coverage reports
+coverage
+
 # Mac specfic
 .DS_Store

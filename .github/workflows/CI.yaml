@@ -55,8 +55,8 @@ jobs:
         # import { TestUtility } from "@itwin/oidc-signin-tool"; in test setup
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Run Test
-        run: pnpm run test
+      - name: Run Test with Coverage
+        run: pnpm run test:coverage
         env:
           IMJS_URL_PREFIX: ${{ secrets.IMJS_URL_PREFIX }}
           IMJS_OIDC_BROWSER_TEST_CLIENT_ID: ${{ secrets.IMJS_OIDC_BROWSER_TEST_CLIENT_ID }}

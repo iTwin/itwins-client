@@ -65,6 +65,12 @@ globalThis.IMJS_URL_PREFIX = "qa-";
 globalThis.IMJS_URL_PREFIX = undefined;
 ```
 
+Configure max redirect limit for federated architecture (default: 5):
+
+```typescript
+globalThis.IMJS_MAX_REDIRECTS = 10; // Increase if needed for multi-hop redirects
+```
+
 ## Documentation
 
 ### Core Documentation
@@ -150,6 +156,7 @@ pnpm build
 ```
 
 ### Running Tests
+
 .env file setup is required for tests view [Getting Started](./GETTINGSTARTED.md) for more information.
 
 ```bash
@@ -184,4 +191,3 @@ Copyright © Bentley Systems, Incorporated. All rights reserved.
 This project is licensed under the MIT License - see the [LICENSE.md](./LICENSE.md) file for details.
 
 ---
-
