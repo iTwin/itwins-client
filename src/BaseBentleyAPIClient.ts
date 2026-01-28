@@ -160,8 +160,7 @@ export abstract class BaseBentleyAPIClient {
     if (verificationResult.error) {
       return verificationResult.error;
     }
-
-    const redirectUrl = verificationResult.redirectUrl!;
+    const redirectUrl = verificationResult.redirectUrl;
 
     try {
       const requestOptions = this.createRequestOptions(
@@ -187,7 +186,7 @@ export abstract class BaseBentleyAPIClient {
           method,
           data,
           headers,
-          redirectCount
+          redirectCount + 1
         );
       }
 
@@ -260,7 +259,7 @@ export abstract class BaseBentleyAPIClient {
   private checkRedirectValidity(
     response: Response,
     redirectCount: number
-  ): { error?: BentleyAPIResponse<never>; redirectUrl?: string } {
+  ): { error?: BentleyAPIResponse<never>; redirectUrl: string } {
     // Check redirect limit to prevent infinite loops
     if (redirectCount >= this._maxRedirects) {
       return {
@@ -271,6 +270,7 @@ export abstract class BaseBentleyAPIClient {
             message: `Maximum redirect limit (${this._maxRedirects}) exceeded. Possible redirect loop detected.`,
           },
         },
+        redirectUrl: "",
       };
     }
 
@@ -285,6 +285,7 @@ export abstract class BaseBentleyAPIClient {
             message: "302 redirect response missing Location header",
           },
         },
+        redirectUrl: "",
       };
     }
 
@@ -300,6 +301,7 @@ export abstract class BaseBentleyAPIClient {
             message: error instanceof Error ? error.message : "Invalid redirect URL",
           },
         },
+        redirectUrl: "",
       };
     }
 
