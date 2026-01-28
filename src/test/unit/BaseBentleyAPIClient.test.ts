@@ -17,6 +17,26 @@ class TestableBaseBentleyAPIClient extends BaseBentleyAPIClient {
   public testValidateRedirectUrl(url: string): boolean {
     return (this as unknown as { validateRedirectUrl: (url: string) => boolean }).validateRedirectUrl(url);
   }
+
+  /**
+   * Expose verifyRedirect for testing
+   * @param response - Mock response object
+   * @param redirectCount - Current redirect count
+   * @returns Verification result
+   */
+  public testVerifyRedirect(
+    response: Response,
+    redirectCount: number
+  ): { error?: any; redirectUrl?: string } {
+    return (this as unknown as { verifyRedirect: (response: Response, redirectCount: number) => any }).verifyRedirect(response, redirectCount);
+  }
+
+  /**
+   * Expose _maxRedirects for testing
+   */
+  public get testMaxRedirects(): number {
+    return this._maxRedirects;
+  }
 }
 
 describe("BaseBentleyAPIClient - Redirect Security", () => {
@@ -199,6 +219,335 @@ describe("BaseBentleyAPIClient - Redirect Security", () => {
         const url = "data:text/html,<script>alert('XSS')</script>";
         expect(() => client.testValidateRedirectUrl(url)).toThrow(/HTTPS required/);
       });
+    });
+  });
+});
+
+describe("BaseBentleyAPIClient - verifyRedirect", () => {
+  let client: TestableBaseBentleyAPIClient;
+
+  beforeEach(() => {
+    client = new TestableBaseBentleyAPIClient();
+  });
+
+  /**
+   * Helper to create a mock Response object with Location header
+   */
+  function createMockResponse(locationHeader: string | null): Response {
+    const headers = new Headers();
+    if (locationHeader !== null) {
+      headers.set('location', locationHeader);
+    }
+    
+    return {
+      headers,
+      status: 302,
+      ok: false,
+    } as Response;
+  }
+
+  describe("Redirect Count Validation", () => {
+    it("should allow redirect when count is below limit", () => {
+      const response = createMockResponse("https://api.bentley.com/redirect");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeUndefined();
+      expect(result.redirectUrl).toBe("https://api.bentley.com/redirect");
+    });
+
+    it("should allow redirect at max limit minus one", () => {
+      const response = createMockResponse("https://api.bentley.com/redirect");
+      const maxRedirects = client.testMaxRedirects;
+      const result = client.testVerifyRedirect(response, maxRedirects - 1);
+
+      expect(result.error).toBeUndefined();
+      expect(result.redirectUrl).toBe("https://api.bentley.com/redirect");
+    });
+
+    it("should reject redirect when count equals max limit", () => {
+      const response = createMockResponse("https://api.bentley.com/redirect");
+      const maxRedirects = client.testMaxRedirects;
+      const result = client.testVerifyRedirect(response, maxRedirects);
+
+      expect(result.error).toBeDefined();
+      expect(result.redirectUrl).toBeUndefined();
+      expect(result.error!.status).toBe(508);
+      expect(result.error!.error.code).toBe("TooManyRedirects");
+      expect(result.error!.error.message).toContain("Maximum redirect limit");
+      expect(result.error!.error.message).toContain(maxRedirects.toString());
+    });
+
+    it("should reject redirect when count exceeds max limit", () => {
+      const response = createMockResponse("https://api.bentley.com/redirect");
+      const maxRedirects = client.testMaxRedirects;
+      const result = client.testVerifyRedirect(response, maxRedirects + 5);
+
+      expect(result.error).toBeDefined();
+      expect(result.error!.status).toBe(508);
+      expect(result.error!.error.code).toBe("TooManyRedirects");
+    });
+
+    it("should return 508 Loop Detected status code for infinite loop protection", () => {
+      const response = createMockResponse("https://api.bentley.com/redirect");
+      const result = client.testVerifyRedirect(response, 100);
+
+      expect(result.error!.status).toBe(508);
+    });
+
+    it("should include redirect limit in error message", () => {
+      const response = createMockResponse("https://api.bentley.com/redirect");
+      const maxRedirects = client.testMaxRedirects;
+      const result = client.testVerifyRedirect(response, maxRedirects);
+
+      expect(result.error!.error.message).toContain(`${maxRedirects}`);
+      expect(result.error!.error.message).toContain("redirect loop");
+    });
+
+    it("should work with custom max redirect values", () => {
+      const customClient = new TestableBaseBentleyAPIClient(10);
+      const response = createMockResponse("https://api.bentley.com/redirect");
+      
+      // Should pass at 9
+      const result1 = customClient.testVerifyRedirect(response, 9);
+      expect(result1.error).toBeUndefined();
+      
+      // Should fail at 10
+      const result2 = customClient.testVerifyRedirect(response, 10);
+      expect(result2.error).toBeDefined();
+      expect(result2.error!.status).toBe(508);
+    });
+  });
+
+  describe("Location Header Validation", () => {
+    it("should extract valid Location header", () => {
+      const expectedUrl = "https://api.bentley.com/repositories/abc123";
+      const response = createMockResponse(expectedUrl);
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeUndefined();
+      expect(result.redirectUrl).toBe(expectedUrl);
+    });
+
+    it("should reject when Location header is missing", () => {
+      const response = createMockResponse(null);
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeDefined();
+      expect(result.redirectUrl).toBeUndefined();
+      expect(result.error!.status).toBe(502);
+      expect(result.error!.error.code).toBe("InvalidRedirect");
+      expect(result.error!.error.message).toContain("missing Location header");
+    });
+
+    it("should return 502 Bad Gateway for missing Location header", () => {
+      const response = createMockResponse(null);
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error!.status).toBe(502);
+    });
+
+    it("should handle empty Location header as missing", () => {
+      const response = createMockResponse("");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeDefined();
+      expect(result.error!.status).toBe(502);
+      expect(result.error!.error.code).toBe("InvalidRedirect");
+    });
+
+    it("should provide clear error message for missing Location header", () => {
+      const response = createMockResponse(null);
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error!.error.message).toBe("302 redirect response missing Location header");
+    });
+  });
+
+  describe("Redirect URL Security Validation", () => {
+    it("should accept valid HTTPS Bentley domain", () => {
+      const response = createMockResponse("https://api.bentley.com/redirect");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeUndefined();
+      expect(result.redirectUrl).toBe("https://api.bentley.com/redirect");
+    });
+
+    it("should accept dev environment URL", () => {
+      const response = createMockResponse("https://dev-api.bentley.com/redirect");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeUndefined();
+      expect(result.redirectUrl).toBe("https://dev-api.bentley.com/redirect");
+    });
+
+    it("should accept QA environment URL", () => {
+      const response = createMockResponse("https://qa-api.bentley.com/redirect");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeUndefined();
+      expect(result.redirectUrl).toBe("https://qa-api.bentley.com/redirect");
+    });
+
+    it("should reject HTTP URLs (insecure protocol)", () => {
+      const response = createMockResponse("http://api.bentley.com/redirect");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeDefined();
+      expect(result.error!.status).toBe(502);
+      expect(result.error!.error.code).toBe("InvalidRedirectUrl");
+      expect(result.error!.error.message).toContain("HTTPS required");
+    });
+
+    it("should reject non-Bentley domains", () => {
+      const response = createMockResponse("https://evil.com/malicious");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeDefined();
+      expect(result.error!.status).toBe(502);
+      expect(result.error!.error.code).toBe("InvalidRedirectUrl");
+      expect(result.error!.error.message).toContain("not a trusted Bentley domain");
+    });
+
+    it("should reject malformed URLs", () => {
+      const response = createMockResponse("not-a-valid-url");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeDefined();
+      expect(result.error!.status).toBe(502);
+      expect(result.error!.error.code).toBe("InvalidRedirectUrl");
+      expect(result.error!.error.message).toContain("malformed URL");
+    });
+
+    it("should return 502 Bad Gateway for invalid redirect URLs", () => {
+      const response = createMockResponse("https://evil.com/attack");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error!.status).toBe(502);
+    });
+
+    it("should include validation error details in message", () => {
+      const response = createMockResponse("https://malicious-site.com/redirect");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error!.error.message).toContain("malicious-site.com");
+      expect(result.error!.error.message).toContain("not a trusted Bentley domain");
+    });
+
+    it("should handle URL with query parameters", () => {
+      const response = createMockResponse("https://api.bentley.com/redirect?id=123&token=abc");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeUndefined();
+      expect(result.redirectUrl).toBe("https://api.bentley.com/redirect?id=123&token=abc");
+    });
+
+    it("should handle URL with path segments", () => {
+      const response = createMockResponse("https://api.bentley.com/itwins/abc123/repositories/xyz789");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeUndefined();
+      expect(result.redirectUrl).toContain("/itwins/abc123/repositories/xyz789");
+    });
+  });
+
+  describe("Combined Validation Scenarios", () => {
+    it("should validate redirect count before URL extraction", () => {
+      // Even with a missing Location header, redirect count is checked first
+      const response = createMockResponse(null);
+      const maxRedirects = client.testMaxRedirects;
+      const result = client.testVerifyRedirect(response, maxRedirects);
+
+      // Should fail on redirect count, not Location header
+      expect(result.error!.status).toBe(508);
+      expect(result.error!.error.code).toBe("TooManyRedirects");
+    });
+
+    it("should check Location header before URL validation", () => {
+      // Missing Location header should be caught before URL validation
+      const response = createMockResponse(null);
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error!.status).toBe(502);
+      expect(result.error!.error.code).toBe("InvalidRedirect");
+    });
+
+    it("should validate URL security after extracting Location header", () => {
+      // Valid Location header but invalid URL
+      const response = createMockResponse("https://evil.com/attack");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error!.status).toBe(502);
+      expect(result.error!.error.code).toBe("InvalidRedirectUrl");
+    });
+
+    it("should pass all validations for valid redirect", () => {
+      const response = createMockResponse("https://api.bentley.com/valid");
+      const result = client.testVerifyRedirect(response, 2);
+
+      expect(result.error).toBeUndefined();
+      expect(result.redirectUrl).toBe("https://api.bentley.com/valid");
+    });
+
+    it("should handle redirect at count 0 with valid URL", () => {
+      const response = createMockResponse("https://qa-api.bentley.com/resource");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeUndefined();
+      expect(result.redirectUrl).toBe("https://qa-api.bentley.com/resource");
+    });
+  });
+
+  describe("Error Response Structure", () => {
+    it("should return proper error structure for redirect loop", () => {
+      const response = createMockResponse("https://api.bentley.com/redirect");
+      const result = client.testVerifyRedirect(response, 10);
+
+      expect(result).toHaveProperty("error");
+      expect(result.error).toHaveProperty("status");
+      expect(result.error).toHaveProperty("error");
+      expect(result.error!.error).toHaveProperty("code");
+      expect(result.error!.error).toHaveProperty("message");
+    });
+
+    it("should return proper error structure for missing Location", () => {
+      const response = createMockResponse(null);
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result).toHaveProperty("error");
+      expect(result.error).toHaveProperty("status");
+      expect(result.error).toHaveProperty("error");
+      expect(result.error!.error).toHaveProperty("code");
+      expect(result.error!.error).toHaveProperty("message");
+    });
+
+    it("should return proper error structure for invalid URL", () => {
+      const response = createMockResponse("http://api.bentley.com/insecure");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result).toHaveProperty("error");
+      expect(result.error).toHaveProperty("status");
+      expect(result.error).toHaveProperty("error");
+      expect(result.error!.error).toHaveProperty("code");
+      expect(result.error!.error).toHaveProperty("message");
+    });
+  });
+
+  describe("Success Response Structure", () => {
+    it("should return redirectUrl on success", () => {
+      const expectedUrl = "https://api.bentley.com/redirect";
+      const response = createMockResponse(expectedUrl);
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result).toHaveProperty("redirectUrl");
+      expect(result.redirectUrl).toBe(expectedUrl);
+      expect(result.error).toBeUndefined();
+    });
+
+    it("should not include error property on success", () => {
+      const response = createMockResponse("https://api.bentley.com/valid");
+      const result = client.testVerifyRedirect(response, 0);
+
+      expect(result.error).toBeUndefined();
     });
   });
 });

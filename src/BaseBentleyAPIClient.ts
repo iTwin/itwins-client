@@ -40,6 +40,38 @@ function isErrorResponse(data: unknown): data is { error: ApimError } {
  */
 export abstract class BaseBentleyAPIClient {
 
+
+  /**
+   * The max redirects for iTwins API endpoints.
+   * The max redirects can be customized via the constructor parameter or automatically
+   * modified based on the IMJS_MAX_REDIRECTS environment variable.
+   *
+   * @readonly
+   */
+  protected readonly _maxRedirects: number = 5;
+
+  /**
+   * Creates a new BaseClient instance for API operations
+   * @param maxRedirects - Optional custom max redirects, defaults to 5
+   *
+   * @example
+   * ```typescript
+   * // Use default max redirects
+   * const client = new BaseClient();
+   *
+   * // Use custom max redirects
+   * const client = new BaseClient(10);
+   * ```
+   */
+  public constructor(maxRedirects?: number) {
+    if (maxRedirects !== undefined) {
+      this._maxRedirects = maxRedirects;
+    } else {
+      this._maxRedirects = globalThis.IMJS_MAX_REDIRECTS ?? 5;
+    }
+  }
+
+
   /**
    * Sends a generic API request with type safety and response validation.
    * Handles authentication, error responses, and data extraction automatically.
@@ -87,7 +119,7 @@ export abstract class BaseBentleyAPIClient {
             },
           };
         }
-        return await this.handleRedirect<TResponse, TData>(
+        return await this.followRedirect<TResponse, TData>(
           response,
           accessToken,
           method,
@@ -114,7 +146,7 @@ export abstract class BaseBentleyAPIClient {
    * @param redirectCount - Current redirect depth
    * @returns Promise that resolves to the final API response
    */
-  private async handleRedirect<TResponse = unknown, TData = unknown>(
+  private async followRedirect<TResponse = unknown, TData = unknown>(
     response: Response,
     accessToken: AccessToken,
     method: Method,
@@ -122,85 +154,25 @@ export abstract class BaseBentleyAPIClient {
     headers: Record<string, string> | undefined,
     redirectCount: number = 0
   ): Promise<BentleyAPIResponse<TResponse>> {
-    const MAX_REDIRECTS = 5;
 
-    // Check redirect limit to prevent infinite loops
-    if (redirectCount >= MAX_REDIRECTS) {
-      return {
-        status: 508,
-        error: {
-          code: "TooManyRedirects",
-          message: `Maximum redirect limit (${MAX_REDIRECTS}) exceeded. Possible redirect loop detected.`,
-        },
-      };
+    // Verify redirect is valid and safe to follow
+    const verificationResult = this.checkRedirectValidity(response, redirectCount);
+    if (verificationResult.error) {
+      return verificationResult.error;
     }
 
-    // Extract and validate redirect URL
-    const redirectUrl = response.headers.get('location');
-    if (!redirectUrl) {
-      return {
-        status: 502,
-        error: {
-          code: "InvalidRedirect",
-          message: "302 redirect response missing Location header",
-        },
-      };
-    }
+    const redirectUrl = verificationResult.redirectUrl!;
 
-    // Validate redirect URL for security
-    try {
-      this.validateRedirectUrl(redirectUrl);
-    } catch (error) {
-      return {
-        status: 502,
-        error: {
-          code: "InvalidRedirectUrl",
-          message: error instanceof Error ? error.message : "Invalid redirect URL",
-        },
-      };
-    }
-
-    // Forward original headers (including authentication) to redirect target
-    return this.followRedirect<TResponse, TData>(
-      accessToken,
-      method,
-      redirectUrl,
-      data,
-      headers,
-      redirectCount + 1
-    );
-  }
-
-  /**
-   * Follows a redirect by making a new request with the redirect URL.
-   * This is a recursive helper that maintains redirect count state.
-   *
-   * @param accessToken - The client access token
-   * @param method - The HTTP method
-   * @param url - The redirect target URL
-   * @param data - Optional request payload
-   * @param headers - Original request headers (forwarded to redirect target)
-   * @param redirectCount - Current redirect depth
-   * @returns Promise that resolves to the final API response
-   */
-  private async followRedirect<TResponse = unknown, TData = unknown>(
-    accessToken: AccessToken,
-    method: Method,
-    url: string,
-    data: TData | undefined,
-    headers: Record<string, string> | undefined,
-    redirectCount: number
-  ): Promise<BentleyAPIResponse<TResponse>> {
     try {
       const requestOptions = this.createRequestOptions(
         accessToken,
         method,
-        url,
+        redirectUrl,
         data,
         headers
       );
 
-      const response = await fetch(requestOptions.url, {
+      const redirectResponse = await fetch(requestOptions.url, {
         method: requestOptions.method,
         headers: requestOptions.headers,
         body: requestOptions.body,
@@ -208,9 +180,9 @@ export abstract class BaseBentleyAPIClient {
       });
 
       // Handle subsequent 302 redirects
-      if (response.status === 302) {
-        return await this.handleRedirect<TResponse, TData>(
-          response,
+      if (redirectResponse.status === 302) {
+        return await this.followRedirect<TResponse, TData>(
+          redirectResponse,
           accessToken,
           method,
           data,
@@ -220,7 +192,7 @@ export abstract class BaseBentleyAPIClient {
       }
 
       // Process final response
-      return await this.processResponse<TResponse>(response);
+      return await this.processResponse<TResponse>(redirectResponse);
     } catch {
       return this.createInternalServerError();
     }
@@ -273,12 +245,74 @@ export abstract class BaseBentleyAPIClient {
     };
   }
 
+
+  /**
+   * Verifies that a redirect response is valid and safe to follow.
+   * Performs three critical validations:
+   * 1. Checks redirect count to prevent infinite loops
+   * 2. Ensures Location header is present
+   * 3. Validates redirect URL for security
+   *
+   * @param response - The 302 redirect response to verify
+   * @param redirectCount - Current redirect depth
+   * @returns Verification result with either error or validated redirect URL
+   */
+  private checkRedirectValidity(
+    response: Response,
+    redirectCount: number
+  ): { error?: BentleyAPIResponse<never>; redirectUrl?: string } {
+    // Check redirect limit to prevent infinite loops
+    if (redirectCount >= this._maxRedirects) {
+      return {
+        error: {
+          status: 508,
+          error: {
+            code: "TooManyRedirects",
+            message: `Maximum redirect limit (${this._maxRedirects}) exceeded. Possible redirect loop detected.`,
+          },
+        },
+      };
+    }
+
+    // Extract and validate redirect URL
+    const redirectUrl = response.headers.get('location');
+    if (!redirectUrl) {
+      return {
+        error: {
+          status: 502,
+          error: {
+            code: "InvalidRedirect",
+            message: "302 redirect response missing Location header",
+          },
+        },
+      };
+    }
+
+    // Validate redirect URL for security
+    try {
+      this.validateRedirectUrlSecurity(redirectUrl);
+    } catch (error) {
+      return {
+        error: {
+          status: 502,
+          error: {
+            code: "InvalidRedirectUrl",
+            message: error instanceof Error ? error.message : "Invalid redirect URL",
+          },
+        },
+      };
+    }
+
+    // All validations passed
+    return { redirectUrl };
+  }
+
   /**
    * Validates that a redirect URL is secure and targets a trusted APIM Bentley domain.
    *
    * This method enforces security requirements for following HTTP redirects:
    * - URL must use HTTPS protocol (not HTTP)
-   * - Domain must be a Bentley-owned domain (*.bentley.com or *.bentley.systems)
+   * - Domain must be a Bentley-owned domain (*api.bentley.com)
    *
    * @param url - The redirect URL to validate
    * @returns True if the URL is valid and safe to follow
@@ -293,15 +327,12 @@ export abstract class BaseBentleyAPIClient {
    * ```typescript
    * // Valid URLs
    * this.validateRedirectUrl("https://api.bentley.com/resource");
-   * this.validateRedirectUrl("https://dev-api.bentley.com/resource");
-   * this.validateRedirectUrl("https://qa-api.bentley.com/resource");
    * // Invalid URLs (will throw)
-   * this.validateRedirectUrl("http://api.bentley.com/resource"); // HTTP not allowed
-   * this.validateRedirectUrl("https://evil.com/phishing"); // Non-Bentley domain
+   * this.validateRedirectUrl("https://evil-tuna.com/phishing/"); // Non-Bentley domain
    * this.validateRedirectUrl("https://bentley.com.evil.com/fake"); // Domain spoofing attempt
    * ```
    */
-  private validateRedirectUrl(url: string): boolean {
+  private validateRedirectUrlSecurity(url: string): boolean {
     let parsedUrl: URL;
 
     try {

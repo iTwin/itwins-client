@@ -6,6 +6,7 @@
 // Add this at the top of the file or in a types file
 declare global {
   var IMJS_URL_PREFIX: string | undefined;
+  var IMJS_MAX_REDIRECTS: number | undefined;
 }
 
 /**

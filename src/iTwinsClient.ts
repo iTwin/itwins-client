@@ -49,8 +49,8 @@ import type {
  * @beta
  */
 export class ITwinsClient extends BaseITwinsApiClient {
-  constructor(url?: string) {
-    super(url);
+  constructor(url?: string, maxRedirects?: number) {
+    super(url, maxRedirects);
   }
 
   /** Get a list of iTwin exports for the current user

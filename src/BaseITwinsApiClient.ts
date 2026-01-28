@@ -171,8 +171,8 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
    * const client = new ITwinsAccessClient("https://dev-api.bentley.com/itwins");
    * ```
    */
-  public constructor(url?: string) {
-    super();
+  public constructor(url?: string, maxRedirects?: number) {
+    super(maxRedirects);
     if (url !== undefined) {
       this._baseUrl = url;
     } else {
