@@ -2,8 +2,9 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { BaseBentleyAPIClient } from "../../BaseBentleyAPIClient";
+import type { BentleyAPIResponse } from "../../types/CommonApiTypes";
 
 /**
  * Test subclass to expose private methods for unit testing
@@ -642,9 +643,9 @@ class ExtendedTestableClient extends BaseBentleyAPIClient {
   /**
    * Expose processResponse for testing
    */
-  public async testProcessResponse<TResponse>(response: Response) {
+  public async testProcessResponse<TResponse>(response: Response): Promise<BentleyAPIResponse<TResponse>> {
     return (this as unknown as {
-      processResponse: <_T>(response: Response) => Promise<any>;
+      processResponse: <TRes>(response: Response) => Promise<BentleyAPIResponse<TRes>>;
     }).processResponse<TResponse>(response);
   }
 
@@ -658,16 +659,16 @@ class ExtendedTestableClient extends BaseBentleyAPIClient {
     data?: TData,
     headers?: Record<string, string>,
     redirectCount: number = 0
-  ) {
+  ): Promise<BentleyAPIResponse<TResponse>> {
     return (this as unknown as {
-      followRedirect: <_T, _D>(
+      followRedirect: <TRes, TDat>(
         response: Response,
         token: string,
         method: string,
-        data?: _D,
+        data?: TDat,
         headers?: Record<string, string>,
         count?: number
-      ) => Promise<any>;
+      ) => Promise<BentleyAPIResponse<TRes>>;
     }).followRedirect<TResponse, TData>(response, accessToken, method, data, headers, redirectCount);
   }
 
@@ -681,16 +682,16 @@ class ExtendedTestableClient extends BaseBentleyAPIClient {
     data?: TData,
     headers?: Record<string, string>,
     allowRedirects: boolean = false
-  ) {
+  ): Promise<BentleyAPIResponse<TResponse>> {
     return (this as unknown as {
-      sendGenericAPIRequest: <_T, _D>(
+      sendGenericAPIRequest: <TRes, TDat>(
         token: string,
         method: string,
         url: string,
-        data?: _D,
+        data?: TDat,
         headers?: Record<string, string>,
         allowRedirects?: boolean
-      ) => Promise<any>;
+      ) => Promise<BentleyAPIResponse<TRes>>;
     }).sendGenericAPIRequest<TResponse, TData>(
       accessToken,
       method,
