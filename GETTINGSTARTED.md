@@ -267,6 +267,18 @@ pnpm build
 pnpm test
 ```
 
+### Browser E2E Tests (Playwright)
+
+The browser E2E tests validate redirect behavior using real browser fetch implementations (Chromium, Firefox, WebKit).
+
+```bash
+# Run browser E2E tests
+pnpm test:e2e
+
+# Run with Playwright UI
+pnpm test:e2e:ui
+```
+
 For more details about testing, see the [test documentation](./src/test/README.md) and existing test files in `src/test/integration/`.
 
 ## Next Steps
