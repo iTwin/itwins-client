@@ -851,11 +851,22 @@ describe("BaseBentleyAPIClient - sendGenericAPIRequest with redirects", () => {
     };
   }
 
+  type TestResponseType =
+    | "basic"
+    | "cors"
+    | "default"
+    | "error"
+    | "opaque"
+    | "opaqueredirect";
+
   function createMockResponse(
     status: number,
     ok: boolean,
     body: any,
-    locationHeader?: string
+    locationHeader?: string,
+    type?: TestResponseType,
+    redirected?: boolean,
+    url?: string
   ): Response {
     const headers = new Headers();
     if (locationHeader) {
@@ -867,6 +878,9 @@ describe("BaseBentleyAPIClient - sendGenericAPIRequest with redirects", () => {
       ok,
       headers,
       json: async () => body,
+      type,
+      redirected,
+      url,
     } as Response;
   }
 
@@ -894,6 +908,31 @@ describe("BaseBentleyAPIClient - sendGenericAPIRequest with redirects", () => {
       expect(result.error).toBeDefined();
       expect(result.error!.code).toBe("RedirectsNotAllowed");
       expect(result.error!.message).toContain("not allowed");
+    });
+
+    it("should return 403 when opaque redirect encountered but allowRedirects is false", async () => {
+      const opaqueRedirectResponse = createMockResponse(
+        0,
+        false,
+        {},
+        undefined,
+        "opaqueredirect"
+      );
+
+      mockFetch([opaqueRedirectResponse]);
+
+      const result = await client.testSendGenericAPIRequest(
+        "test-token",
+        "GET",
+        "https://api.bentley.com/original",
+        undefined,
+        undefined,
+        false
+      );
+
+      expect(result.status).toBe(403);
+      expect(result.error).toBeDefined();
+      expect(result.error!.code).toBe("RedirectsNotAllowed");
     });
 
     it("should return 403 when allowRedirects is not specified (defaults to false)", async () => {
@@ -946,6 +985,41 @@ describe("BaseBentleyAPIClient - sendGenericAPIRequest with redirects", () => {
 
       expect(result.status).toBe(200);
       expect(result.data).toEqual({ id: "123", data: "success" });
+      expect(result.error).toBeUndefined();
+    });
+
+    it("should follow opaque redirect when allowed using fetch follow", async () => {
+      const opaqueRedirectResponse = createMockResponse(
+        0,
+        false,
+        {},
+        undefined,
+        "opaqueredirect"
+      );
+
+      const finalResponse = createMockResponse(
+        200,
+        true,
+        { result: "final" },
+        undefined,
+        "basic",
+        true,
+        "https://api.bentley.com/final"
+      );
+
+      mockFetch([opaqueRedirectResponse, finalResponse]);
+
+      const result = await client.testSendGenericAPIRequest(
+        "test-token",
+        "GET",
+        "https://api.bentley.com/original",
+        undefined,
+        undefined,
+        true
+      );
+
+      expect(result.status).toBe(200);
+      expect(result.data).toEqual({ result: "final" });
       expect(result.error).toBeUndefined();
     });
 
