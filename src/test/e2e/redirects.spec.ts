@@ -2,7 +2,7 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { createTestServer } from "./test-server";
 
 test.describe("Browser redirect handling", () => {
@@ -24,7 +24,7 @@ test.describe("Browser redirect handling", () => {
 
     const result = await page.evaluate(async (baseUrl) => {
       const moduleUrl = new URL("/lib/esm/BaseBentleyAPIClient.js", baseUrl).toString();
-      const { BaseBentleyAPIClient } = await import(moduleUrl);
+      const { BaseBentleyAPIClient: BaseBentleyApiClient } = await import(moduleUrl);
 
       const originalFetch = globalThis.fetch;
       const fetchCalls: Array<{ input: string | URL; init?: RequestInit }> = [];
@@ -53,7 +53,7 @@ test.describe("Browser redirect handling", () => {
         } as unknown as Response;
       }) as typeof fetch;
 
-      class TestClient extends BaseBentleyAPIClient {
+      class TestClient extends BaseBentleyApiClient {
         public async request(url: string, allowRedirects: boolean) {
           return this.sendGenericAPIRequest(
             "test-token",
@@ -84,7 +84,7 @@ test.describe("Browser redirect handling", () => {
 
     const result = await page.evaluate(async (baseUrl) => {
       const moduleUrl = new URL("/lib/esm/BaseBentleyAPIClient.js", baseUrl).toString();
-      const { BaseBentleyAPIClient } = await import(moduleUrl);
+      const { BaseBentleyAPIClient: BaseBentleyApiClient } = await import(moduleUrl);
 
       const originalFetch = globalThis.fetch;
       const fetchCalls: Array<{ input: string | URL; init?: RequestInit }> = [];
@@ -101,7 +101,7 @@ test.describe("Browser redirect handling", () => {
         } as unknown as Response;
       }) as typeof fetch;
 
-      class TestClient extends BaseBentleyAPIClient {
+      class TestClient extends BaseBentleyApiClient {
         public async request(url: string, allowRedirects: boolean) {
           return this.sendGenericAPIRequest(
             "test-token",

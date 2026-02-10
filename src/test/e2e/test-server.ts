@@ -92,7 +92,7 @@ export async function createTestServer(): Promise<TestServer> {
 
   return {
     baseUrl,
-    close: () =>
+    close: async () =>
       new Promise<void>((resolvePromise) => server.close(() => resolvePromise())),
   };
 }
