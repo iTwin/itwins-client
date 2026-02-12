@@ -108,6 +108,23 @@ export abstract class BaseBentleyAPIClient {
         redirect: 'manual',
       });
 
+      // Browser fetch returns an opaque redirect when redirect is set to manual
+      if (response.type === "opaqueredirect") {
+        if (!allowRedirects) {
+          return {
+            status: 403,
+            error: {
+              code: "RedirectsNotAllowed",
+              message: "Redirects are not allowed for this request.",
+            },
+          };
+        }
+
+        return await this.followRedirectWithFetchFollow<TResponse>(
+          requestOptions
+        );
+      }
+
       // Handle 302 redirects with auth header forwarding
       if (response.status === 302) {
         if (!allowRedirects) {
@@ -129,6 +146,45 @@ export abstract class BaseBentleyAPIClient {
       }
 
       // Process non-redirect response
+      return await this.processResponse<TResponse>(response);
+    } catch {
+      return this.createInternalServerError();
+    }
+  }
+
+  /**
+   * Follows redirects using the fetch default 'follow' behavior.
+   * Used for environments where manual redirect returns opaque responses.
+   *
+   * @param requestOptions - The original request options
+   * @returns Promise that resolves to the final API response
+   */
+  private async followRedirectWithFetchFollow<TResponse = unknown>(
+    requestOptions: RequestConfig
+  ): Promise<BentleyAPIResponse<TResponse>> {
+    try {
+      const response = await fetch(requestOptions.url, {
+        method: requestOptions.method,
+        headers: requestOptions.headers,
+        body: requestOptions.body,
+        redirect: "follow",
+      });
+
+      if (response.redirected) {
+        try {
+          this.validateRedirectUrlSecurity(response.url);
+        } catch (error) {
+          return {
+            status: 502,
+            error: {
+              code: "InvalidRedirectUrl",
+              message:
+                error instanceof Error ? error.message : "Invalid redirect URL",
+            },
+          };
+        }
+      }
+
       return await this.processResponse<TResponse>(response);
     } catch {
       return this.createInternalServerError();

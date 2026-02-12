@@ -40,6 +40,8 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
+    "test:e2e": "pnpm build && playwright test",
+    "test:e2e:ui": "pnpm build && playwright test --ui",
     "test:debug": "vitest --reporter=verbose --no-coverage",
     "typecheck": "tsc --noEmit"
   },
@@ -67,7 +69,7 @@
     "@changesets/cli": "^2.27.11",
     "@changesets/types": "6.0.0",
     "@eslint/eslintrc": "^3.3.1",
-    "@itwin/build-tools": "^5.1.8",
+    "@itwin/build-tools": "^5.6.0",
     "@itwin/core-bentley": "^5.1.8",
     "@itwin/eslint-plugin": "^5.2.1",
     "@itwin/oidc-signin-tool": "^5.0.2",

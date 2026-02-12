@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for all branches and tags
+          fetch-depth: 0 # Fetch all history for all branches and tags
 
       - name: Install pnpm@10.12.4
         uses: pnpm/action-setup@v2
@@ -50,10 +50,8 @@ jobs:
           git pull -f origin main:main
           pnpm changeset status --since=main
 
-      - name: Install Playwright browsers, for test user sign-in
-        # Playwright, for test user sign-in
-        # import { TestUtility } from "@itwin/oidc-signin-tool"; in test setup
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
 
       - name: Run Test with Coverage
         run: pnpm run test:coverage
@@ -67,3 +65,6 @@ jobs:
           IMJS_ITWIN_TEST_USER_PASSWORD: ${{ secrets.IMJS_ITWIN_TEST_USER_PASSWORD }}
           IMJS_TEST_ASSET_ID: ${{ secrets.IMJS_TEST_ASSET_ID }}
           IMJS_TEST_PROJECT_ID: ${{ secrets.IMJS_TEST_PROJECT_ID }}
+
+      - name: Run Browser E2E Tests
+        run: pnpm run test:e2e
