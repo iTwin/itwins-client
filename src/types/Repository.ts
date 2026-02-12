@@ -15,7 +15,7 @@ export interface Repository {
   /** Main classification of the repository */
   class: RepositoryClass;
   /** Sub-classification providing more specific categorization */
-  subClass: RepositorySubClass;
+  subClass?: RepositorySubClass;
   /** Human-readable name for the repository */
   displayName: string;
   /** The URI or endpoint URL for accessing the repository data */
@@ -105,8 +105,10 @@ export type RepositorySubClass =
  * Repository classes that support creating new repositories.
  * @beta
  */
-export type CreatableRepositoryClass = Extract<RepositoryClass, "GeographicInformationSystem" | "Construction" | "Subsurface">;
-
+export type CreatableRepositoryClass = Extract<
+  RepositoryClass,
+  "GeographicInformationSystem" | "Construction" | "Subsurface"
+>;
 
 /**
  * Response interface for single repository operations (create, get, update)
@@ -167,14 +169,16 @@ export interface GetRepositoryResourceMinimalResponse {
 
 /**
  * Response interface for getting a repository resource in representation mode.
- * Extends the minimal response with additional detailed properties.
  * @beta
  */
-export interface GetRepositoryResourceRepresentationResponse extends GetRepositoryResourceMinimalResponse {
-  /** Additional properties providing detailed information about the resource */
-  properties?: {
-    /** Dynamic properties specific to the resource type */
-    [key: string]: unknown;
+export interface GetRepositoryResourceRepresentationResponse {
+  /** The repository resource with detailed information including properties */
+  resource: GetRepositoryResourceMinimalResponse["resource"] & {
+    /** Additional properties providing detailed information about the resource */
+    properties?: {
+      /** Dynamic properties specific to the resource type */
+      [key: string]: unknown;
+    };
   };
 }
 
