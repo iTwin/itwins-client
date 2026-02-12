@@ -3,36 +3,56 @@
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 /* eslint-disable @typescript-eslint/naming-convention */
+import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
-import { createTestServer } from "./test-server";
+import { createTestServer } from "./test-server.js";
 
-test.describe("Browser redirect handling", () => {
-  let serverUrl: string;
-  let closeServer: () => Promise<void>;
+/** Result shape returned by {@link executeRedirectScenario}. */
+interface RedirectScenarioResult {
+  response: { status: number; data?: unknown; error?: { code: string } };
+  fetchCalls: Array<{ input: string | URL; init?: RequestInit }>;
+}
 
-  test.beforeAll(async () => {
-    const server = await createTestServer();
-    serverUrl = server.baseUrl;
-    closeServer = server.close;
-  });
+/** Navigates the page to the test server root. */
+const loadTestPage = async (page: Page, serverUrl: string): Promise<void> => {
+  await page.goto(`${serverUrl}/`);
+};
 
-  test.afterAll(async () => {
-    await closeServer();
-  });
-
-  test("follows opaque redirect when allowed", async ({ page }) => {
-    await page.goto(`${serverUrl}/`);
-
-    const result = await page.evaluate(async (baseUrl) => {
-      const moduleUrl = new URL("/lib/esm/BaseBentleyAPIClient.js", baseUrl).toString();
+/**
+ * Executes a redirect test scenario in the browser context.
+ *
+ * Sets up a fetch mock, creates a TestClient that extends
+ * BaseBentleyAPIClient, and makes a single request.
+ *
+ * @param mockAlwaysOpaque - When `true` every fetch returns an opaque
+ *   redirect. When `false` only the first fetch is opaque and subsequent
+ *   calls return a 200 success response.
+ */
+const executeRedirectScenario = async (
+  page: Page,
+  serverUrl: string,
+  options: { allowRedirects: boolean; mockAlwaysOpaque: boolean },
+): Promise<RedirectScenarioResult> =>
+  page.evaluate(
+    async ({ baseUrl, allowRedirects, mockAlwaysOpaque }) => {
+      const moduleUrl = new URL(
+        "/lib/esm/BaseBentleyAPIClient.js",
+        baseUrl,
+      ).toString();
       const { BaseBentleyAPIClient } = await import(moduleUrl);
-      const baseBentleyApiClient = BaseBentleyAPIClient as typeof BaseBentleyAPIClient;
+      const baseBentleyApiClient =
+        BaseBentleyAPIClient as typeof BaseBentleyAPIClient;
 
       const originalFetch = globalThis.fetch;
       const fetchCalls: Array<{ input: string | URL; init?: RequestInit }> = [];
-      globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
+
+      globalThis.fetch = (async (
+        input: string | URL,
+        init?: RequestInit,
+      ) => {
         fetchCalls.push({ input, init });
-        if (fetchCalls.length === 1) {
+
+        if (mockAlwaysOpaque || fetchCalls.length === 1) {
           return {
             type: "opaqueredirect",
             status: 0,
@@ -56,75 +76,130 @@ test.describe("Browser redirect handling", () => {
       }) as typeof fetch;
 
       class TestClient extends baseBentleyApiClient {
-        public async request(url: string, allowRedirects: boolean) {
+        public async request(url: string, allowRedir: boolean) {
           return this.sendGenericAPIRequest(
             "test-token",
             "GET",
             url,
             undefined,
             undefined,
-            allowRedirects
+            allowRedir,
           );
         }
       }
 
       const client = new TestClient();
-      const response = await client.request(`${baseUrl}/redirect`, true);
+      const response = await client.request(
+        `${baseUrl}/redirect`,
+        allowRedirects,
+      );
       globalThis.fetch = originalFetch;
       return { response, fetchCalls };
-    }, serverUrl);
+    },
+    {
+      baseUrl: serverUrl,
+      allowRedirects: options.allowRedirects,
+      mockAlwaysOpaque: options.mockAlwaysOpaque,
+    },
+  );
 
-    expect(result.response.status).toBe(200);
-    expect(result.response.data).toEqual({ ok: true });
-    expect(result.response.error).toBeUndefined();
-    expect(result.fetchCalls.length).toBe(2);
-    expect(result.fetchCalls[1].init?.redirect).toBe("follow");
+test.describe("Feature: Browser redirect handling", () => {
+  let serverUrl: string;
+  let closeServer: () => Promise<void>;
+
+  test.beforeAll(async () => {
+    const server = await createTestServer();
+    serverUrl = server.baseUrl;
+    closeServer = server.close;
   });
 
-  test("returns 403 when opaque redirect not allowed", async ({ page }) => {
-    await page.goto(`${serverUrl}/`);
+  test.afterAll(async () => {
+    await closeServer();
+  });
 
-    const result = await page.evaluate(async (baseUrl) => {
-      const moduleUrl = new URL("/lib/esm/BaseBentleyAPIClient.js", baseUrl).toString();
-      const { BaseBentleyAPIClient } = await import(moduleUrl);
-      const baseBentleyApiClient = BaseBentleyAPIClient as typeof BaseBentleyAPIClient;
+  test.describe(
+    "Scenario: Client follows opaque redirect when redirects are allowed",
+    () => {
+      test("should retry with redirect: follow and return success", async ({
+        page,
+      }) => {
+        let result!: RedirectScenarioResult;
 
-      const originalFetch = globalThis.fetch;
-      const fetchCalls: Array<{ input: string | URL; init?: RequestInit }> = [];
-      globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
-        fetchCalls.push({ input, init });
-        return {
-          type: "opaqueredirect",
-          status: 0,
-          ok: false,
-          headers: new Headers(),
-          json: async () => {
-            throw new Error("opaque redirect");
+        await test.step(
+          "Given a page loaded from the test server",
+          async () => {
+            await loadTestPage(page, serverUrl);
           },
-        } as unknown as Response;
-      }) as typeof fetch;
+        );
 
-      class TestClient extends baseBentleyApiClient {
-        public async request(url: string, allowRedirects: boolean) {
-          return this.sendGenericAPIRequest(
-            "test-token",
-            "GET",
-            url,
-            undefined,
-            undefined,
-            allowRedirects
-          );
-        }
-      }
+        await test.step(
+          "When the client makes a request with allowRedirects=true and receives an opaque redirect",
+          async () => {
+            result = await executeRedirectScenario(page, serverUrl, {
+              allowRedirects: true,
+              mockAlwaysOpaque: false,
+            });
+          },
+        );
 
-      const client = new TestClient();
-      const response = await client.request(`${baseUrl}/redirect`, false);
-      globalThis.fetch = originalFetch;
-      return { response, fetchCalls };
-    }, serverUrl);
+        await test.step(
+          "Then the response should be 200 with the expected data",
+          async () => {
+            expect(result.response.status).toBe(200);
+            expect(result.response.data).toEqual({ ok: true });
+            expect(result.response.error).toBeUndefined();
+          },
+        );
 
-    expect(result.response.status).toBe(403);
-    expect(result.response.error?.code).toBe("RedirectsNotAllowed");
-    expect(result.fetchCalls.length).toBe(1);
-  });
+        await test.step(
+          "And the client should have made 2 fetch calls, retrying with redirect: follow",
+          async () => {
+            expect(result.fetchCalls.length).toBe(2);
+            expect(result.fetchCalls[1].init?.redirect).toBe("follow");
+          },
+        );
+      });
+    },
+  );
+
+  test.describe(
+    "Scenario: Client returns 403 when redirects are not allowed",
+    () => {
+      test("should return RedirectsNotAllowed error", async ({ page }) => {
+        let result!: RedirectScenarioResult;
+
+        await test.step(
+          "Given a page loaded from the test server",
+          async () => {
+            await loadTestPage(page, serverUrl);
+          },
+        );
+
+        await test.step(
+          "When the client makes a request with allowRedirects=false and receives an opaque redirect",
+          async () => {
+            result = await executeRedirectScenario(page, serverUrl, {
+              allowRedirects: false,
+              mockAlwaysOpaque: true,
+            });
+          },
+        );
+
+        await test.step(
+          "Then the response should be 403 with RedirectsNotAllowed error code",
+          async () => {
+            expect(result.response.status).toBe(403);
+            expect(result.response.error?.code).toBe("RedirectsNotAllowed");
+          },
+        );
+
+        await test.step(
+          "And the client should have made only 1 fetch call",
+          async () => {
+            expect(result.fetchCalls.length).toBe(1);
+          },
+        );
+      });
+    },
+  );
 });
