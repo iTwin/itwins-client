@@ -1,5 +1,13 @@
 # Change Log - @itwin/itwins-client
 
+## 2.5.1
+
+### Patch Changes
+
+#### [2.5.1](https://www.npmjs.com/package/@itwin/itwins-client/v/2.5.1) - 2026-02-12
+
+Added browser support for redirects. Previously we only supported node enviroment
+
 ## 2.5.0
 
 ### Minor Changes
