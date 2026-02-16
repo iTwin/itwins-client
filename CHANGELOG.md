@@ -1,5 +1,13 @@
 # Change Log - @itwin/itwins-client
 
+## 2.5.2
+
+### Patch Changes
+
+#### [2.5.2](https://www.npmjs.com/package/@itwin/itwins-client/v/2.5.2) - 2026-02-16
+
+Updated repository interface to make subclass optional and move properties into resource object for GetRepositoryResourceRepresentationResponse
+
 ## 2.5.1
 
 ### Patch Changes
