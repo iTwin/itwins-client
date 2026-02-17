@@ -11,7 +11,7 @@ import { ITwinsClient } from "../../iTwinsClient";
 import type { NewRepositoryConfig } from "../../types/Repository";
 import { TestConfig } from "../TestConfig";
 
-describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => {
+describe("iTwinsClient - URI-Based Repository Integration", () => {
   let accessToken: AccessToken;
   let client: ITwinsClient;
 
@@ -26,444 +26,431 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
   });
 
   describe("getRepositoryResourcesByUri", () => {
-    it("should get repository resources using capability URI", async () => {
-      // Arrange - Create test iTwin and repository
-      const newiTwin: ItwinCreate = {
-        displayName: `URI Test iTwin ${new Date().toISOString()}`,
-        number: `URI-Test-${new Date().toISOString()}`,
-        type: "Bridge",
-        subClass: "Asset",
-        class: "Thing",
-        dataCenterLocation: "East US",
-        status: "Trial",
-      };
+    describe("Success Cases", () => {
+      it("should get repository resources using capability URI", async () => {
+        const newiTwin: ItwinCreate = {
+          displayName: `URI Test iTwin ${new Date().toISOString()}`,
+          number: `URI-Test-${new Date().toISOString()}`,
+          type: "Bridge",
+          subClass: "Asset",
+          class: "Thing",
+          dataCenterLocation: "East US",
+          status: "Trial",
+        };
 
-      const iTwinResponse = await client.createITwin(accessToken, newiTwin);
-      const iTwinId = iTwinResponse.data!.iTwin.id!;
+        const iTwinResponse = await client.createITwin(accessToken, newiTwin);
+        const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-      const newRepository: NewRepositoryConfig = {
-        class: "GeographicInformationSystem",
-        subClass: "WebMapService",
-        uri: "https://www.example.com/",
-      };
+        const newRepository: NewRepositoryConfig = {
+          class: "GeographicInformationSystem",
+          subClass: "WebMapService",
+          uri: "https://www.example.com/",
+        };
 
-      try {
-        const repoResponse = await client.createRepository(
-          accessToken,
-          iTwinId,
-          newRepository
-        );
-        const repositoryId = repoResponse.data!.repository.id!;
-
-        // Get repository with capabilities
-        const repoWithCaps = await client.getRepository(
-          accessToken,
-          iTwinId,
-          repositoryId
-        );
-
-        // Extract capability URI
-        const resourcesUri =
-          repoWithCaps.data?.repository.capabilities?.resources?.uri;
-
-        if (resourcesUri) {
-          // Act - Use URI-based method
-          const resourcesResponse = await client.getRepositoryResourcesByUri(
+        try {
+          const repoResponse = await client.createRepository(
             accessToken,
-            resourcesUri
+            iTwinId,
+            newRepository,
+          );
+          const repositoryId = repoResponse.data!.repository.id!;
+
+          const repoWithCaps = await client.getRepository(
+            accessToken,
+            iTwinId,
+            repositoryId,
           );
 
-          // Assert
-          expect(resourcesResponse.status).toBe(200);
-          expect(resourcesResponse.data).toBeDefined();
-          expect(resourcesResponse.data?.resources).toBeDefined();
-          expect(Array.isArray(resourcesResponse.data?.resources)).toBe(true);
-        } else {
-          // Skip test if capabilities not available
-          console.warn("Repository capabilities.resources.uri not available");
+          const resourcesUri =
+            repoWithCaps.data?.repository.capabilities?.resources?.uri;
+
+          if (resourcesUri) {
+            const resourcesResponse = await client.getRepositoryResourcesByUri(
+              accessToken,
+              resourcesUri,
+            );
+
+            expect(resourcesResponse.status).toBe(200);
+            expect(resourcesResponse.data).toBeDefined();
+            expect(resourcesResponse.data?.resources).toBeDefined();
+            expect(Array.isArray(resourcesResponse.data?.resources)).toBe(true);
+          } else {
+            console.warn("Repository capabilities.resources.uri not available");
+          }
+        } finally {
+          await client.deleteItwin(accessToken, iTwinId);
         }
-      } finally {
-        // Cleanup
-        await client.deleteItwin(accessToken, iTwinId);
-      }
+      });
+
+      it("should get repository resources in representation mode", async () => {
+        const newiTwin: ItwinCreate = {
+          displayName: `URI Test iTwin ${new Date().toISOString()}`,
+          number: `URI-Test-${new Date().toISOString()}`,
+          type: "Bridge",
+          subClass: "Asset",
+          class: "Thing",
+          dataCenterLocation: "East US",
+          status: "Trial",
+        };
+
+        const iTwinResponse = await client.createITwin(accessToken, newiTwin);
+        const iTwinId = iTwinResponse.data!.iTwin.id!;
+
+        const newRepository: NewRepositoryConfig = {
+          class: "GeographicInformationSystem",
+          subClass: "WebMapService",
+          uri: "https://www.example.com/",
+        };
+
+        try {
+          const repoResponse = await client.createRepository(
+            accessToken,
+            iTwinId,
+            newRepository,
+          );
+          const repositoryId = repoResponse.data!.repository.id!;
+
+          const repoWithCaps = await client.getRepository(
+            accessToken,
+            iTwinId,
+            repositoryId,
+          );
+
+          const resourcesUri =
+            repoWithCaps.data?.repository.capabilities?.resources?.uri;
+
+          if (resourcesUri) {
+            const resourcesResponse = await client.getRepositoryResourcesByUri(
+              accessToken,
+              resourcesUri,
+              undefined,
+              "representation",
+            );
+
+            expect(resourcesResponse.status).toBe(200);
+            expect(resourcesResponse.data).toBeDefined();
+          } else {
+            console.warn("Repository capabilities.resources.uri not available");
+          }
+        } finally {
+          await client.deleteItwin(accessToken, iTwinId);
+        }
+      });
     });
 
-    it("should get repository resources with search and pagination parameters", async () => {
-      // Arrange
-      const newiTwin: ItwinCreate = {
-        displayName: `URI Test iTwin ${new Date().toISOString()}`,
-        number: `URI-Test-${new Date().toISOString()}`,
-        type: "Bridge",
-        subClass: "Asset",
-        class: "Thing",
-        dataCenterLocation: "East US",
-        status: "Trial",
-      };
+    describe("Pagination", () => {
+      it("should get repository resources with search and pagination parameters", async () => {
+        const newiTwin: ItwinCreate = {
+          displayName: `URI Test iTwin ${new Date().toISOString()}`,
+          number: `URI-Test-${new Date().toISOString()}`,
+          type: "Bridge",
+          subClass: "Asset",
+          class: "Thing",
+          dataCenterLocation: "East US",
+          status: "Trial",
+        };
 
-      const iTwinResponse = await client.createITwin(accessToken, newiTwin);
-      const iTwinId = iTwinResponse.data!.iTwin.id!;
+        const iTwinResponse = await client.createITwin(accessToken, newiTwin);
+        const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-      const newRepository: NewRepositoryConfig = {
-        class: "GeographicInformationSystem",
-        subClass: "WebMapService",
-        uri: "https://www.example.com/",
-      };
+        const newRepository: NewRepositoryConfig = {
+          class: "GeographicInformationSystem",
+          subClass: "WebMapService",
+          uri: "https://www.example.com/",
+        };
 
-      try {
-        const repoResponse = await client.createRepository(
-          accessToken,
-          iTwinId,
-          newRepository
-        );
-        const repositoryId = repoResponse.data!.repository.id!;
-
-        const repoWithCaps = await client.getRepository(
-          accessToken,
-          iTwinId,
-          repositoryId
-        );
-
-        const resourcesUri =
-          repoWithCaps.data?.repository.capabilities?.resources?.uri;
-
-        if (resourcesUri) {
-          // Act - Use URI-based method with OData parameters
-          const resourcesResponse = await client.getRepositoryResourcesByUri(
+        try {
+          const repoResponse = await client.createRepository(
             accessToken,
-            resourcesUri,
-            { top: 10, skip: 0 }
+            iTwinId,
+            newRepository,
+          );
+          const repositoryId = repoResponse.data!.repository.id!;
+
+          const repoWithCaps = await client.getRepository(
+            accessToken,
+            iTwinId,
+            repositoryId,
           );
 
-          // Assert
-          expect(resourcesResponse.status).toBe(200);
-          expect(resourcesResponse.data).toBeDefined();
-        } else {
-          console.warn("Repository capabilities.resources.uri not available");
+          const resourcesUri =
+            repoWithCaps.data?.repository.capabilities?.resources?.uri;
+
+          if (resourcesUri) {
+            const resourcesResponse = await client.getRepositoryResourcesByUri(
+              accessToken,
+              resourcesUri,
+              { top: 10, skip: 0 },
+            );
+
+            expect(resourcesResponse.status).toBe(200);
+            expect(resourcesResponse.data).toBeDefined();
+          } else {
+            console.warn("Repository capabilities.resources.uri not available");
+          }
+        } finally {
+          await client.deleteItwin(accessToken, iTwinId);
         }
-      } finally {
-        // Cleanup
-        await client.deleteItwin(accessToken, iTwinId);
-      }
-    });
-
-    it("should get repository resources in representation mode", async () => {
-      // Arrange
-      const newiTwin: ItwinCreate = {
-        displayName: `URI Test iTwin ${new Date().toISOString()}`,
-        number: `URI-Test-${new Date().toISOString()}`,
-        type: "Bridge",
-        subClass: "Asset",
-        class: "Thing",
-        dataCenterLocation: "East US",
-        status: "Trial",
-      };
-
-      const iTwinResponse = await client.createITwin(accessToken, newiTwin);
-      const iTwinId = iTwinResponse.data!.iTwin.id!;
-
-      const newRepository: NewRepositoryConfig = {
-        class: "GeographicInformationSystem",
-        subClass: "WebMapService",
-        uri: "https://www.example.com/",
-      };
-
-      try {
-        const repoResponse = await client.createRepository(
-          accessToken,
-          iTwinId,
-          newRepository
-        );
-        const repositoryId = repoResponse.data!.repository.id!;
-
-        const repoWithCaps = await client.getRepository(
-          accessToken,
-          iTwinId,
-          repositoryId
-        );
-
-        const resourcesUri =
-          repoWithCaps.data?.repository.capabilities?.resources?.uri;
-
-        if (resourcesUri) {
-          // Act - Use URI-based method with representation mode
-          const resourcesResponse = await client.getRepositoryResourcesByUri(
-            accessToken,
-            resourcesUri,
-            undefined,
-            "representation"
-          );
-
-          // Assert
-          expect(resourcesResponse.status).toBe(200);
-          expect(resourcesResponse.data).toBeDefined();
-        } else {
-          console.warn("Repository capabilities.resources.uri not available");
-        }
-      } finally {
-        // Cleanup
-        await client.deleteItwin(accessToken, iTwinId);
-      }
+      });
     });
   });
 
   describe("getRepositoryResourceByUri", () => {
-    it("should get a specific repository resource using capability URI", async () => {
-      // Arrange
-      const newiTwin: ItwinCreate = {
-        displayName: `URI Test iTwin ${new Date().toISOString()}`,
-        number: `URI-Test-${new Date().toISOString()}`,
-        type: "Bridge",
-        subClass: "Asset",
-        class: "Thing",
-        dataCenterLocation: "East US",
-        status: "Trial",
-      };
+    describe("Success Cases", () => {
+      it("should get a specific repository resource using capability URI", async () => {
+        const newiTwin: ItwinCreate = {
+          displayName: `URI Test iTwin ${new Date().toISOString()}`,
+          number: `URI-Test-${new Date().toISOString()}`,
+          type: "Bridge",
+          subClass: "Asset",
+          class: "Thing",
+          dataCenterLocation: "East US",
+          status: "Trial",
+        };
 
-      const iTwinResponse = await client.createITwin(accessToken, newiTwin);
-      const iTwinId = iTwinResponse.data!.iTwin.id!;
+        const iTwinResponse = await client.createITwin(accessToken, newiTwin);
+        const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-      const newRepository: NewRepositoryConfig = {
-        class: "GeographicInformationSystem",
-        subClass: "WebMapService",
-        uri: "https://www.example.com/",
-      };
+        const newRepository: NewRepositoryConfig = {
+          class: "GeographicInformationSystem",
+          subClass: "WebMapService",
+          uri: "https://www.example.com/",
+        };
 
-      try {
-        const repoResponse = await client.createRepository(
-          accessToken,
-          iTwinId,
-          newRepository
-        );
-        const repositoryId = repoResponse.data!.repository.id!;
+        try {
+          const repoResponse = await client.createRepository(
+            accessToken,
+            iTwinId,
+            newRepository,
+          );
+          const repositoryId = repoResponse.data!.repository.id!;
 
-        // Create a test resource
-        const resourceId = `test-resource-${Date.now()}`;
-        const resourceResponse = await client.createRepositoryResource(
-          accessToken,
-          iTwinId,
-          repositoryId,
-          {
-            id: resourceId,
-            displayName: "Test Resource for URI",
+          const resourceId = `test-resource-${Date.now()}`;
+          const resourceResponse = await client.createRepositoryResource(
+            accessToken,
+            iTwinId,
+            repositoryId,
+            {
+              id: resourceId,
+              displayName: "Test Resource for URI",
+            },
+          );
+
+          expect(resourceResponse.status).toBe(201);
+
+          const repoWithCaps = await client.getRepository(
+            accessToken,
+            iTwinId,
+            repositoryId,
+          );
+
+          const resourcesUri =
+            repoWithCaps.data?.repository.capabilities?.resources?.uri;
+
+          if (resourcesUri) {
+            const resourceUri = `${resourcesUri}/${resourceId}`;
+
+            const resourceResponse2 = await client.getRepositoryResourceByUri(
+              accessToken,
+              resourceUri,
+            );
+
+            expect(resourceResponse2.status).toBe(200);
+            expect(resourceResponse2.data).toBeDefined();
+            expect(resourceResponse2.data?.resource).toBeDefined();
+            expect(resourceResponse2.data?.resource.id).toBe(resourceId);
+          } else {
+            console.warn("Repository capabilities.resources.uri not available");
           }
-        );
+        } finally {
+          await client.deleteItwin(accessToken, iTwinId);
+        }
+      });
 
-        expect(resourceResponse.status).toBe(201);
+      it("should get resource in representation mode using URI", async () => {
+        const newiTwin: ItwinCreate = {
+          displayName: `URI Test iTwin ${new Date().toISOString()}`,
+          number: `URI-Test-${new Date().toISOString()}`,
+          type: "Bridge",
+          subClass: "Asset",
+          class: "Thing",
+          dataCenterLocation: "East US",
+          status: "Trial",
+        };
 
-        const repoWithCaps = await client.getRepository(
-          accessToken,
-          iTwinId,
-          repositoryId
-        );
+        const iTwinResponse = await client.createITwin(accessToken, newiTwin);
+        const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-        const resourcesUri =
-          repoWithCaps.data?.repository.capabilities?.resources?.uri;
+        const newRepository: NewRepositoryConfig = {
+          class: "GeographicInformationSystem",
+          subClass: "WebMapService",
+          uri: "https://www.example.com/",
+        };
 
-        if (resourcesUri) {
-          const resourceUri = `${resourcesUri}/${resourceId}`;
-
-          // Act - Use URI-based method
-          const resourceResponse2 = await client.getRepositoryResourceByUri(
+        try {
+          const repoResponse = await client.createRepository(
             accessToken,
-            resourceUri
+            iTwinId,
+            newRepository,
+          );
+          const repositoryId = repoResponse.data!.repository.id!;
+
+          const resourceId = `test-resource-${Date.now()}`;
+          await client.createRepositoryResource(
+            accessToken,
+            iTwinId,
+            repositoryId,
+            {
+              id: resourceId,
+              displayName: "Test Resource for Representation Mode",
+            },
           );
 
-          // Assert
-          expect(resourceResponse2.status).toBe(200);
-          expect(resourceResponse2.data).toBeDefined();
-          expect(resourceResponse2.data?.resource).toBeDefined();
-          expect(resourceResponse2.data?.resource.id).toBe(resourceId);
-        } else {
-          console.warn("Repository capabilities.resources.uri not available");
+          const repoWithCaps = await client.getRepository(
+            accessToken,
+            iTwinId,
+            repositoryId,
+          );
+
+          const resourcesUri =
+            repoWithCaps.data?.repository.capabilities?.resources?.uri;
+
+          if (resourcesUri) {
+            const resourceUri = `${resourcesUri}/${resourceId}`;
+
+            const resourceResponse = await client.getRepositoryResourceByUri(
+              accessToken,
+              resourceUri,
+              "representation",
+            );
+
+            expect(resourceResponse.status).toBe(200);
+            expect(resourceResponse.data).toBeDefined();
+          } else {
+            console.warn("Repository capabilities.resources.uri not available");
+          }
+        } finally {
+          await client.deleteItwin(accessToken, iTwinId);
         }
-      } finally {
-        // Cleanup
-        await client.deleteItwin(accessToken, iTwinId);
-      }
+      });
     });
 
-    it("should return 404 for non-existent resource URI", async () => {
-      // Arrange
-      const newiTwin: ItwinCreate = {
-        displayName: `URI Test iTwin ${new Date().toISOString()}`,
-        number: `URI-Test-${new Date().toISOString()}`,
-        type: "Bridge",
-        subClass: "Asset",
-        class: "Thing",
-        dataCenterLocation: "East US",
-        status: "Trial",
-      };
+    describe("Error Responses", () => {
+      it("should return 404 for non-existent resource URI", async () => {
+        const newiTwin: ItwinCreate = {
+          displayName: `URI Test iTwin ${new Date().toISOString()}`,
+          number: `URI-Test-${new Date().toISOString()}`,
+          type: "Bridge",
+          subClass: "Asset",
+          class: "Thing",
+          dataCenterLocation: "East US",
+          status: "Trial",
+        };
 
-      const iTwinResponse = await client.createITwin(accessToken, newiTwin);
-      const iTwinId = iTwinResponse.data!.iTwin.id!;
+        const iTwinResponse = await client.createITwin(accessToken, newiTwin);
+        const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-      const newRepository: NewRepositoryConfig = {
-        class: "GeographicInformationSystem",
-        subClass: "WebMapService",
-        uri: "https://www.example.com/",
-      };
+        const newRepository: NewRepositoryConfig = {
+          class: "GeographicInformationSystem",
+          subClass: "WebMapService",
+          uri: "https://www.example.com/",
+        };
 
-      try {
-        const repoResponse = await client.createRepository(
-          accessToken,
-          iTwinId,
-          newRepository
-        );
-        const repositoryId = repoResponse.data!.repository.id!;
-
-        const repoWithCaps = await client.getRepository(
-          accessToken,
-          iTwinId,
-          repositoryId
-        );
-
-        const resourcesUri =
-          repoWithCaps.data?.repository.capabilities?.resources?.uri;
-
-        if (resourcesUri) {
-          const nonExistentUri = `${resourcesUri}/non-existent-resource-id`;
-
-          // Act - Try to get non-existent resource
-          const resourceResponse = await client.getRepositoryResourceByUri(
+        try {
+          const repoResponse = await client.createRepository(
             accessToken,
-            nonExistentUri
+            iTwinId,
+            newRepository,
+          );
+          const repositoryId = repoResponse.data!.repository.id!;
+
+          const repoWithCaps = await client.getRepository(
+            accessToken,
+            iTwinId,
+            repositoryId,
           );
 
-          // Assert
-          expect(resourceResponse.status).toBe(404);
-          expect(resourceResponse.data).toBeUndefined();
-          expect(resourceResponse.error).toBeDefined();
-        } else {
-          console.warn("Repository capabilities.resources.uri not available");
+          const resourcesUri =
+            repoWithCaps.data?.repository.capabilities?.resources?.uri;
+
+          if (resourcesUri) {
+            const nonExistentUri = `${resourcesUri}/non-existent-resource-id`;
+
+            const resourceResponse = await client.getRepositoryResourceByUri(
+              accessToken,
+              nonExistentUri,
+            );
+
+            expect(resourceResponse.status).toBe(404);
+            expect(resourceResponse.data).toBeUndefined();
+            expect(resourceResponse.error).toBeDefined();
+          } else {
+            console.warn("Repository capabilities.resources.uri not available");
+          }
+        } finally {
+          await client.deleteItwin(accessToken, iTwinId);
         }
-      } finally {
-        // Cleanup
-        await client.deleteItwin(accessToken, iTwinId);
-      }
-    });
-
-    it("should get resource in representation mode using URI", async () => {
-      // Arrange
-      const newiTwin: ItwinCreate = {
-        displayName: `URI Test iTwin ${new Date().toISOString()}`,
-        number: `URI-Test-${new Date().toISOString()}`,
-        type: "Bridge",
-        subClass: "Asset",
-        class: "Thing",
-        dataCenterLocation: "East US",
-        status: "Trial",
-      };
-
-      const iTwinResponse = await client.createITwin(accessToken, newiTwin);
-      const iTwinId = iTwinResponse.data!.iTwin.id!;
-
-      const newRepository: NewRepositoryConfig = {
-        class: "GeographicInformationSystem",
-        subClass: "WebMapService",
-        uri: "https://www.example.com/",
-      };
-
-      try {
-        const repoResponse = await client.createRepository(
-          accessToken,
-          iTwinId,
-          newRepository
-        );
-        const repositoryId = repoResponse.data!.repository.id!;
-
-        const resourceId = `test-resource-${Date.now()}`;
-        await client.createRepositoryResource(accessToken, iTwinId, repositoryId, {
-          id: resourceId,
-          displayName: "Test Resource for Representation Mode",
-        });
-
-        const repoWithCaps = await client.getRepository(
-          accessToken,
-          iTwinId,
-          repositoryId
-        );
-
-        const resourcesUri =
-          repoWithCaps.data?.repository.capabilities?.resources?.uri;
-
-        if (resourcesUri) {
-          const resourceUri = `${resourcesUri}/${resourceId}`;
-
-          // Act - Use representation mode
-          const resourceResponse = await client.getRepositoryResourceByUri(
-            accessToken,
-            resourceUri,
-            "representation"
-          );
-
-          // Assert
-          expect(resourceResponse.status).toBe(200);
-          expect(resourceResponse.data).toBeDefined();
-        } else {
-          console.warn("Repository capabilities.resources.uri not available");
-        }
-      } finally {
-        // Cleanup
-        await client.deleteItwin(accessToken, iTwinId);
-      }
+      });
     });
   });
 
   describe("getResourceGraphicsByUri", () => {
-    it("should return 404 when graphics capability URI is not available", async () => {
-      // Arrange
-      const newiTwin: ItwinCreate = {
-        displayName: `URI Test iTwin ${new Date().toISOString()}`,
-        number: `URI-Test-${new Date().toISOString()}`,
-        type: "Bridge",
-        subClass: "Asset",
-        class: "Thing",
-        dataCenterLocation: "East US",
-        status: "Trial",
-      };
+    describe("Error Responses", () => {
+      it("should return 404 when graphics capability URI is not available", async () => {
+        const newiTwin: ItwinCreate = {
+          displayName: `URI Test iTwin ${new Date().toISOString()}`,
+          number: `URI-Test-${new Date().toISOString()}`,
+          type: "Bridge",
+          subClass: "Asset",
+          class: "Thing",
+          dataCenterLocation: "East US",
+          status: "Trial",
+        };
 
-      const iTwinResponse = await client.createITwin(accessToken, newiTwin);
-      const iTwinId = iTwinResponse.data!.iTwin.id!;
+        const iTwinResponse = await client.createITwin(accessToken, newiTwin);
+        const iTwinId = iTwinResponse.data!.iTwin.id!;
 
-      const newRepository: NewRepositoryConfig = {
-        class: "GeographicInformationSystem",
-        subClass: "WebMapService",
-        uri: "https://www.example.com/",
-      };
+        const newRepository: NewRepositoryConfig = {
+          class: "GeographicInformationSystem",
+          subClass: "WebMapService",
+          uri: "https://www.example.com/",
+        };
 
-      try {
-        const repoResponse = await client.createRepository(
-          accessToken,
-          iTwinId,
-          newRepository
-        );
-        const repositoryId = repoResponse.data!.repository.id!;
+        try {
+          const repoResponse = await client.createRepository(
+            accessToken,
+            iTwinId,
+            newRepository,
+          );
+          const repositoryId = repoResponse.data!.repository.id!;
 
-        const resourceId = `test-resource-${Date.now()}`;
-        await client.createRepositoryResource(accessToken, iTwinId, repositoryId, {
-          id: resourceId,
-          displayName: "Test Resource",
-        });
+          const resourceId = `test-resource-${Date.now()}`;
+          await client.createRepositoryResource(
+            accessToken,
+            iTwinId,
+            repositoryId,
+            {
+              id: resourceId,
+              displayName: "Test Resource",
+            },
+          );
 
-        // Construct a fake graphics URI (will return 404 if not supported)
-        const fakeGraphicsUri = `${client["_baseUrl"]}/${iTwinId}/repositories/${repositoryId}/resources/${resourceId}/graphics`;
+          const fakeGraphicsUri = `${client["_baseUrl"]}/${iTwinId}/repositories/${repositoryId}/resources/${resourceId}/graphics`;
 
-        // Act - Try to get graphics from non-existent capability
-        const graphicsResponse = await client.getResourceGraphicsByUri(
-          accessToken,
-          fakeGraphicsUri
-        );
+          const graphicsResponse = await client.getResourceGraphicsByUri(
+            accessToken,
+            fakeGraphicsUri,
+          );
 
-        // Assert - Expect 404 since graphics capability may not be available
-        expect([200, 404]).toContain(graphicsResponse.status);
-        if (graphicsResponse.status === 404) {
-          expect(graphicsResponse.data).toBeUndefined();
-          expect(graphicsResponse.error).toBeDefined();
+          expect([200, 404]).toContain(graphicsResponse.status);
+          if (graphicsResponse.status === 404) {
+            expect(graphicsResponse.data).toBeUndefined();
+            expect(graphicsResponse.error).toBeDefined();
+          }
+        } finally {
+          await client.deleteItwin(accessToken, iTwinId);
         }
-      } finally {
-        // Cleanup
-        await client.deleteItwin(accessToken, iTwinId);
-      }
+      });
     });
 
     // Note: Positive test for graphics would require a resource with graphics capability
@@ -509,7 +496,6 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
 
   describe("Backward Compatibility", () => {
     it("should verify getRepositoryResource method still works", async () => {
-      // Arrange
       const newiTwin: ItwinCreate = {
         displayName: `Compat Test iTwin ${new Date().toISOString()}`,
         number: `Compat-Test-${new Date().toISOString()}`,
@@ -533,36 +519,37 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
         const repoResponse = await client.createRepository(
           accessToken,
           iTwinId,
-          newRepository
+          newRepository,
         );
         const repositoryId = repoResponse.data!.repository.id!;
 
         const resourceId = `test-resource-${Date.now()}`;
-        await client.createRepositoryResource(accessToken, iTwinId, repositoryId, {
-          id: resourceId,
-          displayName: "Backward Compat Test Resource",
-        });
+        await client.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          {
+            id: resourceId,
+            displayName: "Backward Compat Test Resource",
+          },
+        );
 
-        // Act
         const resourceResponse = await client.getRepositoryResource(
           accessToken,
           iTwinId,
           repositoryId,
-          resourceId
+          resourceId,
         );
 
-        // Assert
         expect(resourceResponse.status).toBe(200);
         expect(resourceResponse.data).toBeDefined();
         expect(resourceResponse.data?.resource.id).toBe(resourceId);
       } finally {
-        // Cleanup
         await client.deleteItwin(accessToken, iTwinId);
       }
     });
 
     it("should verify getRepositoryResources method still works", async () => {
-      // Arrange
       const newiTwin: ItwinCreate = {
         displayName: `Compat Test iTwin ${new Date().toISOString()}`,
         number: `Compat-Test-${new Date().toISOString()}`,
@@ -586,23 +573,20 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
         const repoResponse = await client.createRepository(
           accessToken,
           iTwinId,
-          newRepository
+          newRepository,
         );
         const repositoryId = repoResponse.data!.repository.id!;
 
-        // Act
         const resourcesResponse = await client.getRepositoryResources(
           accessToken,
           iTwinId,
-          repositoryId
+          repositoryId,
         );
 
-        // Assert
         expect(resourcesResponse.status).toBe(200);
         expect(resourcesResponse.data).toBeDefined();
         expect(Array.isArray(resourcesResponse.data?.resources)).toBe(true);
       } finally {
-        // Cleanup
         await client.deleteItwin(accessToken, iTwinId);
       }
     });
@@ -610,7 +594,6 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
 
   describe("Migration Pattern", () => {
     it("should demonstrate complete migration from old to URI-based methods", async () => {
-      // Arrange
       const newiTwin: ItwinCreate = {
         displayName: `Migration Test iTwin ${new Date().toISOString()}`,
         number: `Migration-Test-${new Date().toISOString()}`,
@@ -634,22 +617,27 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
         const repoResponse = await client.createRepository(
           accessToken,
           iTwinId,
-          newRepository
+          newRepository,
         );
         const repositoryId = repoResponse.data!.repository.id!;
 
         const resourceId = `migration-test-${Date.now()}`;
-        await client.createRepositoryResource(accessToken, iTwinId, repositoryId, {
-          id: resourceId,
-          displayName: "Migration Test Resource",
-        });
+        await client.createRepositoryResource(
+          accessToken,
+          iTwinId,
+          repositoryId,
+          {
+            id: resourceId,
+            displayName: "Migration Test Resource",
+          },
+        );
 
         // Step 1:
         const oldWayResponse = await client.getRepositoryResource(
           accessToken,
           iTwinId,
           repositoryId,
-          resourceId
+          resourceId,
         );
 
         expect(oldWayResponse.status).toBe(200);
@@ -659,7 +647,7 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
         const repo = await client.getRepository(
           accessToken,
           iTwinId,
-          repositoryId
+          repositoryId,
         );
         const resourcesUri = repo.data?.repository.capabilities?.resources?.uri;
 
@@ -667,28 +655,27 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
           const resourceUri = `${resourcesUri}/${resourceId}`;
           const newWayResponse = await client.getRepositoryResourceByUri(
             accessToken,
-            resourceUri
+            resourceUri,
           );
 
           expect(newWayResponse.status).toBe(200);
           const newResourceData = newWayResponse.data?.resource;
 
-          // Assert - Both methods return equivalent data
           expect(newResourceData?.id).toBe(oldResourceData?.id);
-          expect(newResourceData?.displayName).toBe(oldResourceData?.displayName);
+          expect(newResourceData?.displayName).toBe(
+            oldResourceData?.displayName,
+          );
         } else {
           console.warn(
-            "Migration test skipped: capabilities.resources.uri not available"
+            "Migration test skipped: capabilities.resources.uri not available",
           );
         }
       } finally {
-        // Cleanup
         await client.deleteItwin(accessToken, iTwinId);
       }
     });
 
     it("should demonstrate migration for list operations", async () => {
-      // Arrange
       const newiTwin: ItwinCreate = {
         displayName: `Migration List Test ${new Date().toISOString()}`,
         number: `Migration-List-${new Date().toISOString()}`,
@@ -712,7 +699,7 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
         const repoResponse = await client.createRepository(
           accessToken,
           iTwinId,
-          newRepository
+          newRepository,
         );
         const repositoryId = repoResponse.data!.repository.id!;
 
@@ -720,7 +707,7 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
         const oldWayResponse = await client.getRepositoryResources(
           accessToken,
           iTwinId,
-          repositoryId
+          repositoryId,
         );
 
         expect(oldWayResponse.status).toBe(200);
@@ -730,28 +717,26 @@ describe("iTwinsClient - URI-Based Repository Methods Integration Tests", () => 
         const repo = await client.getRepository(
           accessToken,
           iTwinId,
-          repositoryId
+          repositoryId,
         );
         const resourcesUri = repo.data?.repository.capabilities?.resources?.uri;
 
         if (resourcesUri) {
           const newWayResponse = await client.getRepositoryResourcesByUri(
             accessToken,
-            resourcesUri
+            resourcesUri,
           );
 
           expect(newWayResponse.status).toBe(200);
           const newResourcesCount = newWayResponse.data?.resources.length || 0;
 
-          // Assert - Both methods return same number of resources
           expect(newResourcesCount).toBe(oldResourcesCount);
         } else {
           console.warn(
-            "Migration test skipped: capabilities.resources.uri not available"
+            "Migration test skipped: capabilities.resources.uri not available",
           );
         }
       } finally {
-        // Cleanup
         await client.deleteItwin(accessToken, iTwinId);
       }
     });
