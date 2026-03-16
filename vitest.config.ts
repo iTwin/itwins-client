@@ -17,11 +17,6 @@ export default defineConfig({
     },
     // Debugging configuration
     pool: process.env.NODE_ENV === 'debug' ? 'forks' : 'threads',
-    poolOptions: {
-      forks: {
-        singleFork: true
-      }
-    },
     // Coverage configuration
     coverage: {
       provider: 'v8',
