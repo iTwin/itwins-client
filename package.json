@@ -73,7 +73,7 @@
     "@itwin/core-bentley": "^5.7.2",
     "@itwin/eslint-plugin": "^6.0.0",
     "@itwin/oidc-signin-tool": "^5.1.1",
-    "@playwright/test": "1.58.2",
+    "@playwright/test": "1.56.1",
     "@types/node": "25.5.00",
     "@typescript-eslint/eslint-plugin": "^8.57.1",
     "@typescript-eslint/parser": "^8.57.1",
@@ -92,7 +92,8 @@
   "pnpm": {
     "overrides": {
       "serialize-javascript": ">=7.0.3",
-      "diff":">=8.0.3"
+      "diff":">=8.0.3",
+      "esbuild": ">=0.25.0"
     }
   }
 }
