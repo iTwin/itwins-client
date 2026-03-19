@@ -660,9 +660,9 @@ describe("iTwins Client - Repository Integration Tests", () => {
     expect(getResponse.status).toBe(404);
     expect(getResponse.data).toBeUndefined();
     expect(getResponse.error).not.toBeUndefined();
-    expect(getResponse.error!.code).toBe("iTwinRepositoryNotFound");
+    expect(getResponse.error!.code).toBe("iTwinNotFound");
     expect(getResponse.error?.message).toBe(
-      "Requested iTwin Repository is not available."
+      "Requested iTwin is not available."
     );
   });
 
@@ -911,9 +911,9 @@ describe("iTwins Client - Repository Integration Tests", () => {
     expect(updateResponse.status).toBe(404);
     expect(updateResponse.data).toBeUndefined();
     expect(updateResponse.error).not.toBeUndefined();
-    expect(updateResponse.error!.code).toBe("iTwinRepositoryNotFound");
+    expect(updateResponse.error!.code).toBe("iTwinNotFound");
     expect(updateResponse.error?.message).toBe(
-      "Requested iTwin Repository is not available."
+      "Requested iTwin is not available."
     );
   });
 
@@ -1679,7 +1679,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     expect(createResourceResponse.status).toBe(404);
     expect(createResourceResponse.data).toBeUndefined();
     expect(createResourceResponse.error).not.toBeUndefined();
-    expect(createResourceResponse.error!.code).toBe("iTwinRepositoryNotFound");
+    expect(createResourceResponse.error!.code).toBe("iTwinNotFound");
   });
 
   it("should successfully get a repository resource with minimal mode", async () => {
@@ -2939,7 +2939,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     expect(deleteResourceResponse.status).toBe(404);
     expect(deleteResourceResponse.data).toBeUndefined();
     expect(deleteResourceResponse.error).not.toBeUndefined();
-    expect(deleteResourceResponse.error!.code).toBe("iTwinRepositoryNotFound");
+    expect(deleteResourceResponse.error!.code).toBe("iTwinNotFound");
   });
 
   it("should handle resource graphics request (may return 404 if graphics capability unavailable)", async () => {
@@ -3052,7 +3052,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     }
   });
 
-  it("should get a 404 not found when trying to get graphics for a resource that doesn't exist", async () => {
+  it("should get a 200 OK when trying to get graphics for a resource that doesn't exist, and an empty graphics array", async () => {
     // Arrange
     const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
@@ -3087,7 +3087,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
       expect(createRepositoryResponse.status).toBe(201);
       const repositoryId = createRepositoryResponse.data?.repository!.id!;
 
-      const someRandomResourceId = "ffd3dc75-0b4a-4587-b428-4c73f5d6dbb4";
+      const someRandomResourceId = "ffd3dc75-0b4a-4587-b428-4c69f5d9dbb8";
 
       // Act - Try to get graphics for a non-existent resource
       const graphicsResponse = await iTwinsAccessClient.getResourceGraphics(
@@ -3098,9 +3098,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       );
 
       // Assert
-      expect(graphicsResponse.status).toBe(404);
-      expect(graphicsResponse.data).toBeUndefined();
-      expect(graphicsResponse.error).not.toBeUndefined();
+      expect(graphicsResponse.status).toBe(200);
+      expect(graphicsResponse.data).toBeDefined();
+      expect(graphicsResponse.data?.graphics).toBeDefined();
+      expect(Array.isArray(graphicsResponse.data!.graphics)).toBe(true);
+      expect(graphicsResponse.data!.graphics.length).toBe(0);
 
       // Cleanup repository
       const repositoryDeleteResponse =
@@ -3121,7 +3123,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     }
   });
 
-  it("should get a 404 not found when trying to get graphics from a repository that doesn't exist", async () => {
+  it("should get a 200 OK when trying to get graphics from a repository that doesn't exist, and an empty graphics array", async () => {
     // Arrange
     const newiTwin: ItwinCreate = {
       displayName: `APIM iTwin Test Display Name ${new Date().toISOString()}`,
@@ -3151,9 +3153,11 @@ describe("iTwins Client - Repository Integration Tests", () => {
       );
 
       // Assert
-      expect(graphicsResponse.status).toBe(404);
-      expect(graphicsResponse.data).toBeUndefined();
-      expect(graphicsResponse.error).not.toBeUndefined();
+      expect(graphicsResponse.status).toBe(200);
+      expect(graphicsResponse.data).toBeDefined();
+      expect(graphicsResponse.data?.graphics).toBeDefined();
+      expect(Array.isArray(graphicsResponse.data!.graphics)).toBe(true);
+      expect(graphicsResponse.data!.graphics.length).toBe(0);
     } finally {
       // Cleanup
       const iTwinDeleteResponse = await iTwinsAccessClient.deleteItwin(
