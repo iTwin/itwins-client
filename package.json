@@ -1,6 +1,6 @@
 {
   "name": "@itwin/itwins-client",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "iTwins client for the iTwin platform",
   "main": "./lib/cjs/itwins-client.js",
   "module": "./lib/esm/itwins-client.js",
@@ -92,7 +92,7 @@
   "pnpm": {
     "overrides": {
       "serialize-javascript": ">=7.0.3",
-      "diff":">=8.0.3",
+      "diff": ">=8.0.3",
       "esbuild": ">=0.25.0"
     }
   }
