@@ -248,6 +248,61 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
       : MultiITwinMinimalResponse>
   >;
 
+  /** Get all global repositories with optional filtering by repository class and subClass identifiers.
+   * @beta
+   */
+  public abstract getGlobalRepositories(
+    accessToken: AccessToken,
+    arg?:
+      | { class: Repository["class"] }
+      | { class: Repository["class"]; subClass: Repository["subClass"] }
+  ): Promise<BentleyAPIResponse<MultiRepositoriesResponse>>;
+
+  /** Get a specific global repository by ID.
+   * @beta
+   */
+  public abstract getGlobalRepository(
+    accessToken: AccessToken,
+    repositoryId: string
+  ): Promise<BentleyAPIResponse<SingleRepositoryResponse>>;
+
+  /** Get a global repository resource by ID.
+   * @beta
+   */
+  public abstract getGlobalRepositoryResource<T extends ResultMode = "minimal">(
+    accessToken: AccessToken,
+    repositoryId: string,
+    resourceId: string,
+    resultMode?: T
+  ): Promise<
+    BentleyAPIResponse<T extends "representation"
+      ? GetRepositoryResourceRepresentationResponse
+      : GetRepositoryResourceMinimalResponse>
+  >;
+
+  /** Get global repository resources with optional filtering and pagination.
+   * @beta
+   */
+  public abstract getGlobalRepositoryResources<T extends ResultMode = "minimal">(
+    accessToken: AccessToken,
+    repositoryId: string,
+    args?: Pick<ODataQueryParams, "search" | "skip" | "top">,
+    resultMode?: T
+  ): Promise<
+    BentleyAPIResponse<T extends "representation"
+      ? GetMultiRepositoryResourceRepresentationResponse
+      : GetMultiRepositoryResourceMinimalResponse>
+  >;
+
+  /** Get graphics metadata for a global repository resource.
+   * @beta
+   */
+  public abstract getGlobalResourceGraphics(
+    accessToken: AccessToken,
+    repositoryId: string,
+    resourceId: string
+  ): Promise<BentleyAPIResponse<ResourceGraphicsResponse>>;
+
   /** Create a new repository for the specified iTwin */
   public abstract createRepository(
     accessToken: AccessToken,
@@ -262,7 +317,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     repositoryId: string
   ): Promise<BentleyAPIResponse<undefined>>;
 
-  /** Get all repositories for an iTwin with optional filtering by class and subClass. If subClass is specified, class is also required. */
+  /** Get all repositories for an iTwin with optional filtering by repository class and subClass identifiers. If subClass is specified, class is also required. */
   public abstract getRepositories(
     accessToken: AccessToken,
     iTwinId: string,
@@ -286,7 +341,7 @@ export abstract class BaseITwinsApiClient extends BaseBentleyAPIClient {
     repository: Partial<Omit<Repository, "id" | "class" | "subClass" | "capabilities">>
   ): Promise<BentleyAPIResponse<SingleRepositoryResponse>>;
 
-  /** Create a repository resource for a repository of class GeographicInformationSystem */
+  /** Create a repository resource for a repository that exposes a resources collection. */
   public abstract createRepositoryResource(
     accessToken: AccessToken,
     iTwinId: string,

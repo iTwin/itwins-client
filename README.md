@@ -80,6 +80,7 @@ globalThis.IMJS_MAX_REDIRECTS = 10; // Increase if needed for multi-hop redirect
 | **[Getting Started Guide](./GETTINGSTARTED.md)** | Complete setup and first steps |
 | **[API Examples](./docs/EXAMPLES.md)** | Comprehensive usage examples |
 | **[Migration Guide v1→v2](./MIGRATION-GUIDE-v1-to-v2.md)** | Upgrading from v1.x to v2.x |
+| **[Migration Guide v2→v3](./MIGRATION-GUIDE-v2-to-v3.md)** | Upgrading from v2.x to v3.x |
 | **[Contributing Guide](./CONTRIBUTING.md)** | Development and contribution workflow |
 | **[AI Coding Instructions](./.github/copilot-instructions.md)** | Guidelines for AI assistants |
 

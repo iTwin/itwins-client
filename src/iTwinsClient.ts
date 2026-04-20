@@ -269,6 +269,155 @@ export class ITwinsClient extends BaseITwinsApiClient {
     );
   }
 
+  /** Get global repositories accessible to user with optional filtering
+   * @param accessToken The client access token string
+   * @param arg Optional query arguments for repository class and subClass identifiers. If subClass is specified, class is also required.
+   * @returns Promise that resolves with an array of global repositories, may be empty
+   * @beta
+   */
+  public async getGlobalRepositories(
+    accessToken: AccessToken,
+    arg?:
+      | { class: Repository["class"] }
+      | { class: Repository["class"]; subClass: Repository["subClass"] }
+  ): Promise<BentleyAPIResponse<MultiRepositoriesResponse>> {
+    let url = `${this._baseUrl}/repositories`;
+    const query = this.getQueryStringArg(ITwinsClient.repositoryParamMapping, arg);
+    if (query !== "") {
+      url += `?${query}`;
+    }
+
+    return this.sendGenericAPIRequest(accessToken, "GET", url);
+  }
+
+  /** Get a specific global repository by ID
+   * @param accessToken The client access token string
+   * @param repositoryId The id of the global repository
+   * @returns Promise that resolves with the global repository details
+   * @beta
+   */
+  public async getGlobalRepository(
+    accessToken: AccessToken,
+    repositoryId: string
+  ): Promise<BentleyAPIResponse<SingleRepositoryResponse>> {
+    const url = `${this._baseUrl}/repositories/${repositoryId}`;
+    return this.sendGenericAPIRequest(accessToken, "GET", url);
+  }
+
+  /** Get a specific global repository resource by ID
+   * @param accessToken The client access token string for authorization
+   * @param repositoryId The id of the global repository containing the resource
+   * @param resourceId The unique id of the global repository resource to retrieve
+   * @param resultMode Optional result mode controlling the level of detail returned (minimal or representation)
+   * @returns Promise that resolves with the global repository resource details in the requested format
+   * @example
+   * ```typescript
+   * // Returns GetRepositoryResourceMinimalResponse
+   * const minimal = await client.getGlobalRepositoryResource(token, "1234", "3954", "minimal");
+   *
+   * // Returns GetRepositoryResourceRepresentationResponse
+   * const detailed = await client.getGlobalRepositoryResource(token, "1234", "3954", "representation");
+   *
+   * // Defaults to minimal when no resultMode specified
+   * const defaultResult = await client.getGlobalRepositoryResource(token, "1234", "3954");
+   * ```
+   * @beta
+   */
+  public async getGlobalRepositoryResource<T extends ResultMode = "minimal">(
+    accessToken: AccessToken,
+    repositoryId: string,
+    resourceId: string,
+    resultMode?: T
+  ): Promise<
+    BentleyAPIResponse<T extends "representation"
+      ? GetRepositoryResourceRepresentationResponse
+      : GetRepositoryResourceMinimalResponse>
+  > {
+    const headers = this.getResultModeHeaders(resultMode);
+    const url = `${this._baseUrl}/repositories/${repositoryId}/resources/${resourceId}`;
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      headers,
+      true
+    );
+  }
+
+  /** Get multiple global repository resources with optional filtering and pagination
+   * @param accessToken The client access token string for authorization
+   * @param repositoryId The id of the global repository containing the resources
+   * @param args Optional query parameters for search, pagination (skip, top)
+   * @param resultMode Optional result mode controlling the level of detail returned (minimal or representation)
+   * @returns Promise that resolves with an array of global repository resources in the requested format
+   * @example
+   * ```typescript
+   * // Returns GetMultiRepositoryResourceMinimalResponse
+   * const minimal = await client.getGlobalRepositoryResources(token, "cesium", undefined, "minimal");
+   *
+   * // Returns GetMultiRepositoryResourceRepresentationResponse
+   * const detailed = await client.getGlobalRepositoryResources(token, "cesium", { top: 10 }, "representation");
+   *
+   * // Defaults to minimal when no resultMode specified
+   * const defaultResult = await client.getGlobalRepositoryResources(token, "cesium");
+   * ```
+   * @beta
+   */
+  public async getGlobalRepositoryResources<T extends ResultMode = "minimal">(
+    accessToken: AccessToken,
+    repositoryId: string,
+    args?: Pick<ODataQueryParams, "search" | "skip" | "top">,
+    resultMode?: T
+  ): Promise<
+    BentleyAPIResponse<T extends "representation"
+      ? GetMultiRepositoryResourceRepresentationResponse
+      : GetMultiRepositoryResourceMinimalResponse>
+  > {
+    const headers = this.getResultModeHeaders(resultMode);
+    let url = `${this._baseUrl}/repositories/${repositoryId}/resources`;
+    const query = this.getQueryStringArg(ITwinsClient.ODataParamMapping, args);
+    if (query !== "") {
+      url += `?${query}`;
+    }
+
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      headers,
+      true
+    );
+  }
+
+  /** Get graphics metadata for a global repository resource
+   * @param accessToken The client access token string for authorization
+   * @param repositoryId The global repository identifier
+   * @param resourceId The resource identifier
+   * @returns Promise that resolves with graphics metadata including content type, URI, and authentication
+   * @example
+   * ```typescript
+   * const graphics = await client.getGlobalResourceGraphics(token, "cesium", "3954");
+   * ```
+   * @beta
+   */
+  public async getGlobalResourceGraphics(
+    accessToken: AccessToken,
+    repositoryId: string,
+    resourceId: string
+  ): Promise<BentleyAPIResponse<ResourceGraphicsResponse>> {
+    const url = `${this._baseUrl}/repositories/${repositoryId}/resources/${resourceId}/graphics`;
+    return this.sendGenericAPIRequest(
+      accessToken,
+      "GET",
+      url,
+      undefined,
+      undefined,
+      true
+    );
+  }
+
   /** Create a new iTwin Repository
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
@@ -303,7 +452,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
   /** Get repositories accessible to user with optional filtering
    * @param accessToken The client access token string
    * @param iTwinId The id of the iTwin
-   * @param arg Optional query arguments for class and subClass filtering. If subClass is specified, class is also required.
+   * @param arg Optional query arguments for repository class and subClass identifiers. If subClass is specified, class is also required.
    * @returns Promise that resolves with an array of repositories, may be empty
    */
   public async getRepositories(
@@ -358,10 +507,10 @@ export class ITwinsClient extends BaseITwinsApiClient {
   }
 
   /**
-   * Create a repository resource for a repository of class GeographicInformationSystem
+   * Create a repository resource for a repository that exposes a resources collection
    * @param accessToken - The client access token string for authorization
    * @param iTwinId - The id of the iTwin that contains the repository
-   * @param repositoryId - The id of the GeographicInformationSystem repository to add the resource to
+   * @param repositoryId - The id of the repository to add the resource to
    * @param repositoryResource - The repository resource to create with required id and displayName properties
    * @returns Promise that resolves with the created repository resource details
    *
@@ -386,7 +535,7 @@ export class ITwinsClient extends BaseITwinsApiClient {
    * Delete a repository resource
    * @param accessToken - The client access token string for authorization
    * @param iTwinId - The id of the iTwin that contains the repository
-   * @param repositoryId - The id of the GeographicInformationSystem repository to add the resource to
+    * @param repositoryId - The id of the repository that contains the resource
    * @param resourceId - The id repository resource to delete
    * @returns Promise that resolves when the iTwin is successfully deleted
    *
