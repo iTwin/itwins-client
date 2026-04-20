@@ -152,6 +152,9 @@ async function demoCRUD(): Promise<void> {
 
 ## Repository Operations
 
+Repository `class` and `subClass` values are API-provided string identifiers.
+The examples below use common values, but the exported repository aliases are no longer exhaustive unions.
+
 ### Get Repositories by iTwin ID
 
 ```typescript
@@ -219,7 +222,7 @@ import type {
   BentleyAPIResponse,
   ItwinCreate,
   ITwinRepresentationResponse,
-  Repository,
+  NewRepositoryConfig,
   SingleRepositoryResponse,
 } from "@itwin/itwins-client";
 
@@ -243,7 +246,7 @@ async function demoRepositoryCRUD(): Promise<void> {
   const iTwinId = createResponse.data!.iTwin.id;
 
   /* Create the iTwin Repository */
-  const newRepository: Omit<Repository, "id"> = {
+  const newRepository: NewRepositoryConfig = {
     class: "GeographicInformationSystem",
     subClass: "WebMapService",
     uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -312,6 +315,69 @@ async function getRepositoryDetails(): Promise<void> {
   if (repo.capabilities) {
     console.log(`Capabilities: ${repo.capabilities.join(", ")}`);
   }
+}
+```
+
+## Global Repository Operations
+
+Global repositories are not scoped to a specific iTwin. These endpoints are currently Technical Preview APIs.
+
+### Get Global Repositories
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  MultiRepositoriesResponse,
+} from "@itwin/itwins-client";
+
+/** Function that lists global repositories available to all iTwins. */
+async function printGlobalRepositoryIds(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+
+  const response: BentleyAPIResponse<MultiRepositoriesResponse> =
+    await client.getGlobalRepositories(accessToken, { class: "Cesium" });
+
+  response.data!.repositories.forEach((repository) => {
+    console.log(repository.id, repository.displayName);
+  });
+}
+```
+
+### Get Global Repository Resources and Graphics
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+
+/** Function that reads a global repository resource and its graphics metadata. */
+async function readGlobalResourceGraphics(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+
+  const resourcesResponse = await client.getGlobalRepositoryResources(
+    accessToken,
+    "cesium",
+    { top: 1 }
+  );
+
+  const resource = resourcesResponse.data!.resources[0];
+  const resourceResponse = await client.getGlobalRepositoryResource(
+    accessToken,
+    "cesium",
+    resource.id,
+    "representation"
+  );
+  const graphicsResponse = await client.getGlobalResourceGraphics(
+    accessToken,
+    "cesium",
+    resource.id
+  );
+
+  console.log(resourceResponse.data!.resource.displayName);
+  console.log(graphicsResponse.data!.graphics.map((graphic) => graphic.uri));
 }
 ```
 
