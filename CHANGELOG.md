@@ -1,5 +1,115 @@
 # Change Log - @itwin/itwins-client
 
+## 3.0.0
+
+### Major Changes
+
+#### [3.0.0](https://www.npmjs.com/package/@itwin/itwins-client/v/3.0.0) - 2026-04-21
+
+Use strict graphics provider unions and plain string public identifiers
+
+BREAKING CHANGE: `RepositoryClass`, `RepositorySubClass`, and `GraphicsContentType`
+are now plain `string` aliases instead of string unions.
+
+BREAKING CHANGE: `GraphicsProvider` is now a discriminated union keyed by
+provider `name`, and `GraphicsProviderOptions` is now a union of the
+provider-specific option interfaces instead of a merged superset interface.
+
+This also removes the remaining repository resource response literals that previously narrowed
+repository `class` values to a smaller fixed set.
+
+Before:
+
+```typescript
+type RepositoryClass =
+  | "iModels"
+  | "Storage"
+  | "Forms"
+  | "RealityData"
+  | "GeographicInformationSystem";
+
+type RepositorySubClass = "WebMapService" | "WebMapTileService" | "ArcGIS";
+
+type GraphicsContentType =
+  | "3DTILES"
+  | "GLTF"
+  | "IMAGERY"
+  | "TERRAIN"
+  | "KML"
+  | "CZML"
+  | "GEOJSON"
+  | "OAPIF+GEOJSON";
+
+interface GraphicsProviderOptions {
+  tilingScheme?: string;
+  bounds?: [number, number, number, number];
+  credit?: string;
+  mapType?: string;
+  url?: string;
+  session?: string;
+  tileWidth?: number;
+  tileHeight?: number;
+  imageFormat?: string;
+  [key: string]: unknown;
+}
+
+interface GraphicsProvider {
+  name: string;
+  options: GraphicsProviderOptions;
+}
+```
+
+After:
+
+```typescript
+type RepositoryClass = string;
+type RepositorySubClass = string;
+type GraphicsContentType = string;
+
+type GraphicsProvider = UrlTemplateImageryProvider | Google2DImageryProvider;
+
+type GraphicsProviderOptions =
+  | UrlTemplateImageryProviderOptions
+  | Google2DImageryProviderOptions;
+```
+
+Migration:
+
+- Existing calls that already pass string literals continue to work unchanged.
+- Code that relied on exhaustive autocomplete or literal-union narrowing for repository
+  `class`, `subClass`, and graphics `type` values should now treat those values as API-provided strings.
+- Narrow `GraphicsProvider` by `name` before reading provider-specific option fields.
+- Code that extended `GraphicsProviderOptions` should switch to one of the concrete option interfaces
+  or use composition instead of interface inheritance.
+
+### Minor Changes
+
+#### [2.6.0](https://www.npmjs.com/package/@itwin/itwins-client/v/2.6.0) - 2026-04-21
+
+Add Global Repositories endpoint methods
+
+Added new `@beta` methods for the Global Repositories Technical Preview APIs:
+
+- `getGlobalRepositories`
+- `getGlobalRepository`
+- `getGlobalRepositoryResource`
+- `getGlobalRepositoryResources`
+- `getGlobalResourceGraphics`
+
+The implementation reuses the existing repository and repository-resource response types,
+and expands the shared graphics provider options model to cover the Google provider
+metadata returned by the global graphics endpoint.
+
+### Patch Changes
+
+#### [2.5.5](https://www.npmjs.com/package/@itwin/itwins-client/v/2.5.5) - 2026-04-21
+
+Fixed audit issue with lodash by adding a package resolution
+
+#### [2.5.5](https://www.npmjs.com/package/@itwin/itwins-client/v/2.5.5) - 2026-04-21
+
+Fixed audit issue coming from changesets cli
+
 ## 2.5.4
 
 ### Patch Changes
