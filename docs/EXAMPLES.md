@@ -152,6 +152,9 @@ async function demoCRUD(): Promise<void> {
 
 ## Repository Operations
 
+Repository `class` and `subClass` values are API-provided string identifiers.
+The examples below use common values, but the exported repository aliases are no longer exhaustive unions.
+
 ### Get Repositories by iTwin ID
 
 ```typescript
@@ -219,7 +222,7 @@ import type {
   BentleyAPIResponse,
   ItwinCreate,
   ITwinRepresentationResponse,
-  Repository,
+  NewRepositoryConfig,
   SingleRepositoryResponse,
 } from "@itwin/itwins-client";
 
@@ -243,7 +246,7 @@ async function demoRepositoryCRUD(): Promise<void> {
   const iTwinId = createResponse.data!.iTwin.id;
 
   /* Create the iTwin Repository */
-  const newRepository: Omit<Repository, "id"> = {
+  const newRepository: NewRepositoryConfig = {
     class: "GeographicInformationSystem",
     subClass: "WebMapService",
     uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
@@ -312,6 +315,69 @@ async function getRepositoryDetails(): Promise<void> {
   if (repo.capabilities) {
     console.log(`Capabilities: ${repo.capabilities.join(", ")}`);
   }
+}
+```
+
+## Global Repository Operations
+
+Global repositories are not scoped to a specific iTwin. These endpoints are currently Technical Preview APIs.
+
+### Get Global Repositories
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+import type {
+  BentleyAPIResponse,
+  MultiRepositoriesResponse,
+} from "@itwin/itwins-client";
+
+/** Function that lists global repositories available to all iTwins. */
+async function printGlobalRepositoryIds(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+
+  const response: BentleyAPIResponse<MultiRepositoriesResponse> =
+    await client.getGlobalRepositories(accessToken, { class: "Cesium" });
+
+  response.data!.repositories.forEach((repository) => {
+    console.log(repository.id, repository.displayName);
+  });
+}
+```
+
+### Get Global Repository Resources and Graphics
+
+```typescript
+import type { AccessToken } from "@itwin/core-bentley";
+import { ITwinsClient } from "@itwin/itwins-client";
+
+/** Function that reads a global repository resource and its graphics metadata. */
+async function readGlobalResourceGraphics(): Promise<void> {
+  const client = new ITwinsClient();
+  const accessToken: AccessToken = { /* get_access_token_logic_here */ };
+
+  const resourcesResponse = await client.getGlobalRepositoryResources(
+    accessToken,
+    "cesium",
+    { top: 1 }
+  );
+
+  const resource = resourcesResponse.data!.resources[0];
+  const resourceResponse = await client.getGlobalRepositoryResource(
+    accessToken,
+    "cesium",
+    resource.id,
+    "representation"
+  );
+  const graphicsResponse = await client.getGlobalResourceGraphics(
+    accessToken,
+    "cesium",
+    resource.id
+  );
+
+  console.log(resourceResponse.data!.resource.displayName);
+  console.log(graphicsResponse.data!.graphics.map((graphic) => graphic.uri));
 }
 ```
 
@@ -802,10 +868,8 @@ async function getResourceGraphics(): Promise<void> {
 
   // Display provider configuration (e.g., for CesiumJS)
   if (graphics.provider) {
-    console.log(`Provider Type: ${graphics.provider.type}`);
-    if (graphics.provider.options) {
-      console.log("Provider Options:", JSON.stringify(graphics.provider.options, null, 2));
-    }
+    console.log(`Provider Name: ${graphics.provider.name}`);
+    console.log("Provider Options:", JSON.stringify(graphics.provider.options, null, 2));
   }
 }
 ```
@@ -999,9 +1063,19 @@ async function getResourceGraphicsByIds(): Promise<void> {
     // CesiumJS provider configuration if available
     if (graphic.provider) {
       console.log(`  Provider: ${graphic.provider.name}`);
-      console.log(`  Tiling Scheme: ${graphic.provider.options.tilingScheme}`);
-      console.log(`  Bounds: ${graphic.provider.options.bounds.join(", ")}`);
-      console.log(`  Credit: ${graphic.provider.options.credit}`);
+      switch (graphic.provider.name) {
+        case "UrlTemplateImageryProvider":
+          console.log(`  Tiling Scheme: ${graphic.provider.options.tilingScheme}`);
+          if (graphic.provider.options.bounds) {
+            console.log(`  Bounds: ${graphic.provider.options.bounds.join(", ")}`);
+          }
+          console.log(`  Credit: ${graphic.provider.options.credit}`);
+          break;
+        case "Google2DImageryProvider":
+          console.log(`  Map Type: ${graphic.provider.options.mapType}`);
+          console.log(`  URL: ${graphic.provider.options.url}`);
+          break;
+      }
     }
   });
 }
@@ -1197,6 +1271,17 @@ async function setupCesiumProvider(): Promise<void> {
   const provider = cesiumGraphic.provider;
   console.log("CesiumJS Provider Configuration:");
   console.log(`  Name: ${provider.name}`);
+
+  if (provider.name !== "UrlTemplateImageryProvider") {
+    console.log(`  Provider ${provider.name} is not compatible with UrlTemplateImageryProvider setup`);
+    return;
+  }
+
+  if (!provider.options.bounds) {
+    console.log("  UrlTemplate provider did not include bounds");
+    return;
+  }
+
   console.log(`  Tiling Scheme: ${provider.options.tilingScheme}`);
   console.log(`  Bounds [W, S, E, N]: ${provider.options.bounds.join(", ")}`);
   console.log(`  Credit: ${provider.options.credit}`);

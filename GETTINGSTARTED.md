@@ -289,6 +289,7 @@ Now that you have the basics working, explore these areas:
 
 - **[Complete Examples](./docs/EXAMPLES.md)** - Comprehensive usage examples
 - **[Migration Guide](./MIGRATION-GUIDE-v1-to-v2.md)** - If upgrading from v1.x
+- **[Migration Guide](./MIGRATION-GUIDE-v2-to-v3.md)** - If upgrading from v2.x
 
 ### Additional Resources
 
