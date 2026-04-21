@@ -1,5 +1,13 @@
 # Change Log - @itwin/itwins-client
 
+## 2.5.4
+
+### Patch Changes
+
+#### [2.5.4](https://www.npmjs.com/package/@itwin/itwins-client/v/2.5.4) - 2026-03-26
+
+Fixed audit issue coming from changesets cli
+
 ## 2.5.3
 
 ### Patch Changes
