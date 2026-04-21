@@ -868,10 +868,8 @@ async function getResourceGraphics(): Promise<void> {
 
   // Display provider configuration (e.g., for CesiumJS)
   if (graphics.provider) {
-    console.log(`Provider Type: ${graphics.provider.type}`);
-    if (graphics.provider.options) {
-      console.log("Provider Options:", JSON.stringify(graphics.provider.options, null, 2));
-    }
+    console.log(`Provider Name: ${graphics.provider.name}`);
+    console.log("Provider Options:", JSON.stringify(graphics.provider.options, null, 2));
   }
 }
 ```
@@ -1065,9 +1063,19 @@ async function getResourceGraphicsByIds(): Promise<void> {
     // CesiumJS provider configuration if available
     if (graphic.provider) {
       console.log(`  Provider: ${graphic.provider.name}`);
-      console.log(`  Tiling Scheme: ${graphic.provider.options.tilingScheme}`);
-      console.log(`  Bounds: ${graphic.provider.options.bounds.join(", ")}`);
-      console.log(`  Credit: ${graphic.provider.options.credit}`);
+      switch (graphic.provider.name) {
+        case "UrlTemplateImageryProvider":
+          console.log(`  Tiling Scheme: ${graphic.provider.options.tilingScheme}`);
+          if (graphic.provider.options.bounds) {
+            console.log(`  Bounds: ${graphic.provider.options.bounds.join(", ")}`);
+          }
+          console.log(`  Credit: ${graphic.provider.options.credit}`);
+          break;
+        case "Google2DImageryProvider":
+          console.log(`  Map Type: ${graphic.provider.options.mapType}`);
+          console.log(`  URL: ${graphic.provider.options.url}`);
+          break;
+      }
     }
   });
 }
@@ -1263,6 +1271,17 @@ async function setupCesiumProvider(): Promise<void> {
   const provider = cesiumGraphic.provider;
   console.log("CesiumJS Provider Configuration:");
   console.log(`  Name: ${provider.name}`);
+
+  if (provider.name !== "UrlTemplateImageryProvider") {
+    console.log(`  Provider ${provider.name} is not compatible with UrlTemplateImageryProvider setup`);
+    return;
+  }
+
+  if (!provider.options.bounds) {
+    console.log("  UrlTemplate provider did not include bounds");
+    return;
+  }
+
   console.log(`  Tiling Scheme: ${provider.options.tilingScheme}`);
   console.log(`  Bounds [W, S, E, N]: ${provider.options.bounds.join(", ")}`);
   console.log(`  Credit: ${provider.options.credit}`);

@@ -71,7 +71,7 @@ export interface RepositoryCapabilities {
  * Repository class identifier returned by the API.
  * Known values include iModels, Storage, Forms, RealityData,
  * GeographicInformationSystem, Construction, Subsurface,
- * GeospatialFeatures, CesiumCuratedContent, SensorData,
+ * GeospatialFeatures, SensorData,
  * PdfPlansets, and IndexedMedia.
  * @beta
  */
@@ -188,18 +188,12 @@ export interface NewRepositoryConfig
   }
 
 /**
- * Graphics content type specifying the format of visualization data.
+ * Graphics content type identifier returned by the API.
+ * Known values include 3DTILES, GLTF, IMAGERY, TERRAIN,
+ * KML, CZML, GEOJSON, and OAPIF+GEOJSON.
  * @beta
  */
-export type GraphicsContentType =
-  |"3DTILES"
-  |"GLTF"
-  |"IMAGERY"
-  |"TERRAIN"
-  |"KML"
-  |"CZML"
-  |"GEOJSON"
-  |"OAPIF+GEOJSON"
+export type GraphicsContentType = string;
 
 /**
  * This value determines how to process the authentication information returned from the API.
@@ -249,13 +243,20 @@ export type GraphicsAuthentication =
  * Configuration options for a UrlTemplate imagery provider.
  * @beta
  */
-export interface GraphicsProviderOptions {
+export interface UrlTemplateImageryProviderOptions {
   /** The tiling scheme used (e.g., 'WebMercatorTilingScheme'). */
   tilingScheme?: string;
   /** Geographic bounds as [west, south, east, north] in degrees */
   bounds?: [number, number, number, number];
   /** Attribution or credit for the imagery provider */
   credit?: string;
+}
+
+/**
+ * Configuration options for a Google 2D imagery provider.
+ * @beta
+ */
+export interface Google2DImageryProviderOptions {
   /** The type of map to display (e.g., 'terrain', 'satellite', 'roadmap'). */
   mapType?: string;
   /** The base URL for the provider. */
@@ -268,20 +269,47 @@ export interface GraphicsProviderOptions {
   tileHeight?: number;
   /** The image format for the tiles (e.g., 'png', 'jpeg'). */
   imageFormat?: string;
-  /** Additional provider-specific properties. */
-  [key: string]: unknown;
 }
 
 /**
- * Graphics provider configuration combining content type and options.
+ * Graphics provider options returned by the API.
+ * Modeled as a union of provider-specific option shapes.
  * @beta
  */
-export interface GraphicsProvider {
-  /** The name of the provider. Known values include UrlTemplateImageryProvider and Google2DImageryProvider. */
-  name: string;
-  /** Additional options for the provider */
-  options: GraphicsProviderOptions;
+export type GraphicsProviderOptions =
+  | UrlTemplateImageryProviderOptions
+  | Google2DImageryProviderOptions;
+
+/**
+ * UrlTemplate imagery provider configuration.
+ * @beta
+ */
+export interface UrlTemplateImageryProvider {
+  /** The provider name returned by the API. */
+  name: "UrlTemplateImageryProvider";
+  /** UrlTemplate-specific options. */
+  options: UrlTemplateImageryProviderOptions;
 }
+
+/**
+ * Google 2D imagery provider configuration.
+ * @beta
+ */
+export interface Google2DImageryProvider {
+  /** The provider name returned by the API. */
+  name: "Google2DImageryProvider";
+  /** Google 2D-specific options. */
+  options: Google2DImageryProviderOptions;
+}
+
+/**
+ * Graphics provider configuration returned by the API.
+ * Modeled as a discriminated union keyed by provider name.
+ * @beta
+ */
+export type GraphicsProvider =
+  | UrlTemplateImageryProvider
+  | Google2DImageryProvider;
 
 /**
  * Graphics resource metadata including URIs and authentication.
