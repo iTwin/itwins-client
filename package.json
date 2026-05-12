@@ -69,7 +69,7 @@
     "@changesets/cli": "^2.30.0",
     "@changesets/types": "6.1.0",
     "@eslint/eslintrc": "^3.3.5",
-    "@itwin/build-tools": "^5.7.2",
+    "@itwin/build-tools": "^5.9.2",
     "@itwin/core-bentley": "^5.7.2",
     "@itwin/eslint-plugin": "^6.0.0",
     "@itwin/oidc-signin-tool": "^5.1.1",
