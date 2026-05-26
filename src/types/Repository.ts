@@ -120,7 +120,7 @@ export interface PostRepositoryResourceResponse {
  */
 export interface GetRepositoryResourceMinimalResponse {
   /** The repository resource with minimal information */
-  resource: Pick<Repository, "id" | "class" | "displayName"> & {
+  resource: Pick<Repository, "id" | "class" | "subClass" | "displayName"> & {
     /** Optional type identifier for the resource */
     type?: GraphicsContentType;
     /** Optional capabilities supported by the resource */
