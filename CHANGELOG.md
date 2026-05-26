@@ -1,5 +1,13 @@
 # Change Log - @itwin/itwins-client
 
+## 3.1.0
+
+### Minor Changes
+
+#### [3.1.0](https://www.npmjs.com/package/@itwin/itwins-client/v/3.1.0) - 2026-05-26
+
+Added new capability to GetRepositoryResourceMinimalResponse interface
+
 ## 3.0.0
 
 ### Major Changes
