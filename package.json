@@ -69,7 +69,7 @@
     "@changesets/cli": "^2.30.0",
     "@changesets/types": "6.1.0",
     "@eslint/eslintrc": "^3.3.5",
-    "@itwin/build-tools": "^5.9.2",
+    "@itwin/build-tools": "^5.11.3",
     "@itwin/core-bentley": "^5.7.2",
     "@itwin/eslint-plugin": "^6.0.0",
     "@itwin/oidc-signin-tool": "^5.1.1",
@@ -86,8 +86,8 @@
     "source-map-loader": "^5.0.0",
     "typedoc": "^0.28.17",
     "typescript": "~5.9.3",
-    "vite": "^5.4.21",
-    "vitest": "^3.2.4"
+    "vite": "^6.4.3",
+    "vitest": "^3.2.6"
   },
   "pnpm": {
     "overrides": {
