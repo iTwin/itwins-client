@@ -66,7 +66,7 @@
     "url": "https://github.com/iTwin/itwins-client"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.30.0",
+    "@changesets/cli": "^2.31.1",
     "@changesets/types": "6.1.0",
     "@eslint/eslintrc": "^3.3.5",
     "@itwin/build-tools": "^5.11.3",
