@@ -9,6 +9,7 @@ overrides:
   diff: '>=8.0.3'
   esbuild: '>=0.25.0'
   lodash: '>=4.18.0'
+  '@changesets/write>human-id': 4.1.1
 
 importers:
 
@@ -1828,8 +1829,8 @@ packages:
     resolution: {integrity: sha512-V5nVw1PAOgfI3Lmeaj2Exmeg7fenjhRUgz1lPSezy1CuhPYbgQtbQj4jZfEAEMlaL+vupsvhjqCyjzob0yxsmQ==}
     engines: {node: '>=10.19.0'}
 
-  human-id@4.2.0:
-    resolution: {integrity: sha512-K3GbkIWqyvvlpfhBPlbEvD97TtqBpAYA4kt+cn2lD2x2HuohzZCibcA2nOlnJT6exqvJLggoB5nv2dNf192nEA==}
+  human-id@4.1.1:
+    resolution: {integrity: sha512-3gKm/gCSUipeLsRYZbbdA1BD83lBoWUkZ7G9VFrhWPAU76KwYo5KR8V28bpoPm/ygy0x5/GCbpRQdY7VLYCoIg==}
     hasBin: true
 
   iconv-lite@0.4.24:
@@ -3418,7 +3419,7 @@ snapshots:
     dependencies:
       '@changesets/types': 6.1.0
       fs-extra: 7.0.1
-      human-id: 4.2.0
+      human-id: 4.1.1
       prettier: 2.8.8
 
   '@es-joy/jsdoccomment@0.52.0':
@@ -5326,7 +5327,7 @@ snapshots:
       quick-lru: 5.1.1
       resolve-alpn: 1.2.1
 
-  human-id@4.2.0: {}
+  human-id@4.1.1: {}
 
   iconv-lite@0.4.24:
     dependencies:
