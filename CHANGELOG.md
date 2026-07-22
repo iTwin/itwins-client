@@ -1,5 +1,13 @@
 # Change Log - @itwin/itwins-client
 
+## 3.1.1
+
+### Patch Changes
+
+#### [3.1.1](https://www.npmjs.com/package/@itwin/itwins-client/v/3.1.1) - 2026-07-22
+
+Updated dependencies to fix audit vulnerabilities
+
 ## 3.1.0
 
 ### Minor Changes
