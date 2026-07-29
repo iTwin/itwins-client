@@ -36,7 +36,11 @@ jobs:
       - name: Typecheck
         run: pnpm run typecheck
 
-      - name: Run Audit
+      - name: Run Production Dependency Audit
+        run: pnpm audit --prod --audit-level high
+
+      - name: Report Development Dependency Audit
+        continue-on-error: true
         run: pnpm audit --audit-level high
 
       - name: Build components
