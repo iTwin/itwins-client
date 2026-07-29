@@ -370,7 +370,7 @@ export abstract class BaseBentleyAPIClient {
    *
    * This method enforces security requirements for following HTTP redirects:
    * - URL must use HTTPS protocol (not HTTP)
-   * - Domain must be a Bentley-owned domain (*api.bentley.com)
+  * - Domain must be an approved Bentley API domain
    *
    * @param url - The redirect URL to validate
    * @returns True if the URL is valid and safe to follow
@@ -406,19 +406,15 @@ export abstract class BaseBentleyAPIClient {
       );
     }
 
-    // Validate domain is a Bentley-owned domain (specific whitelist)
+    // Validate the hostname against the approved Bentley API domains.
     const hostname = parsedUrl.hostname.toLowerCase();
-    const allowedDomains = [
-      "api.bentley.com",
-    ];
-
-    const isBentleyDomain = allowedDomains.some(domain =>
-      hostname === domain || hostname.endsWith(`-${domain}`)
-    );
+    const isBentleyDomain =
+      hostname === "api.bentley.com" ||
+      /^(qa|dev|staging)-api\.bentley\.com$/.test(hostname);
 
     if (!isBentleyDomain) {
       throw new Error(
-        `Invalid redirect URL: domain "${hostname}" is not a trusted Bentley domain. Only api.bentley.com and its subdomains are allowed.`
+        `Invalid redirect URL: domain "${hostname}" is not a trusted Bentley domain. Only approved Bentley API domains are allowed.`
       );
     }
 

@@ -120,6 +120,14 @@ describe("BaseBentleyAPIClient - Redirect Security", () => {
         expect(() => client.testValidateRedirectUrlSecurity(url)).toThrow(/not a trusted Bentley domain/);
       });
 
+      it.each(["attacker-api.bentley.com", "evil-api.bentley.com"])(
+        "should reject unapproved hyphenated API domain (%s)",
+        (hostname) => {
+          const url = `https://${hostname}/steal`;
+          expect(() => client.testValidateRedirectUrlSecurity(url)).toThrow(/not a trusted Bentley domain/);
+        }
+      );
+
       it("should reject domain spoofing (api.bentley.com.evil.com)", () => {
         const url = "https://api.bentley.com.evil.com/spoof";
         expect(() => client.testValidateRedirectUrlSecurity(url)).toThrow(/not a trusted Bentley domain/);
