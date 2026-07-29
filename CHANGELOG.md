@@ -1,5 +1,13 @@
 # Change Log - @itwin/itwins-client
 
+## 3.1.2
+
+### Patch Changes
+
+#### [3.1.2](https://www.npmjs.com/package/@itwin/itwins-client/v/3.1.2) - 2026-07-29
+
+Added better protection around allowed domains for redirects, lowers spoofing attack vector surface.
+
 ## 3.1.1
 
 ### Patch Changes
