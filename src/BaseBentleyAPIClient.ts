@@ -6,6 +6,9 @@ import type { AccessToken } from "@itwin/core-bentley";
 import type { ApimError, BentleyAPIResponse, Method, RequestConfig } from "./types/CommonApiTypes";
 import { ParameterMapping } from "./types/typeUtils";
 
+const INVALID_REDIRECT_URL_MESSAGE =
+  "Invalid redirect URL: HTTPS and an approved Bentley API domain are required.";
+
 /**
  * Type guard to validate if an object is a valid Error structure
  * @param error - Unknown object to validate
@@ -82,6 +85,7 @@ export abstract class BaseBentleyAPIClient {
    * @param url - The complete URL of the request endpoint
    * @param data - Optional payload data for the request body
    * @param headers - Optional additional request headers
+   * @param allowRedirects - Whether secure redirects may be followed
    * @returns Promise that resolves to the parsed API response with type safety
    */
   protected async sendGenericAPIRequest<TResponse = unknown, TData = unknown>(
@@ -171,15 +175,12 @@ export abstract class BaseBentleyAPIClient {
       });
 
       if (response.redirected) {
-        try {
-          this.validateRedirectUrlSecurity(response.url);
-        } catch (error) {
+        if (!this.isValidBentleyUrl(response.url)) {
           return {
             status: 502,
             error: {
               code: "InvalidRedirectUrl",
-              message:
-                error instanceof Error ? error.message : "Invalid redirect URL",
+              message: INVALID_REDIRECT_URL_MESSAGE,
             },
           };
         }
@@ -345,16 +346,13 @@ export abstract class BaseBentleyAPIClient {
       };
     }
 
-    // Validate redirect URL for security
-    try {
-      this.validateRedirectUrlSecurity(redirectUrl);
-    } catch (error) {
+    if (!this.isValidBentleyUrl(redirectUrl)) {
       return {
         error: {
           status: 502,
           error: {
             code: "InvalidRedirectUrl",
-            message: error instanceof Error ? error.message : "Invalid redirect URL",
+            message: INVALID_REDIRECT_URL_MESSAGE,
           },
         },
         redirectUrl: "",
@@ -373,8 +371,7 @@ export abstract class BaseBentleyAPIClient {
   * - Domain must be an approved Bentley API domain
    *
    * @param url - The redirect URL to validate
-   * @returns True if the URL is valid and safe to follow
-   * @throws Error if the URL is invalid, uses HTTP, or targets an untrusted domain
+  * @returns True when the URL uses HTTPS and targets an approved Bentley API domain
    *
    * @remarks
    * This validation is critical for security when following 302 redirects in federated
@@ -390,35 +387,16 @@ export abstract class BaseBentleyAPIClient {
    * this.validateRedirectUrl("https://bentley.com.evil.com/fake"); // Domain spoofing attempt
    * ```
    */
-  private validateRedirectUrlSecurity(url: string): boolean {
-    let parsedUrl: URL;
-
+  private isValidBentleyUrl(url: string): boolean {
     try {
-      parsedUrl = new URL(url);
+      const parsedUrl = new URL(url);
+      const hostname = parsedUrl.hostname.toLowerCase();
+      return parsedUrl.protocol === "https:" &&
+        (hostname === "api.bentley.com" ||
+          /^(qa|dev|staging)-api\.bentley\.com$/.test(hostname));
     } catch {
-      throw new Error(`Invalid redirect URL: malformed URL "${url}"`);
+      return false;
     }
-
-    // Require HTTPS protocol for security
-    if (parsedUrl.protocol !== "https:") {
-      throw new Error(
-        `Invalid redirect URL: HTTPS required, but URL uses "${parsedUrl.protocol}" protocol. URL: ${url}`
-      );
-    }
-
-    // Validate the hostname against the approved Bentley API domains.
-    const hostname = parsedUrl.hostname.toLowerCase();
-    const isBentleyDomain =
-      hostname === "api.bentley.com" ||
-      /^(qa|dev|staging)-api\.bentley\.com$/.test(hostname);
-
-    if (!isBentleyDomain) {
-      throw new Error(
-        `Invalid redirect URL: domain "${hostname}" is not a trusted Bentley domain. Only approved Bentley API domains are allowed.`
-      );
-    }
-
-    return true;
   }
 
   /**
@@ -447,6 +425,12 @@ export abstract class BaseBentleyAPIClient {
     if (!url) {
       throw new Error("URL is required");
     }
+    const includeAuthorization = this.isValidBentleyUrl(url);
+    const requestHeaders = Object.fromEntries(
+      Object.entries(headers).filter(
+        ([header]) => header.toLowerCase() !== "authorization"
+      )
+    );
     let body: string | Blob | undefined;
     if (!(data instanceof Blob)) {
       body = JSON.stringify(data);
@@ -458,8 +442,10 @@ export abstract class BaseBentleyAPIClient {
       url,
       body,
       headers: {
-        ...headers,
-        authorization: accessTokenString,
+        ...requestHeaders,
+        ...(includeAuthorization
+          ? { authorization: accessTokenString }
+          : {}),
         "content-type":
           headers.contentType || headers["content-type"]
             ? headers.contentType || headers["content-type"]

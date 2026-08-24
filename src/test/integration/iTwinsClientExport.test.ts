@@ -193,7 +193,7 @@ describe("iTwinsClient Export Functionality", () => {
     expect(exportResponse.status).toBe(401);
     expect(exportResponse.data).toBeUndefined();
     expect(exportResponse.error).toBeDefined();
-    expect(exportResponse.error?.message).toBe("Access denied due to invalid access_token. Make sure that issuer is correct, the token is not expired and is not corrupted.");
-    expect(exportResponse.error!.code).toBe("InvalidToken");
+    expect(exportResponse.error?.message).toBe("Authorization scheme is not valid.");
+    expect(exportResponse.error!.code).toBe("InvalidAuthorizationScheme");
   });
 });

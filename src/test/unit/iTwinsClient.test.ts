@@ -2,7 +2,7 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ITwinsClient } from "../../iTwinsClient";
 import type { ITwinsQueryArg } from "../../types/ITwinsQueryArgs";
 
@@ -22,6 +22,39 @@ class TestableiTwinsClient extends ITwinsClient {
     return (this as any).getQueryScopeHeaders(queryScope);
   }
 }
+
+describe("ITwinsClient - Capability URI Security", () => {
+  const originalFetch = globalThis.fetch;
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+  });
+
+  it.each([
+    ["getRepositoryResourcesByUri", async (client: ITwinsClient) =>
+      client.getRepositoryResourcesByUri("Bearer sensitive-token", "https://attacker.example/resources")],
+    ["getRepositoryResourceByUri", async (client: ITwinsClient) =>
+      client.getRepositoryResourceByUri("Bearer sensitive-token", "https://attacker.example/resources/1")],
+    ["getResourceGraphicsByUri", async (client: ITwinsClient) =>
+      client.getResourceGraphicsByUri("Bearer sensitive-token", "https://attacker.example/graphics")],
+  ])("%s strips authorization from an untrusted URI", async (_name, request) => {
+    let sentHeaders: Record<string, string | undefined> | undefined;
+    globalThis.fetch = async (_input, init) => {
+      if (init?.headers && !(init.headers instanceof Headers) && !Array.isArray(init.headers)) {
+        sentHeaders = init.headers;
+      }
+      return new Response(JSON.stringify({ graphics: [] }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    };
+
+    const response = await request(new ITwinsClient());
+
+    expect(response.status).toBe(200);
+    expect(new Headers(sentHeaders).has("authorization")).toBe(false);
+  });
+});
 
 describe("ITwinsClient - Header Generation", () => {
   let client: TestableiTwinsClient;
