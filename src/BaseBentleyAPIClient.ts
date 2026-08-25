@@ -81,7 +81,7 @@ export abstract class BaseBentleyAPIClient {
    * @param method - The HTTP method type (GET, POST, DELETE, etc.)
    * @param url - The complete URL of the request endpoint
    * @param data - Optional payload data for the request body
-    * @param headers - Optional additional request headers
+   * @param headers - Optional additional request headers
    * @returns Promise that resolves to the parsed API response with type safety
    */
   protected async sendGenericAPIRequest<TResponse = unknown, TData = unknown>(
