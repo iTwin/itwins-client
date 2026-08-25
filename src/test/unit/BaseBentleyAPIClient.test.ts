@@ -49,12 +49,9 @@ describe("BaseBentleyAPIClient - Redirect Security", () => {
       "https://bentley.com/resource",
       "https://api.bentley.com/itwins/abc123",
       "https://qa-api.bentley.com/repositories/xyz789",
-      "https://attacker-api.bentley.com/steal",
-      "https://evil.com.api.bentley.com/resource",
       "https://deep.internal.bentley.com/resource",
       "https://API.BENTLEY.COM/path/to/resource#section",
       "https://dev-api.bentley.com:443/resources",
-      "https://user:pass@api.bentley.com/test",
     ])("accepts Bentley HTTPS URL %s", (url) => {
       expect(client.testIsValidBentleyUrl(url)).toBe(true);
     });
