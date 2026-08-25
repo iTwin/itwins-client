@@ -175,7 +175,7 @@ export abstract class BaseBentleyAPIClient {
       });
 
       if (response.redirected) {
-        if (!this.isValidBentleyUrl(response.url)) {
+        if (!this.isValidRedirectUrl(response.url)) {
           return {
             status: 502,
             error: {
@@ -346,7 +346,7 @@ export abstract class BaseBentleyAPIClient {
       };
     }
 
-    if (!this.isValidBentleyUrl(redirectUrl)) {
+    if (!this.isValidRedirectUrl(redirectUrl)) {
       return {
         error: {
           status: 502,
@@ -387,13 +387,32 @@ export abstract class BaseBentleyAPIClient {
    * this.validateRedirectUrl("https://bentley.com.evil.com/fake"); // Domain spoofing attempt
    * ```
    */
-  private isValidBentleyUrl(url: string): boolean {
+  private isValidRedirectUrl(url: string): boolean {
     try {
       const parsedUrl = new URL(url);
       const hostname = parsedUrl.hostname.toLowerCase();
       return parsedUrl.protocol === "https:" &&
         (hostname === "api.bentley.com" ||
           /^(qa|dev|staging)-api\.bentley\.com$/.test(hostname));
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+    * Validates that a URL uses HTTPS and targets an exact Bentley domain boundary.
+    * Allows
+   * `bentley.com` and its subdomains while rejecting lookalike domains.
+   *
+   * @param url - The request URL to validate
+    * @returns True when the URL is a valid Bentley HTTPS URL
+   */
+  private isValidBentleyUrl(url: string): boolean {
+    try {
+      const parsedUrl = new URL(url);
+      const hostname = parsedUrl.hostname.toLowerCase();
+      return parsedUrl.protocol === "https:" &&
+        (hostname === "bentley.com" || hostname.endsWith(".bentley.com"));
     } catch {
       return false;
     }

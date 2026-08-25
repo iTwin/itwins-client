@@ -30,29 +30,34 @@ describe("ITwinsClient - Capability URI Security", () => {
     globalThis.fetch = originalFetch;
   });
 
-  it.each([
-    ["getRepositoryResourcesByUri", async (client: ITwinsClient) =>
-      client.getRepositoryResourcesByUri("Bearer sensitive-token", "https://attacker.example/resources")],
-    ["getRepositoryResourceByUri", async (client: ITwinsClient) =>
-      client.getRepositoryResourceByUri("Bearer sensitive-token", "https://attacker.example/resources/1")],
-    ["getResourceGraphicsByUri", async (client: ITwinsClient) =>
-      client.getResourceGraphicsByUri("Bearer sensitive-token", "https://attacker.example/graphics")],
-  ])("%s strips authorization from an untrusted URI", async (_name, request) => {
-    let sentHeaders: Record<string, string | undefined> | undefined;
-    globalThis.fetch = async (_input, init) => {
-      if (init?.headers && !(init.headers instanceof Headers) && !Array.isArray(init.headers)) {
-        sentHeaders = init.headers;
-      }
-      return new Response(JSON.stringify({ graphics: [] }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      });
-    };
+  describe.each([
+    ["getRepositoryResourcesByUri", async (client: ITwinsClient, uri: string) =>
+      client.getRepositoryResourcesByUri("Bearer sensitive-token", uri)],
+    ["getRepositoryResourceByUri", async (client: ITwinsClient, uri: string) =>
+      client.getRepositoryResourceByUri("Bearer sensitive-token", uri)],
+    ["getResourceGraphicsByUri", async (client: ITwinsClient, uri: string) =>
+      client.getResourceGraphicsByUri("Bearer sensitive-token", uri)],
+  ])("%s", (_name, request) => {
+    it.each([
+      "https://attacker.example/resources",
+      "http://127.0.0.1:3000/resources",
+    ])("strips authorization from untrusted URI %s", async (uri) => {
+      let sentHeaders: Record<string, string | undefined> | undefined;
+      globalThis.fetch = async (_input, init) => {
+        if (init?.headers && !(init.headers instanceof Headers) && !Array.isArray(init.headers)) {
+          sentHeaders = init.headers;
+        }
+        return new Response(JSON.stringify({ graphics: [] }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      };
 
-    const response = await request(new ITwinsClient());
+      const response = await request(new ITwinsClient(), uri);
 
-    expect(response.status).toBe(200);
-    expect(new Headers(sentHeaders).has("authorization")).toBe(false);
+      expect(response.status).toBe(200);
+      expect(new Headers(sentHeaders).has("authorization")).toBe(false);
+    });
   });
 });
 

@@ -10,6 +10,12 @@ import type { BentleyAPIResponse } from "../../types/CommonApiTypes";
  * Test subclass to expose private methods for unit testing
  */
 class TestableBaseBentleyAPIClient extends BaseBentleyAPIClient {
+  public testIsValidRedirectUrl(url: string): boolean {
+    return (this as unknown as {
+      isValidRedirectUrl: (url: string) => boolean;
+    }).isValidRedirectUrl(url);
+  }
+
   public testIsValidBentleyUrl(url: string): boolean {
     return (this as unknown as {
       isValidBentleyUrl: (url: string) => boolean;
@@ -44,7 +50,7 @@ describe("BaseBentleyAPIClient - Redirect Security", () => {
     client = new TestableBaseBentleyAPIClient();
   });
 
-  describe("isValidBentleyUrl", () => {
+  describe("isValidRedirectUrl", () => {
     it.each([
       "https://api.bentley.com/itwins/abc123",
       "https://qa-api.bentley.com/repositories/xyz789",
@@ -54,7 +60,7 @@ describe("BaseBentleyAPIClient - Redirect Security", () => {
       "https://dev-api.bentley.com:443/resources",
       "https://user:pass@api.bentley.com/test",
     ])("accepts trusted HTTPS URL %s", (url) => {
-      expect(client.testIsValidBentleyUrl(url)).toBe(true);
+      expect(client.testIsValidRedirectUrl(url)).toBe(true);
     });
 
     it.each([
@@ -72,6 +78,24 @@ describe("BaseBentleyAPIClient - Redirect Security", () => {
       "file:///etc/passwd",
       "javascript:alert('XSS')",
       "data:text/html,<script>alert('XSS')</script>",
+    ])("rejects untrusted URL %s", (url) => {
+      expect(client.testIsValidRedirectUrl(url)).toBe(false);
+    });
+  });
+
+  describe("isValidBentleyUrl", () => {
+    it.each([
+      "https://bentley.com/resource",
+      "https://internal.bentley.com/resource",
+      "https://deep.internal.bentley.com/resource",
+    ])("accepts Bentley HTTPS URL %s", (url) => {
+      expect(client.testIsValidBentleyUrl(url)).toBe(true);
+    });
+
+    it.each([
+      "http://internal.bentley.com/resource",
+      "https://notbentley.com/resource",
+      "https://bentley.com.evil.com/resource",
     ])("rejects untrusted URL %s", (url) => {
       expect(client.testIsValidBentleyUrl(url)).toBe(false);
     });
@@ -489,11 +513,14 @@ describe("BaseBentleyAPIClient - createRequestOptions", () => {
   });
 
   describe("Authorization Security", () => {
-    it("should include authorization for a trusted Bentley API URL", () => {
+    it.each([
+      "https://api.bentley.com/itwins",
+      "https://internal.bentley.com/resources",
+    ])("should include authorization for trusted Bentley URL %s", (url) => {
       const result = createRequestOptions(
         "Bearer sensitive-token",
         "GET",
-        "https://api.bentley.com/itwins"
+        url
       );
 
       expect(result.headers.authorization).toBe("Bearer sensitive-token");
