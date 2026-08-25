@@ -370,7 +370,7 @@ export abstract class BaseBentleyAPIClient {
    *
    * This method enforces security requirements for following HTTP redirects:
    * - URL must use HTTPS protocol (not HTTP)
-  * - Domain must be a Bentley domain
+   * - Domain must be a Bentley domain
    *
    * @param url - The redirect URL to validate
    * @returns True if the URL is valid and safe to follow
