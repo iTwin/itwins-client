@@ -10,12 +10,6 @@ import type { BentleyAPIResponse } from "../../types/CommonApiTypes";
  * Test subclass to expose private methods for unit testing
  */
 class TestableBaseBentleyAPIClient extends BaseBentleyAPIClient {
-  public testIsValidRedirectUrl(url: string): boolean {
-    return (this as unknown as {
-      isValidRedirectUrl: (url: string) => boolean;
-    }).isValidRedirectUrl(url);
-  }
-
   public testIsValidBentleyUrl(url: string): boolean {
     return (this as unknown as {
       isValidBentleyUrl: (url: string) => boolean;
@@ -50,26 +44,26 @@ describe("BaseBentleyAPIClient - Redirect Security", () => {
     client = new TestableBaseBentleyAPIClient();
   });
 
-  describe("isValidRedirectUrl", () => {
+  describe("isValidBentleyUrl", () => {
     it.each([
+      "https://bentley.com/resource",
       "https://api.bentley.com/itwins/abc123",
       "https://qa-api.bentley.com/repositories/xyz789",
-      "https://dev-api.bentley.com/resources/test",
-      "https://staging-api.bentley.com/repos?$top=10&$skip=5",
+      "https://attacker-api.bentley.com/steal",
+      "https://evil.com.api.bentley.com/resource",
+      "https://deep.internal.bentley.com/resource",
       "https://API.BENTLEY.COM/path/to/resource#section",
       "https://dev-api.bentley.com:443/resources",
       "https://user:pass@api.bentley.com/test",
-    ])("accepts trusted HTTPS URL %s", (url) => {
-      expect(client.testIsValidRedirectUrl(url)).toBe(true);
+    ])("accepts Bentley HTTPS URL %s", (url) => {
+      expect(client.testIsValidBentleyUrl(url)).toBe(true);
     });
 
     it.each([
       "http://api.bentley.com/itwins/abc123",
       "https://evil.com/api/redirect",
-      "https://evil.com.api.bentley.com/fake",
-      "https://attacker-api.bentley.com/steal",
       "https://api.bentley.com.evil.com/spoof",
-      "https://bentley.com/api/test",
+      "https://notbentley.com/resource",
       "https://localhost:3000/api/test",
       "https://192.168.1.1/api/redirect",
       "not-a-url-at-all",
@@ -78,24 +72,6 @@ describe("BaseBentleyAPIClient - Redirect Security", () => {
       "file:///etc/passwd",
       "javascript:alert('XSS')",
       "data:text/html,<script>alert('XSS')</script>",
-    ])("rejects untrusted URL %s", (url) => {
-      expect(client.testIsValidRedirectUrl(url)).toBe(false);
-    });
-  });
-
-  describe("isValidBentleyUrl", () => {
-    it.each([
-      "https://bentley.com/resource",
-      "https://internal.bentley.com/resource",
-      "https://deep.internal.bentley.com/resource",
-    ])("accepts Bentley HTTPS URL %s", (url) => {
-      expect(client.testIsValidBentleyUrl(url)).toBe(true);
-    });
-
-    it.each([
-      "http://internal.bentley.com/resource",
-      "https://notbentley.com/resource",
-      "https://bentley.com.evil.com/resource",
     ])("rejects untrusted URL %s", (url) => {
       expect(client.testIsValidBentleyUrl(url)).toBe(false);
     });
@@ -274,7 +250,7 @@ describe("BaseBentleyAPIClient - checkRedirectValidity", () => {
       expect(result.error).toBeDefined();
       expect(result.error!.status).toBe(502);
       expect(result.error!.error.code).toBe("InvalidRedirectUrl");
-      expect(result.error!.error.message).toContain("HTTPS and an approved Bentley API domain are required");
+      expect(result.error!.error.message).toContain("HTTPS required");
     });
 
     it("should reject non-Bentley domains", () => {
@@ -284,7 +260,7 @@ describe("BaseBentleyAPIClient - checkRedirectValidity", () => {
       expect(result.error).toBeDefined();
       expect(result.error!.status).toBe(502);
       expect(result.error!.error.code).toBe("InvalidRedirectUrl");
-      expect(result.error!.error.message).toContain("HTTPS and an approved Bentley API domain are required");
+      expect(result.error!.error.message).toContain("not a trusted Bentley domain");
     });
 
     it("should reject malformed URLs", () => {
@@ -294,7 +270,7 @@ describe("BaseBentleyAPIClient - checkRedirectValidity", () => {
       expect(result.error).toBeDefined();
       expect(result.error!.status).toBe(502);
       expect(result.error!.error.code).toBe("InvalidRedirectUrl");
-      expect(result.error!.error.message).toContain("HTTPS and an approved Bentley API domain are required");
+      expect(result.error!.error.message).toContain("malformed URL");
     });
 
     it("should return 502 Bad Gateway for invalid redirect URLs", () => {
@@ -308,7 +284,7 @@ describe("BaseBentleyAPIClient - checkRedirectValidity", () => {
       const response = createMockResponse("https://malicious-site.com/redirect");
       const result = client.testCheckRedirectValidity(response, 0);
 
-      expect(result.error!.error.message).toContain("HTTPS and an approved Bentley API domain are required");
+      expect(result.error!.error.message).toContain("not a trusted Bentley domain");
     });
 
     it("should handle URL with query parameters", () => {
@@ -1012,7 +988,7 @@ describe("BaseBentleyAPIClient - sendGenericAPIRequest with redirects", () => {
 
       expect(result.status).toBe(502);
       expect(result.error!.code).toBe("InvalidRedirectUrl");
-      expect(result.error!.message).toContain("HTTPS and an approved Bentley API domain are required");
+      expect(result.error!.message).toContain("HTTPS required");
     });
 
     it("should return error when redirect points to untrusted domain", async () => {
@@ -1036,7 +1012,7 @@ describe("BaseBentleyAPIClient - sendGenericAPIRequest with redirects", () => {
 
       expect(result.status).toBe(502);
       expect(result.error!.code).toBe("InvalidRedirectUrl");
-      expect(result.error!.message).toContain("HTTPS and an approved Bentley API domain are required");
+      expect(result.error!.message).toContain("not a trusted Bentley domain");
     });
   });
 

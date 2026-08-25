@@ -6,9 +6,6 @@ import type { AccessToken } from "@itwin/core-bentley";
 import type { ApimError, BentleyAPIResponse, Method, RequestConfig } from "./types/CommonApiTypes";
 import { ParameterMapping } from "./types/typeUtils";
 
-const INVALID_REDIRECT_URL_MESSAGE =
-  "Invalid redirect URL: HTTPS and an approved Bentley API domain are required.";
-
 /**
  * Type guard to validate if an object is a valid Error structure
  * @param error - Unknown object to validate
@@ -84,8 +81,7 @@ export abstract class BaseBentleyAPIClient {
    * @param method - The HTTP method type (GET, POST, DELETE, etc.)
    * @param url - The complete URL of the request endpoint
    * @param data - Optional payload data for the request body
-   * @param headers - Optional additional request headers
-   * @param allowRedirects - Whether secure redirects may be followed
+    * @param headers - Optional additional request headers
    * @returns Promise that resolves to the parsed API response with type safety
    */
   protected async sendGenericAPIRequest<TResponse = unknown, TData = unknown>(
@@ -175,12 +171,15 @@ export abstract class BaseBentleyAPIClient {
       });
 
       if (response.redirected) {
-        if (!this.isValidRedirectUrl(response.url)) {
+        try {
+          this.validateRedirectUrlSecurity(response.url);
+        } catch (error) {
           return {
             status: 502,
             error: {
               code: "InvalidRedirectUrl",
-              message: INVALID_REDIRECT_URL_MESSAGE,
+              message:
+                error instanceof Error ? error.message : "Invalid redirect URL",
             },
           };
         }
@@ -346,13 +345,16 @@ export abstract class BaseBentleyAPIClient {
       };
     }
 
-    if (!this.isValidRedirectUrl(redirectUrl)) {
+    // Validate redirect URL for security
+    try {
+      this.validateRedirectUrlSecurity(redirectUrl);
+    } catch (error) {
       return {
         error: {
           status: 502,
           error: {
             code: "InvalidRedirectUrl",
-            message: INVALID_REDIRECT_URL_MESSAGE,
+            message: error instanceof Error ? error.message : "Invalid redirect URL",
           },
         },
         redirectUrl: "",
@@ -364,14 +366,15 @@ export abstract class BaseBentleyAPIClient {
   }
 
   /**
-   * Validates that a redirect URL is secure and targets a trusted APIM Bentley domain.
+   * Validates that a redirect URL is secure and targets a trusted Bentley domain.
    *
    * This method enforces security requirements for following HTTP redirects:
    * - URL must use HTTPS protocol (not HTTP)
-  * - Domain must be an approved Bentley API domain
+  * - Domain must be a Bentley domain
    *
    * @param url - The redirect URL to validate
-  * @returns True when the URL uses HTTPS and targets an approved Bentley API domain
+   * @returns True if the URL is valid and safe to follow
+   * @throws Error if the URL is invalid, uses HTTP, or targets an untrusted domain
    *
    * @remarks
    * This validation is critical for security when following 302 redirects in federated
@@ -387,25 +390,41 @@ export abstract class BaseBentleyAPIClient {
    * this.validateRedirectUrl("https://bentley.com.evil.com/fake"); // Domain spoofing attempt
    * ```
    */
-  private isValidRedirectUrl(url: string): boolean {
+  private validateRedirectUrlSecurity(url: string): boolean {
+    let parsedUrl: URL;
+
     try {
-      const parsedUrl = new URL(url);
-      const hostname = parsedUrl.hostname.toLowerCase();
-      return parsedUrl.protocol === "https:" &&
-        (hostname === "api.bentley.com" ||
-          /^(qa|dev|staging)-api\.bentley\.com$/.test(hostname));
+      parsedUrl = new URL(url);
     } catch {
-      return false;
+      throw new Error(`Invalid redirect URL: malformed URL "${url}"`);
     }
+
+    // Require HTTPS protocol for security
+    if (parsedUrl.protocol !== "https:") {
+      throw new Error(
+        `Invalid redirect URL: HTTPS required, but URL uses "${parsedUrl.protocol}" protocol. URL: ${url}`
+      );
+    }
+
+    // Validate the hostname against Bentley domains.
+    const hostname = parsedUrl.hostname.toLowerCase();
+    const isBentleyDomain = this.isValidBentleyUrl(url);
+
+    if (!isBentleyDomain) {
+      throw new Error(
+        `Invalid redirect URL: domain "${hostname}" is not a trusted Bentley domain. Only Bentley domains are allowed.`
+      );
+    }
+
+    return true;
   }
 
   /**
-    * Validates that a URL uses HTTPS and targets an exact Bentley domain boundary.
-    * Allows
-   * `bentley.com` and its subdomains while rejecting lookalike domains.
+   * Validates that a URL uses HTTPS and targets an exact Bentley domain boundary.
+   * Allows `bentley.com` and its subdomains while rejecting lookalike domains.
    *
    * @param url - The request URL to validate
-    * @returns True when the URL is a valid Bentley HTTPS URL
+   * @returns True when the URL is a valid Bentley HTTPS URL
    */
   private isValidBentleyUrl(url: string): boolean {
     try {
