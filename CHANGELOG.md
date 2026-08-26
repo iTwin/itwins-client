@@ -1,5 +1,17 @@
 # Change Log - @itwin/itwins-client
 
+## 3.1.3
+
+### Patch Changes
+
+#### [3.1.3](https://www.npmjs.com/package/@itwin/itwins-client/v/3.1.3) - 2026-08-26
+
+Allow credentials for HTTPS Bentley capability URIs
+
+Authorization is retained for `bentley.com` and its subdomains when using
+repository capability URIs and following redirects. Authorization is stripped
+from requests to non-Bentley domains.
+
 ## 3.1.2
 
 ### Patch Changes
