@@ -464,12 +464,16 @@ export abstract class BaseBentleyAPIClient {
       throw new Error("URL is required");
     }
     const includeAuthorization = this.isValidBentleyUrl(url);
-    const requestHeaders = Object.fromEntries(
-      Object.entries(headers).filter(
-        ([header]) => header.toLowerCase() !== "authorization"
-      )
-    );
+    const requestHeaders = includeAuthorization
+      ? { ...headers, authorization: accessTokenString }
+      : Object.fromEntries(
+          Object.entries(headers).filter(
+            ([header]) => header.toLowerCase() !== "authorization"
+          )
+        );
     let body: string | Blob | undefined;
+    const contentType = headers.contentType || headers["content-type"] || "application/json";
+
     if (!(data instanceof Blob)) {
       body = JSON.stringify(data);
     } else {
@@ -481,13 +485,7 @@ export abstract class BaseBentleyAPIClient {
       body,
       headers: {
         ...requestHeaders,
-        ...(includeAuthorization
-          ? { authorization: accessTokenString }
-          : {}),
-        "content-type":
-          headers.contentType || headers["content-type"]
-            ? headers.contentType || headers["content-type"]
-            : "application/json",
+        "content-type": contentType,
       },
     };
   }
