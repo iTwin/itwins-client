@@ -46,6 +46,9 @@ jobs:
       - name: Build components
         run: pnpm run build
 
+      - name: Verify ESM entry point loads in Node.js
+        run: pnpm run test:esm
+
       - name: Check if changeset is present
         if: github.actor != 'imodeljs-admin'
         run: |

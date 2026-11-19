@@ -29,7 +29,7 @@
   "scripts": {
     "build": "pnpm run clean && pnpm run -s build:cjs && pnpm run -s build:esm",
     "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:esm": "tsc -p tsconfig.esm.json && node -e \"require('fs').writeFileSync('lib/esm/package.json', JSON.stringify({ type: 'module' }))\"",
     "clean": "rimraf lib",
     "changeset": "changeset",
     "changeset:version": "changeset version",
@@ -37,6 +37,7 @@
     "lint": "eslint -f visualstudio \"./src/**/*.ts\" 1>&2",
     "lint:fix": "pnpm run lint --fix",
     "test": "vitest run",
+    "test:esm": "node --input-type=module -e \"const m = await import('@itwin/itwins-client'); if (typeof m.ITwinsClient !== 'function') throw new Error('ESM entry point is broken');\"",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",

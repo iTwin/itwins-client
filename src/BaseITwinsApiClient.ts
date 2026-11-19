@@ -3,12 +3,12 @@
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 import type { AccessToken } from "@itwin/core-bentley";
-import { BaseBentleyAPIClient } from "./BaseBentleyAPIClient";
+import { BaseBentleyAPIClient } from "./BaseBentleyAPIClient.js";
 import type {
   BentleyAPIResponse,
   ODataQueryParams,
   ResultMode,
-} from "./types/CommonApiTypes";
+} from "./types/CommonApiTypes.js";
 import type {
   ItwinCreate,
   ITwinMinimalResponse,
@@ -16,14 +16,14 @@ import type {
   ItwinUpdate,
   MultiITwinMinimalResponse,
   MultiITwinRepresentationResponse,
-} from "./types/ITwin";
+} from "./types/ITwin.js";
 import type {
   ITwinExportMultiResponse,
   ITwinExportRequestInfo,
   ITwinExportSingleResponse,
-} from "./types/ITwinExport";
-import type { ITwinImageResponse } from "./types/ITwinImage";
-import type { ITwinsGetQueryArg, ITwinsQueryArg } from "./types/ITwinsQueryArgs";
+} from "./types/ITwinExport.js";
+import type { ITwinImageResponse } from "./types/ITwinImage.js";
+import type { ITwinsGetQueryArg, ITwinsQueryArg } from "./types/ITwinsQueryArgs.js";
 import type {
   GetMultiRepositoryResourceMinimalResponse,
   GetMultiRepositoryResourceRepresentationResponse,
@@ -35,8 +35,8 @@ import type {
   Repository,
   ResourceGraphicsResponse,
   SingleRepositoryResponse,
-} from "./types/Repository";
-import type { ParameterMapping } from "./types/typeUtils";
+} from "./types/Repository.js";
+import type { ParameterMapping } from "./types/typeUtils.js";
 
 /** Abstract class for accessing working with ITwins Service
  * @beta

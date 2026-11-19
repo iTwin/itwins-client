@@ -12,7 +12,7 @@ import type {
   BentleyAPIResponse,
   ODataQueryParams,
   ResultMode,
-} from "./types/CommonApiTypes";
+} from "./types/CommonApiTypes.js";
 import type {
   ItwinCreate,
   ITwinMinimalResponse,
@@ -20,12 +20,12 @@ import type {
   ItwinUpdate,
   MultiITwinMinimalResponse,
   MultiITwinRepresentationResponse,
-} from "./types/ITwin";
+} from "./types/ITwin.js";
 import type {
   ITwinExportMultiResponse,
   ITwinExportRequestInfo,
   ITwinExportSingleResponse,
-} from "./types/ITwinExport";
+} from "./types/ITwinExport.js";
 import type { ITwinImageResponse } from "./types/ITwinImage.js";
 import type {
   ITwinQueryScope,
@@ -43,7 +43,7 @@ import type {
   Repository,
   ResourceGraphicsResponse,
   SingleRepositoryResponse,
-} from "./types/Repository";
+} from "./types/Repository.js";
 
 /** Client API to access the iTwins service.
  * @beta
