@@ -1,5 +1,14 @@
 # Change Log - @itwin/itwins-client
 
+## 3.1.4
+
+### Patch Changes
+
+#### [3.1.4](https://www.npmjs.com/package/@itwin/itwins-client/v/3.1.4) - 2026-11-20
+Fix ESM entry point failing to load in Node.js with ERR_MODULE_NOT_FOUND
+
+Relative imports in the ESM build now include `.js` extensions, and `lib/esm` ships a `package.json` with `"type": "module"`, so `import { ITwinsClient } from "@itwin/itwins-client"` works in native Node.js ESM. CommonJS and bundler consumers are unaffected. Fixes #105.
+
 ## 3.1.3
 
 ### Patch Changes
