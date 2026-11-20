@@ -29,7 +29,7 @@
   "scripts": {
     "build": "pnpm run clean && pnpm run -s build:cjs && pnpm run -s build:esm",
     "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json && node -e \"require('fs').writeFileSync('lib/esm/package.json', JSON.stringify({ type: 'module' }))\"",
+    "build:esm": "tsc -p tsconfig.esm.json && node -e \"fs.writeFileSync('lib/esm/package.json', JSON.stringify({ type: 'module' }))\"",
     "clean": "rimraf lib",
     "changeset": "changeset",
     "changeset:version": "changeset version",
