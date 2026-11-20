@@ -2,7 +2,7 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import type { Links } from "./links";
+import type { Links } from "./links.js";
 
 /**
  * Minimal iTwin interface containing only minimal properties.

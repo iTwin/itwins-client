@@ -141,8 +141,13 @@ describe("iTwinsClient Export Functionality", () => {
     expect(exportResponse.data).toBeUndefined();
     expect(exportResponse.error).toBeDefined();
     expect(exportResponse.error!.code).toBe("InvalidiTwinsRequest");
-    expect(exportResponse.error!.message).toBeDefined();
-    expect(exportResponse.error!.message).toBe("Syntax error at position 14 in 'invalid filter syntax without proper operators'.")
+    expect(exportResponse.error!.message).toBe("Cannot query iTwins.");
+    expect(exportResponse.error!.details).toBeDefined();
+    expect(exportResponse.error!.details!.some(detail =>
+      detail.code === "InvalidValue" &&
+      detail.target === "$filter" &&
+      detail.message === "Syntax error at position 14 in 'invalid filter syntax without proper operators'."
+    )).toBe(true);
   });
 
   it("should return 422 when creating export with invalid select field names", async () => {

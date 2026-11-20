@@ -47,7 +47,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const newRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
     };
 
     // Act
@@ -85,7 +85,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const newRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
     };
 
     try {
@@ -241,7 +241,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const newRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
     };
 
     try {
@@ -358,7 +358,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
     };
 
     try {
@@ -454,7 +454,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const wmsRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
     };
 
     try {
@@ -937,7 +937,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const newRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Original Repository",
     };
 
@@ -1306,7 +1306,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Resources",
     };
 
@@ -1384,7 +1384,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Resources",
     };
 
@@ -1458,7 +1458,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Resources",
     };
 
@@ -1533,7 +1533,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Resources",
     };
 
@@ -1702,7 +1702,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Resource Access",
     };
 
@@ -1797,7 +1797,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Resource Representation",
     };
 
@@ -1889,7 +1889,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository",
     };
 
@@ -2029,7 +2029,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Multiple Resources",
     };
 
@@ -2154,7 +2154,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Resource Representation",
     };
 
@@ -2286,7 +2286,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Pagination",
     };
 
@@ -2385,7 +2385,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Search",
     };
 
@@ -2481,7 +2481,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Minimal Mode Pagination",
     };
 
@@ -2650,7 +2650,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Empty Test GIS Repository",
     };
 
@@ -2718,7 +2718,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Resource Deletion",
     };
 
@@ -2823,7 +2823,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository",
     };
 
@@ -2962,7 +2962,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository for Graphics",
     };
 
@@ -3072,7 +3072,7 @@ describe("iTwins Client - Repository Integration Tests", () => {
     const gisRepository: NewRepositoryConfig = {
       class: "GeographicInformationSystem",
       subClass: "WebMapService",
-      uri: "https://www.sciencebase.gov/arcgis/rest/services/Catalog/5888bf4fe4b05ccb964bab9d/MapServer",
+      uri: "https://www.example.com",
       displayName: "Test GIS Repository",
     };
 

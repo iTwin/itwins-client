@@ -21,10 +21,10 @@ jobs:
           version: 10.12.4
           run_install: false
 
-      - name: Use Node.js 20.12.1
+      - name: Use Node.js 24.15.0
         uses: actions/setup-node@v4
         with:
-          node-version: 20.12.1
+          node-version: 24.15.0
           cache: "pnpm"
 
       - name: Install dependencies
@@ -46,6 +46,9 @@ jobs:
       - name: Build components
         run: pnpm run build
 
+      - name: Verify ESM entry point loads in Node.js
+        run: pnpm run test:esm
+
       - name: Check if changeset is present
         if: github.actor != 'imodeljs-admin'
         run: |
@@ -58,7 +61,8 @@ jobs:
         run: pnpm exec playwright install --with-deps
 
       - name: Run Test with Coverage
-        run: pnpm run test:coverage
+        # Run test files one at a time to rule out concurrent creates as the cause of QA create-iTwin hangs
+        run: pnpm run test:coverage --no-file-parallelism
         env:
           IMJS_URL_PREFIX: ${{ secrets.IMJS_URL_PREFIX }}
           IMJS_OIDC_BROWSER_TEST_CLIENT_ID: ${{ secrets.IMJS_OIDC_BROWSER_TEST_CLIENT_ID }}

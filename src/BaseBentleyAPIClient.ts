@@ -3,8 +3,8 @@
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
 import type { AccessToken } from "@itwin/core-bentley";
-import type { ApimError, BentleyAPIResponse, Method, RequestConfig } from "./types/CommonApiTypes";
-import { ParameterMapping } from "./types/typeUtils";
+import type { ApimError, BentleyAPIResponse, Method, RequestConfig } from "./types/CommonApiTypes.js";
+import { ParameterMapping } from "./types/typeUtils.js";
 
 /**
  * Type guard to validate if an object is a valid Error structure
