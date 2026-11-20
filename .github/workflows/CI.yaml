@@ -61,7 +61,8 @@ jobs:
         run: pnpm exec playwright install --with-deps
 
       - name: Run Test with Coverage
-        run: pnpm run test:coverage
+        # Run test files one at a time to rule out concurrent creates as the cause of QA create-iTwin hangs
+        run: pnpm run test:coverage --no-file-parallelism
         env:
           IMJS_URL_PREFIX: ${{ secrets.IMJS_URL_PREFIX }}
           IMJS_OIDC_BROWSER_TEST_CLIENT_ID: ${{ secrets.IMJS_OIDC_BROWSER_TEST_CLIENT_ID }}
